@@ -1,15 +1,19 @@
 import { useState } from 'react'
+import Header from './components/organisms/Header'
+import Contenido from './components/templates/Contenido'
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
+    <BrowserRouter>
     <div className="App">
-      <h1>Frontend TypeScript</h1>
-      <button onClick={() => setCount(count + 1)}>
-        Count: {count}
-      </button>
+      <Header />
+      <Contenido/>
     </div>
+    </BrowserRouter>
   )
 }
 

@@ -1,0 +1,7 @@
+.contnt {
+    display: flex;
+    height: 100%;
+    align-items: flex-start;
+    flex-shrink: 0;
+    align-self: stretch;
+}

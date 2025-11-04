@@ -1,0 +1,47 @@
+.optioncont {
+  display: flex;
+  width: 267px;
+  height: 100%;
+  padding: 20px 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: #071739;
+}
+
+/* Botones */
+.option {
+  display: flex;
+  height: 73px;
+  padding: 10px 20px;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  align-self: stretch;
+  background: transparent;
+  border: none;
+  color: #CDD5DB;
+  font-family: 'Raleway', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 15px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover */
+.option:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Cuando está activa */
+.option.active {
+  background: #DD9D52;
+  color: #071739;
+  font-weight: 700;
+}
+
+.opttxt {
+  flex: 1;
+  text-align: left;
+}
