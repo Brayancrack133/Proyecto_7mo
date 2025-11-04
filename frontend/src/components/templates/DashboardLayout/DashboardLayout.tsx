@@ -1,17 +1,20 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom'; // <-- 1. IMPORTAR OUTLET
+import { Outlet } from 'react-router-dom';
+import styles from './DashboardLayout.module.css'; // Importar
 
-// Esta es una simulación de tu layout principal.
-export const DashboardLayout: React.FC = () => { // <-- 2. QUITAR 'children'
+export const DashboardLayout: React.FC = () => {
   return (
-    <div style={{ display: 'flex' }}>
-      {/* Simulación de un Sidebar */}
-      <div style={{ width: '240px', background: '#f4f4f4', minHeight: '100vh', padding: '20px' }}>
-        <em>(Sidebar Simulado)</em>
+    <div className={styles.container}>
+      <div className={styles.sidebar}>
+        <div className={styles.logo}>
+          Future Plan
+        </div>
+        <div style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>
+          (Sidebar Simulado)
+        </div>
       </div>
-      {/* Contenido principal de la página */}
-      <main style={{ flex: 1, padding: '20px' }}>
-        <Outlet /> {/* <-- 3. USAR 'Outlet' EN LUGAR DE 'children' */}
+      <main className={styles.main}>
+        <Outlet />
       </main>
     </div>
   );

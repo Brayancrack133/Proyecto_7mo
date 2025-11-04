@@ -1,3 +1,4 @@
+/* Reset y estilos base */
 * {
   margin: 0;
   padding: 0;
@@ -5,16 +6,37 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
-  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f8fafc;
+  color: #0f172a;
+  line-height: 1.6;
 }
 
-.App {
-  text-align: center;
+/* Scrollbar global */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-button {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mejoras de accesibilidad */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }

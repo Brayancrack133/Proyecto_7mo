@@ -1,8 +1,11 @@
 import React from 'react';
-// (Opcional) Puedes añadir un CSS simple si quieres
-// import styles from './Spinner.module.css'; 
+import styles from './Spinner.module.css'; // Importar el CSS
 
 export const Spinner: React.FC = () => {
-  // Simplemente mostramos texto, cumple la función
-  return <div role="status">Cargando...</div>; 
+  return (
+    <div className={styles.container} role="status">
+      <div className={styles.spinner}></div>
+      <span className={styles.text}>Cargando...</span>
+    </div>
+  );
 };

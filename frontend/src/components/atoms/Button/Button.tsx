@@ -1,9 +1,20 @@
 import React from 'react';
+import styles from './Button.module.css'; // Importar el CSS
 
-// Una versión simple que reenvía todos los props (como onClick, children)
-export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ children, ...props }) => {
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  // Puedes añadir variantes aquí si quieres, ej. variant?: 'primary' | 'secondary'
+};
+
+export const Button: React.FC<ButtonProps> = ({ 
+  children, 
+  className, 
+  ...props 
+}) => {
+  // Combina la clase base con cualquier clase externa
+  const buttonClasses = `${styles.button} ${className || ''}`;
+
   return (
-    <button {...props}>
+    <button className={buttonClasses} {...props}>
       {children}
     </button>
   );

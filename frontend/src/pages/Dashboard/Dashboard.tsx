@@ -1,29 +1,44 @@
 import React from 'react';
 import { Text } from '../../components/atoms/Text';
 import { Card } from '../../components/molecules/Card';
-// 1. Importamos el NUEVO Widget que ya tiene el medidor Y los factores
 import { ProjectRiskWidget } from '../../components/organisms/ProjectRiskWidget';
 
-// 2. Ya NO necesitamos 'ProjectRiskGauge' ni 'RiskFactor' aquí
-
 const Dashboard: React.FC = () => {
-  const currentProjectId = "p-123"; 
+  const currentProjectId = "p-123";
+
+  const headerStyle: React.CSSProperties = {
+    marginBottom: '32px',
+    color: '#0f172a',
+    fontSize: '2rem',
+    fontWeight: '800',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px'
+  };
+
+  const cardTitleStyle: React.CSSProperties = {
+    marginTop: 0,
+    marginBottom: '20px',
+    fontSize: '1.3rem',
+    fontWeight: '700',
+    color: '#1e293b',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
+  };
 
   return (
-    <> 
-      <Text as="h1">Panel de Control</Text>
-
+    <>
+      <Text as="h1" style={headerStyle}>
+        Panel de Control
+      </Text>
       <Card>
-        <Text as="h3">Riesgo del Proyecto</Text>
-        
-        {/* 3. Este es el único componente que necesitas.
-             Toda la lógica (useFetch, el medidor, y la lista de factores)
-             ya está DENTRO de ProjectRiskWidget.
-        */}
+        <Text as="h3" style={cardTitleStyle}>
+          Análisis Predictivo de Riesgo
+        </Text>
         <ProjectRiskWidget projectId={currentProjectId} />
-        
       </Card>
-    </> 
+    </>
   );
 };
 
