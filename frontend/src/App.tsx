@@ -1,16 +1,12 @@
 import { useState } from 'react'
+import { AppRoutes } from './routes/AppRoutes'; // <-- 1. IMPORTAR TUS RUTAS
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  // 2. BORRA TODO (el useState, el logo, el return con el contador)
+  // 3. DEJA SOLO ESTO:
   return (
-    <div className="App">
-      <h1>Frontend TypeScript</h1>
-      <button onClick={() => setCount(count + 1)}>
-        Count: {count}
-      </button>
-    </div>
-  )
+    <AppRoutes />
+  );
 }
 
-export default App
+export default App;
