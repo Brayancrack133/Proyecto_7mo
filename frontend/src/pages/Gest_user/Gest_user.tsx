@@ -35,7 +35,7 @@ export default function Gest_user() {
       <Sidebar />
       <main className="content">
         {/* Header */}
-        <div className="header">
+        <div className="cabezacera">
           <h1>Administración de Usuarios</h1>
           <div className="actions">
             <button className="btn agregar"><FaPlus /> Agregar</button>

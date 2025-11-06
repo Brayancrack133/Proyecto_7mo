@@ -2,7 +2,7 @@ import "./Loginform.css";
 const Loginform = () => {
   return (
     <div>
-      <form className="form">
+      <form className="formm">
         <div className="flex-column">
           <label>Email</label>
         </div>

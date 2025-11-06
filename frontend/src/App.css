@@ -1,23 +1,31 @@
+/* Fondo degradado azul marino a turquesa */
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
-  background-color: #0d1b3e;
+  background: linear-gradient(135deg, #0d1b3e, #2a9d8f); /* Degradado Azul marino a Turquesa */
   color: white;
 }
 
 .header {
   text-align: center;
   padding: 60px 20px;
+  background: rgba(0, 0, 0, 0.4); /* Fondo oscuro para el header */
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  max-height: 300px;
+
 }
 
-.title {
+.titlo {
   font-size: 3.5rem;
+  color: #f4a261; /* Color dorado mostaza */
   font-weight: bold;
 }
 
 .subtitle {
   font-size: 1.2rem;
   margin: 10px 0 30px 0;
+  font-style: italic;
 }
 
 .btn-start {
@@ -31,6 +39,7 @@ body {
 }
 .btn-start:hover {
   background: #e76f51;
+  transform: translateY(-5px); /* Animación sutil de hover */
 }
 
 .main-section {
@@ -38,10 +47,7 @@ body {
   padding: 40px 20px;
 }
 
-.main-image img {
-  width: 350px;
-  border-radius: 10px;
-}
+
 
 .description {
   max-width: 800px;
@@ -60,14 +66,26 @@ body {
 .feature {
   width: 200px;
   text-align: center;
+  transform: translateY(10px);
+  opacity: 0;
+  animation: fadeIn 1.5s forwards;
 }
 .feature img {
   width: 100%;
   border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+.feature:hover img {
+  transform: scale(1.1); /* Animación para las imágenes */
+}
+.centralimg{
+  width:100px;
+  height:300px;
+
 }
 
 .how-it-works {
-  background: #162b63;
+  background: #a9b8e039;
   padding: 50px 20px;
   border-radius: 10px;
 }
@@ -90,12 +108,13 @@ body {
   padding: 20px;
   border-radius: 10px;
   width: 280px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .call-to-action {
   margin-top: 60px;
   text-align: center;
-  background: #1a2e6c;
+  background: #a9b8e039;
   padding: 40px 20px;
   border-radius: 10px;
 }
@@ -126,6 +145,7 @@ body {
 }
 .btn-login:hover {
   background: #388e3c;
+  transform: translateY(-5px); /* Efecto al pasar el mouse */
 }
 
 .btn-register {
@@ -133,6 +153,7 @@ body {
 }
 .btn-register:hover {
   background: #1976d2;
+  transform: translateY(-5px);
 }
 
 .btn-gest {
@@ -140,4 +161,54 @@ body {
 }
 .btn-gest:hover {
   background: #7b1fa2;
+  transform: translateY(-5px);
+}
+
+/* Animación fadeIn para las características */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Contenedor para aplicar la perspectiva */
+.parent {
+  width: 100%;
+  height: 500px;
+  perspective: 1000px;  /* Esto define el "campo de visión" 3D */
+}
+
+.card {
+  height: 100%;
+  background: linear-gradient(135deg, #0099CC, #00FF99); /* Fondo bonito */
+  transition: transform 0.3s ease-in-out; /* Suaviza el movimiento */
+  transform-style: preserve-3d;
+  border-radius: 15px;
+  overflow: hidden; /* Para que el efecto no se desborde */
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 30px;
+}
+
+.card img {
+  width: 100%; /* Para que la imagen ocupe todo el contenedor */
+  height: 100%;
+  object-fit: cover; /* Asegura que la imagen se ajuste bien */
+  transition: transform 0.3s ease-out;
+  transform-origin: center;
+  border-radius: 15px;
+}
+
+/* Efecto cuando el cursor se mueve sobre el contenedor */
+.parent:hover .card {
+  transform: rotateY(10deg) rotateX(10deg); /* Gira la carta en el eje X y Y */
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 20px 40px;
+}
+
+.parent:hover .card img {
+  transform: scale(1.1) rotateY(10deg) rotateX(10deg); /* Aumenta el tamaño y da un pequeño giro */
+}
+
+/* Efecto cuando el cursor se acerca */
+.card:hover {
+  transform: translate3d(0, 0, 100px); /* Eleva la carta en Z */
 }

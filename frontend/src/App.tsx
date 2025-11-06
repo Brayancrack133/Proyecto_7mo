@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Registro/Register";
 import GestUser from "./pages/Gest_user/Gest_user";
+
+
 import "./App.css"; // Aquí van los estilos
 
 function App() {
@@ -14,14 +16,18 @@ function App() {
           element={
             <div className="landing">
               <header className="header">
-                <h1 className="title">🌱 FuturePlan</h1>
+                <h1 className="titlo">FuturePlan</h1>
                 <p className="subtitle">"La forma inteligente de organizar tus proyectos"</p>
                 <Link to="/start" className="btn-start">Empezar</Link>
               </header>
 
               <section className="main-section">
                 <div className="main-image">
-                  <img src="path_to_main_image" alt="Main" />
+                  <div className="parent">
+  <div className="card">
+    <img src="/Images/prinimg.png" alt="Imagen 3D" />
+  </div>
+</div>
                 </div>
 
                 <div className="description">
@@ -33,23 +39,24 @@ function App() {
                 </div>
 
                 <div className="features">
-                  <div className="feature">
-                    <img src="path_to_ai_image" alt="IA" />
-                    <p>Planificación inteligente</p>
-                  </div>
-                  <div className="feature">
-                    <img src="path_to_productivity_image" alt="Productividad" />
-                    <p>Productividad optimizada</p>
-                  </div>
-                  <div className="feature">
-                    <img src="path_to_team_image" alt="Equipo" />
-                    <p>Colaboración en equipo</p>
-                  </div>
-                  <div className="feature">
-                    <img src="path_to_central_image" alt="Centralización" />
-                    <p>Gestión centralizada</p>
-                  </div>
-                </div>
+        <div className="feature">
+          <img className="centralimg" src="/Images/IAimagen.jpeg" alt="IA" />
+          <p>Planificación inteligente</p>
+        </div>
+        <div className="feature">
+          
+          <img  className="centralimg" src="/Images/Produc.jpeg" alt="Productividad" />
+          <p>Productividad optimizada</p>
+        </div>
+        <div className="feature">
+          <img  className="centralimg" src="/Images/teams.jpg" alt="Equipo" />
+          <p>Colaboración en equipo</p>
+        </div>
+        <div className="feature">
+          <img className="centralimg" src="/Images/central.jpg" alt="Centralización" />
+          <p>Gestión centralizada</p>
+        </div>
+      </div>
 
                 <div className="how-it-works">
                   <h2>¿Cómo Funciona?</h2>

@@ -62,13 +62,13 @@
 }
 
 /* HEADER */
-.header {
+.cabecera {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
-.header h1 {
+.cabecera h1 {
   font-size: 1.8rem;
   color: #333;
 }
