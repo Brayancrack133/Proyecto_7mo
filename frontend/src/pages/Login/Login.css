@@ -1,255 +1,30 @@
-.pag {
-  background-image: url(./pag-1.png);
-  background-position: 50% 50%;
-  background-size: cover;
-  display: flex;
-  height: 1080px;
-  width: 1920px;
-}
-
-.pag .depth-frame {
-  -webkit-backdrop-filter: blur(7.5px) brightness(100.0%) saturate(95.7%);
-  backdrop-filter: blur(7.5px) brightness(100.0%) saturate(95.7%);
-  background-color: #a4b5c433;
-  border-radius: 20px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 1px 0 0 rgba(
-      255,
-      255,
-      255,
-      0.32
-    ), inset 0 -1px 5px rgba(0, 0, 0, 0.2), inset -1px 0 5px rgba(0, 0, 0, 0.16);
-  height: 544px;
-  margin-left: 624px;
-  margin-top: 321px;
-  overflow: hidden;
-  position: relative;
-  width: 622px;
-}
-
-.pag .text-wrapper {
-  color: #cdd5db;
-  font-family: "Plus Jakarta Sans-Bold", Helvetica;
-  font-size: 40px;
-  font-weight: 700;
-  left: 55px;
-  letter-spacing: 0;
-  line-height: 30px;
-  position: absolute;
-  text-align: center;
-  top: 28px;
-  width: 512px;
-}
-
-.pag .div {
-  align-items: flex-start;
-  display: flex;
-  flex-direction: column;
-  height: 80px;
-  left: 87px;
-  position: absolute;
-  top: 78px;
-  width: 448px;
-}
-
-.pag .text-wrapper-2 {
-  align-self: stretch;
-  color: #cdd5db;
-  font-family: "Plus Jakarta Sans-Medium", Helvetica;
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 24px;
-  margin-top: -1.00px;
-  position: relative;
-}
-
-.pag .div-wrapper {
-  align-items: center;
-  align-self: stretch;
-  background-color: #ffffff;
-  border: 1px solid;
-  border-color: #e5e0db;
-  border-radius: 12px;
-  display: flex;
-  height: 56px;
-  overflow: hidden;
-  padding: 15px;
+.login-container {
   position: relative;
   width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.pag .text-wrapper-3 {
-  align-items: center;
-  color: #877263;
-  display: flex;
-  font-family: "Plus Jakarta Sans-Regular", Helvetica;
-  font-size: 16px;
-  font-weight: 400;
-  height: 56px;
-  justify-content: center;
-  letter-spacing: 0;
-  line-height: 24px;
-  margin-bottom: -14.00px;
-  margin-top: -16.00px;
-  position: relative;
-  width: 41px;
-}
-
-.pag .depth-frame-2 {
-  align-items: flex-start;
-  display: flex;
-  flex-direction: column;
-  left: 87px;
+/* Fondo */
+.Grupomain {
   position: absolute;
-  top: 178px;
-  width: 448px;
-}
-
-.pag .depth-frame-3 {
-  align-items: flex-start;
-  align-self: stretch;
-  display: flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-  padding: 0px 0px 8px;
-  position: relative;
   width: 100%;
+  height: 100%;
+  object-fit:cover; /* Asegura que la imagen cubra toda la pantalla */
+  filter: brightness(0.6); /* oscurece un poco la imagen para que resalte el login */
+  z-index: 0;
 }
 
-.pag .text-wrapper-4 {
-  align-items: center;
-  color: #877263;
-  display: flex;
-  font-family: "Plus Jakarta Sans-Regular", Helvetica;
-  font-size: 16px;
-  font-weight: 400;
-  height: 56px;
-  justify-content: center;
-  letter-spacing: 0;
-  line-height: 24px;
-  margin-bottom: -14.00px;
-  margin-top: -16.00px;
+/* Capa para el formulario */
+.login-overlay {
   position: relative;
-  width: 90px;
-}
-
-.pag .iniciar-sesion-wrapper {
-  align-items: center;
-  background-color: #dd9d52;
-  border-radius: 20px;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
-  height: 50px;
-  justify-content: center;
-  left: 236px;
-  max-width: 480px;
-  overflow: hidden;
-  padding: 0px 16px;
-  position: absolute;
-  top: 287px;
-  width: 170px;
+  justify-content: center; /* centra horizontalmente */
+  align-items: center;     /* centra verticalmente */
+  background: rgba(0, 0, 0, 0.3); /* un leve sombreado para resaltar el form */
 }
 
-.pag .iniciar-sesion {
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  align-items: center;
-  align-self: stretch;
-  color: #071739;
-  display: -webkit-box;
-  font-family: "Plus Jakarta Sans-Bold", Helvetica;
-  font-size: 20px;
-  font-weight: 700;
-  justify-content: center;
-  letter-spacing: 0;
-  line-height: 21px;
-  margin-top: -1.00px;
-  overflow: hidden;
-  position: relative;
-  text-align: center;
-  text-overflow: ellipsis;
-  width: 130px;
-}
 
-.pag .text-wrapper-5 {
-  color: #a4b5c4;
-  font-family: "Plus Jakarta Sans-Regular", Helvetica;
-  font-size: 14px;
-  font-weight: 400;
-  left: 204px;
-  letter-spacing: 0;
-  line-height: 21px;
-  position: absolute;
-  text-align: center;
-  top: 346px;
-  width: 214px;
-}
-
-.pag .depth-frame-4 {
-  align-items: center;
-  background-color: #cdd5db;
-  border-radius: 20px;
-  display: flex;
-  height: 40px;
-  justify-content: center;
-  left: 246px;
-  max-width: 480px;
-  overflow: hidden;
-  padding: 0px 16px;
-  position: absolute;
-  top: 388px;
-  width: 150px;
-}
-
-.pag .text-wrapper-6 {
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  align-items: center;
-  align-self: stretch;
-  color: #071739;
-  display: -webkit-box;
-  font-family: "Plus Jakarta Sans-Bold", Helvetica;
-  font-size: 14px;
-  font-weight: 700;
-  justify-content: center;
-  letter-spacing: 0;
-  line-height: 21px;
-  margin-top: -1.00px;
-  overflow: hidden;
-  position: relative;
-  text-align: center;
-  text-overflow: ellipsis;
-  width: 116px;
-}
-
-.pag .github-fill {
-  height: 49px;
-  left: 242px;
-  position: absolute;
-  top: 443px;
-  width: 63px;
-}
-
-.pag .vector {
-  height: 81.28%;
-  left: 8.34%;
-  position: absolute;
-  top: 8.33%;
-  width: 83.33%;
-}
-
-.pag .google-fill {
-  height: 44px;
-  left: 333px;
-  position: absolute;
-  top: 448px;
-  width: 36px;
-}
-
-.pag .img {
-  height: 83.33%;
-  left: 8.33%;
-  position: absolute;
-  top: 8.33%;
-  width: 81.67%;
-}

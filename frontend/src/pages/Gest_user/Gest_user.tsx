@@ -1,65 +1,198 @@
 import { useState, useEffect } from "react";
-import { FaPlus, FaSyncAlt } from "react-icons/fa";
+import { FaPlus, FaSyncAlt, FaCheck, FaTimes, FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import Sidebar from "../../components/molecules/Sidebar";
-import Tabs from "../../components/molecules/Tabs";
-import UserTable from "../../components/molecules/Usertable";
 import "./Gest_user.css";
 
 interface Usuario {
   id: number;
   nombre: string;
   email: string;
-  direccion: string;
   ci: string;
   rol: string;
   estado: string;
+  foto?: string;
+}
+
+interface Rol {
+  id: number;
+  nombre: string;
+  descripcion: string;
 }
 
 export default function Gest_user() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [filtro, setFiltro] = useState("Aprobados");
+  const [roles, setRoles] = useState<Rol[]>([]);
+  const [filtro, setFiltro] = useState("Habilitados");
+const [modalOpen, setModalOpen] = useState(false);
+const [modo, setModo] = useState<"ver" | "editar" | "agregar">("ver");
+const [usuarioSeleccionado, setUsuarioSeleccionado] = useState<Usuario | null>(null);
 
+  
   useEffect(() => {
-    const datos: Usuario[] = [
-      { id: 1, nombre: "Alex Apaza", email: "alex@gmail.com", direccion: "Cochabamba", ci: "172728237", rol: "Administrador", estado: "Aprobados" },
-      { id: 2, nombre: "Thalia Flores", email: "thalia@gmail.com", direccion: "La Paz", ci: "13150932", rol: "Administrador", estado: "Aprobados" },
-      { id: 3, nombre: "Jhon Rambo", email: "jhon@correo.com", direccion: "Santa Cruz", ci: "123123", rol: "Revisor BT", estado: "Rechazados" },
-    ];
-    setUsuarios(datos);
+    setUsuarios([
+      { id: 1, nombre: "Alex Apaza", email: "alex@gmail.com", ci: "172728237", rol: "Admin", estado: "Habilitado", foto: "/avatar1.jpg" },
+      { id: 2, nombre: "Thalia Flores", email: "thalia@gmail.com", ci: "13150932", rol: "Editor", estado: "Deshabilitado", foto: "/avatar2.jpg" },
+    ]);
+
+    setRoles([
+      { id: 1, nombre: "Administrador", descripcion: "Acceso total al sistema" },
+      { id: 2, nombre: "Revisor", descripcion: "Puede revisar contenidos" },
+    ]);
   }, []);
 
-  const usuariosFiltrados = usuarios.filter((u) => u.estado === filtro);
+  const usuariosFiltrados = usuarios.filter(u => 
+    filtro === "Habilitados" ? u.estado === "Habilitado" : u.estado === "Deshabilitado"
+  );
+  
+const abrirModal = (usuario: Usuario | null, tipo: "ver" | "editar" | "agregar") => {
+  setUsuarioSeleccionado(usuario);
+  setModo(tipo);
+  setModalOpen(true);
+};
+
+const cerrarModal = () => {
+  setModalOpen(false);
+  setUsuarioSeleccionado(null);
+};
 
   return (
     <div className="gest-container">
       <Sidebar />
       <main className="content">
-        {/* Header */}
-        <div className="cabezacera">
+
+        <div className="cabecera">
           <h1>Administración de Usuarios</h1>
           <div className="actions">
-            <button className="btn agregar"><FaPlus /> Agregar</button>
+            <button className="btn agregar" onClick={() => abrirModal(null, "agregar")}>
+  <FaPlus /> Agregar Usuario
+</button>
+
             <button className="btn actualizar"><FaSyncAlt /> Actualizar</button>
           </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs filtro={filtro} setFiltro={setFiltro} />
+        <div className="tabs">
+          <div className={`tab ${filtro === "Habilitados" ? "active" : ""}`} onClick={() => setFiltro("Habilitados")}>Habilitados</div>
+          <div className={`tab ${filtro === "Deshabilitados" ? "active" : ""}`} onClick={() => setFiltro("Deshabilitados")}>Deshabilitados</div>
+        </div>
 
-        {/* Tabla */}
-        <UserTable usuarios={usuariosFiltrados} />
+        <div className="table-container">
+          <table className="user-table">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>C.I.</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {usuariosFiltrados.map(u => (
+                <tr key={u.id}>
+                  <td><img src={u.foto} alt="" className="user-photo" /></td>
+                  <td>{u.nombre}</td>
+                  <td>{u.email}</td>
+                  <td>{u.ci}</td>
+                  <td>{u.rol}</td>
+                  <td className="acciones">
+  <button className="ver" onClick={() => abrirModal(u, "ver")}><FaEye /></button>
+  <button className="editar" onClick={() => abrirModal(u, "editar")}><FaEdit /></button>
+  {u.estado === "Habilitado" ? (
+    <button className="deshabilitar"><FaTimes /></button>
+  ) : (
+    <button className="habilitar"><FaCheck /></button>
+  )}
+</td>
 
-        {/* Footer */}
-        <div className="footer">
-          <p>1 al {usuariosFiltrados.length} de {usuarios.length} registros</p>
-          <div className="pagination">
-            <button>«</button>
-            <button className="active">1</button>
-            <button>2</button>
-            <button>»</button>
-          </div>
+
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h2 className="roles-title">Roles del Sistema</h2>
+        <button className="btn agregar"><FaPlus /> Agregar Rol</button>
+
+        <div className="table-container">
+          <table className="user-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {roles.map(r => (
+                <tr key={r.id}>
+                  <td>{r.nombre}</td>
+                  <td>{r.descripcion}</td>
+                  <td>
+                    <button className="editar"><FaEdit /></button>
+                    <button className="eliminar"><FaTrash /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </main>
+      {modalOpen && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h2>
+          {modo === "agregar" && "Agregar Usuario"}
+          {modo === "editar" && "Editar Usuario"}
+          {modo === "ver" && "Ver Usuario"}
+        </h2>
+        <button className="close-btn" onClick={cerrarModal}>×</button>
+      </div>
+
+      <form className={`user-form ${modo === "ver" ? "readonly" : ""}`}>
+        <div className="form-photo">
+          <img
+            src={usuarioSeleccionado?.foto || "/default-avatar.png"}
+            alt="Foto del usuario"
+            className="user-avatar"
+          />
+          {modo !== "ver" && <input type="file" accept="image/*" />}
+        </div>
+
+        <div className="form-grid">
+          <label>
+            Primer Nombre
+            <input type="text" defaultValue={usuarioSeleccionado?.nombre || ""} readOnly={modo === "ver"} />
+          </label>
+          <label>
+            C.I.
+            <input type="text" defaultValue={usuarioSeleccionado?.ci || ""} readOnly={modo === "ver"} />
+          </label>
+          <label>
+            Email
+            <input type="email" defaultValue={usuarioSeleccionado?.email || ""} readOnly={modo === "ver"} />
+          </label>
+          <label>
+            Rol
+            <input type="text" defaultValue={usuarioSeleccionado?.rol || ""} readOnly={modo === "ver"} />
+          </label>
+        </div>
+
+        {modo !== "ver" && (
+          <div className="modal-actions">
+            <button type="submit" className="btn agregar">
+              {modo === "agregar" ? "Guardar Usuario" : "Guardar Cambios"}
+            </button>
+          </div>
+        )}
+      </form>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

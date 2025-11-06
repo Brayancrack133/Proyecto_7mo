@@ -1,11 +1,15 @@
 /* Fondo degradado azul marino a turquesa */
-body {
+.Pricipal {
   margin: 0;
   font-family: "Poppins", sans-serif;
   background: linear-gradient(135deg, #0d1b3e, #2a9d8f); /* Degradado Azul marino a Turquesa */
   color: white;
 }
-
+body{
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #0d1b3e, #2a9d8f); /* Degradado Azul marino a Turquesa */
+  color: white;
+}
 .header {
   text-align: center;
   padding: 60px 20px;
@@ -82,6 +86,10 @@ body {
   width:100px;
   height:300px;
 
+}
+.imgmain{
+  width:100px;
+  height:100px;
 }
 
 .how-it-works {
@@ -174,11 +182,15 @@ body {
 
 /* Contenedor para aplicar la perspectiva */
 .parent {
-  width: 100%;
+  width: 500px;
   height: 500px;
   perspective: 1000px;  /* Esto define el "campo de visión" 3D */
 }
-
+.main-image{
+  display: flex;
+  justify-content: center; /* Centrado horizontal */
+  align-items: center;   
+}
 .card {
   height: 100%;
   background: linear-gradient(135deg, #0099CC, #00FF99); /* Fondo bonito */

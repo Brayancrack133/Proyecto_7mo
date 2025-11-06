@@ -9,12 +9,12 @@ const Registerform = () => {
         <div className="flex">
           <label>
             <input className="input" type="text" placeholder="" required />
-            <span>Firstname</span>
+            <span>Nombre</span>
           </label>
 
           <label>
             <input className="input" type="text" placeholder="" required />
-            <span>Lastname</span>
+            <span>Apellido</span>
           </label>
         </div>  
             
@@ -36,7 +36,7 @@ const Registerform = () => {
         <button type="submit" className="submit">Submit</button>
         
         <p className="signin">
-          Already have an account? <a href="#">Signin</a>
+          Ya tienes una contrasena? <a href="#">Enviar</a>
         </p>
       </form>
     </div>

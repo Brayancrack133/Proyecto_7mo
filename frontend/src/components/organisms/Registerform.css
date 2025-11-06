@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 350px;
+  max-width: 400px;
   padding: 20px;
   border-radius: 20px;
   position: relative;
@@ -12,26 +12,16 @@
   border: 1px solid #333;
 }
 
+/* TÍTULO */
 .title {
   font-size: 28px;
   font-weight: 600;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
   position: relative;
   display: flex;
   align-items: center;
   padding-left: 30px;
-  color: #00bfff;
-}
-
-.title::before {
-  width: 18px;
-  height: 18px;
-}
-
-.title::after {
-  width: 18px;
-  height: 18px;
-  animation: pulse 1s linear infinite;
+  color: var(--turquesa);
 }
 
 .title::before,
@@ -41,8 +31,13 @@
   height: 16px;
   width: 16px;
   border-radius: 50%;
-  left: 0px;
-  background-color: #00bfff;
+  left: 0;
+  background-color: var(--turquesa);
+}
+
+.title::after {
+  animation: pulse 1.5s linear infinite;
+  background-color: var(--dorado);
 }
 
 .message, 

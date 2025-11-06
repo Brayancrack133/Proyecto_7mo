@@ -8,6 +8,7 @@ import "./App.css"; // Aquí van los estilos
 
 function App() {
   return (
+    <div className="Pricipal">
     <Router>
       <Routes>
         {/* Página principal */}
@@ -25,7 +26,7 @@ function App() {
                 <div className="main-image">
                   <div className="parent">
   <div className="card">
-    <img src="/Images/prinimg.png" alt="Imagen 3D" />
+    <img className="imgmain" src="/Images/prinimg.png" alt="Imagen 3D" />
   </div>
 </div>
                 </div>
@@ -97,7 +98,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/gest_user" element={<GestUser />} />
       </Routes>
-    </Router>
+      </Router>
+    </div>
   );
 }
 

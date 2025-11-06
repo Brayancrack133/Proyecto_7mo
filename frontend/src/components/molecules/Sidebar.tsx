@@ -4,17 +4,21 @@ import "./Sidebar.css";
 export default function Sidebar() {
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">🌿 FuturePlan</div>
+      <div className="sidebar-header">FuturePlan</div>
       <nav className="sidebar-nav">
         <ul>
-          <li className="active"><FaUser /> Usuarios</li>
-          <li><FaKey /> Roles</li>
-          <li><FaDatabase /> Permisos</li>
+          <li className="active">
+  <FaUser /> <span>Usuarios</span>
+</li>
+<li>
+  <FaKey /> <span>Roles</span>
+</li>
+<li>
+  <FaDatabase /> <span>Permisos</span>
+</li>
         </ul>
       </nav>
-      <div className="sidebar-footer">
-        <button className="light-btn">Modo Claro</button>
-      </div>
+      
     </aside>
   );
 }
