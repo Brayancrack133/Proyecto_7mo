@@ -1,16 +1,6 @@
-import { useState } from 'react'
+import React from "react";
+import Dashboard from "../src/pages/Dashboard";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => <Dashboard />;
 
-  return (
-    <div className="App">
-      <h1>Frontend TypeScript</h1>
-      <button onClick={() => setCount(count + 1)}>
-        Count: {count}
-      </button>
-    </div>
-  )
-}
-
-export default App
+export default App;
