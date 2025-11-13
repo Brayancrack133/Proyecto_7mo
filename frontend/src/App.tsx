@@ -4,7 +4,7 @@ import Register from "./pages/Registro/Register";
 import GestUser from "./pages/Gest_user/Gest_user";
 
 
-import "./App.css"; // Aquí van los estilos
+import "./App.css"; 
 
 function App() {
   return (

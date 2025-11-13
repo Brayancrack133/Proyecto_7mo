@@ -5,11 +5,7 @@
   background: linear-gradient(135deg, #0d1b3e, #2a9d8f); /* Degradado Azul marino a Turquesa */
   color: white;
 }
-body{
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #0d1b3e, #2a9d8f); /* Degradado Azul marino a Turquesa */
-  color: white;
-}
+
 .header {
   text-align: center;
   padding: 60px 20px;
@@ -22,7 +18,7 @@ body{
 
 .titlo {
   font-size: 3.5rem;
-  color: #f4a261; /* Color dorado mostaza */
+  color: #f4a861; /* Color dorado mostaza */
   font-weight: bold;
 }
 

@@ -7,7 +7,7 @@
   padding: 20px;
   border-radius: 20px;
   position: relative;
-  background-color: #1a1a1a;
+  background-color: #b1b1b14d;
   color: #fff;
   border: 1px solid #333;
 }
@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   padding-left: 30px;
-  color: var(--turquesa);
+  color: white;
 }
 
 .title::before,
@@ -69,8 +69,8 @@
 }
 
 .form label .input {
-  background-color: #333;
-  color: #fff;
+  background-color: #54545495;
+  color: #ffffff;
   width: 100%;
   padding: 20px 05px 05px 10px;
   outline: 0;
@@ -103,6 +103,7 @@
 
 .input {
   font-size: medium;
+  
 }
 
 .submit {
