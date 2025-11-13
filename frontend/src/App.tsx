@@ -20,7 +20,7 @@ function App() {
                     <li><Link to="/">Inicio</Link></li>
                     <li><Link to="/nosotros">Nosotros</Link></li>
                     <li><Link to="/mis_proyectos">Mis Proyectos</Link></li>
-                    <li><Link to="/admin">Administración</Link></li>
+                    <li><Link to="/Login">Administración</Link></li>
                     <li><Link to="/contacto">Contacto</Link></li>
                   </ul>
                 </nav>

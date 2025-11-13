@@ -139,6 +139,7 @@ export default function Gest_user() {
             <div className="cabecera">
               <h1>Administración de Usuarios</h1>
               <div className="actions">
+                
                 <button className="btn agregar" onClick={() => abrirModalUsuario(null, "agregar")}>
                   <FaPlus /> Agregar Usuario
                 </button>
@@ -150,6 +151,19 @@ export default function Gest_user() {
               <div className={`tab ${filtro === "Habilitados" ? "active" : ""}`} onClick={() => setFiltro("Habilitados")}>Habilitados</div>
               <div className={`tab ${filtro === "Deshabilitados" ? "active" : ""}`} onClick={() => setFiltro("Deshabilitados")}>Deshabilitados</div>
             </div>
+            {/* Barra de búsqueda (solo diseño) */}
+<div className="search-bar">
+  <input
+    type="text"
+    className="search-input"
+    placeholder="🔍 Buscar usuario por nombre, email o rol..."
+    disabled // solo diseño
+  />
+  <button className="btn-search" disabled>
+    Buscar
+  </button>
+</div>
+
 
             <div className="table-container">
               <table className="user-table">
