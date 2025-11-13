@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import Header from './components/organisms/Header'
 import Contenido from './components/templates/Contenido'
+import Inicio from './components/templates/Inicio'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 
@@ -9,10 +9,10 @@ function App() {
 
   return (
     <BrowserRouter>
-    <div className="App">
-      <Header />
-      <Contenido/>
-    </div>
+      <Routes>
+        <Route path="/" element={<Inicio />} />
+        <Route path="/proyectos" element={<Contenido />} />
+      </Routes>
     </BrowserRouter>
   )
 }

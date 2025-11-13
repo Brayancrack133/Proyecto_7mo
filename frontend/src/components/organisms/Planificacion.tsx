@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import './Planificacion.css'
-import TarjetaTarea from './TarjetaTarea'
+import Tareas from './Tareas'
+import Documentos from './Documentos'
+import ChatInterno from './ChatInterno'
+import Notificaciones from './Notificaciones'
 
 const Planificacion = () => {
     const [activo, setActivo] = useState('Tareas')
@@ -12,14 +15,18 @@ const Planificacion = () => {
         { nombre: 'Notificaciones', icono: '/notificacion.png' },
     ]
 
+    const renderContenido = () => {
+        switch (activo) {
+            case 'Tareas': return <Tareas />
+            case 'Documentos': return <Documentos />
+            case 'Chat Interno': return <ChatInterno />
+            case 'Notificaciones': return <Notificaciones />
+            default: return null
+        }
+    }
+
     return (
         <div className='contplancom'>
-            <div className='asigtar'>
-                <p className='titasig'>Asignar tareas</p>
-                <p className='descriasig'>Gestiona tareas, documentos y comunicación del equipo</p>
-            </div>
-
-            {/* Botones de opciones */}
             <div className='contbutop'>
                 {opciones.map((opcion) => (
                     <div
@@ -33,16 +40,9 @@ const Planificacion = () => {
                 ))}
             </div>
 
-            <div className='apartoptn'>
-                <p className='txtapartoptn'>Gestión de tareas</p>
-                <button className='agrebuttnoptn'>
-                    <img className='plustarbutoptn' src="/agregar.png" alt="Agregar" />
-                    <p className='agretxtbutoptn'>Nueva Tarea</p>
-                </button>
+            <div className='contenido-scroll'>
+                {renderContenido()}
             </div>
-
-
-            <TarjetaTarea />
         </div>
     )
 }

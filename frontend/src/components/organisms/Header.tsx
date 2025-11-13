@@ -11,7 +11,7 @@ const Header = () => {
             />
             <div className='datcont'>
                 <div className='ussrname'>
-                    <p className='usnm'>ADMIN</p>
+                    <p className='usnm'>Líder</p>
                     <p className='profile'>Mi Perfil</p>
                 </div>
                 <img

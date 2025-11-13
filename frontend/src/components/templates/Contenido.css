@@ -1,7 +1,9 @@
 .contnt {
     display: flex;
+    flex-direction: row;
     height: 100%;
     align-items: flex-start;
     flex-shrink: 0;
     align-self: stretch;
+    flex: 1;
 }

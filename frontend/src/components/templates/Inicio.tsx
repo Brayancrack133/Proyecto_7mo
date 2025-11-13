@@ -1,18 +1,17 @@
 import React from 'react'
 import Sidebar from '../organisms/Sidebar'
-import './Contenido.css'
-import Planificacion from '../organisms/Planificacion'
+import ContInicio from '../organisms/ContInicio'
 import Header from '../organisms/Header'
-const Contenido = () => {
+const Inicio = () => {
     return (
         <div className="inicio-page">
             <Header />
             <div className="contnt">
                 <Sidebar />
-                <Planificacion />
+                <ContInicio />
             </div>
         </div>
     )
 }
 
-export default Contenido
+export default Inicio
