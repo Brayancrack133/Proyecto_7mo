@@ -1,0 +1,38 @@
+.container {
+  padding: 15px 20px; /* Un padding interno consistente */
+  background-color: #fff; /* Fondo blanco para el contenedor de búsqueda */
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: none; /* 🛑 ELIMINAR BORDE BLANCO EXTERNO 🛑 */
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: #f0f2f5; /* Un gris muy claro para el input */
+  border-radius: 25px; /* Bordes más redondeados */
+  border: 1px solid #e0e0e0; /* Borde sutil */
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.input {
+  flex-grow: 1;
+  border: none;
+  padding: 10px 15px;
+  outline: none;
+  background: none;
+  font-size: 14px;
+}
+
+.searchButton {
+  background-color: transparent;
+  border: none;
+  padding: 8px 15px; /* Ajustar padding */
+  cursor: pointer;
+  color: #888;
+  display: flex;
+  align-items: center;
+}

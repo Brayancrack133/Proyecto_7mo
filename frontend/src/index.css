@@ -5,8 +5,16 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
-  padding: 2rem;
+  margin: 0; /* Esto elimina el margen predeterminado del navegador */
+  padding: 0;
+  font-family: 'Inter', sans-serif; /* Usar una fuente moderna */
+  /* Asegura que el color de fondo sea el mismo que el del layout principal */
+  background-color: #f0f2f5; 
+}
+
+/* Opcional: Box Sizing para manejo de layout más fácil */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 .App {
