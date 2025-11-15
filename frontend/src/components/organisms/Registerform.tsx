@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerService } from "../../services/authService";
 import "./Registerform.css";
 
 const Registerform = () => {
@@ -9,16 +10,23 @@ const Registerform = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegister = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    // Simular registro (guardado en localStorage)
-    const nuevoUsuario = { nombre, apellido, email, password };
-    localStorage.setItem("usuario", JSON.stringify(nuevoUsuario));
+  const data = await registerService({
+    nombre,
+    apellido,
+    correo: email,
+    contraseña: password,
+  });
 
-    alert("Usuario registrado correctamente");
+  if (data.mensaje === "Usuario registrado correctamente") {
+    alert("Registro exitoso. Ahora puedes iniciar sesión.");
     navigate("/");
-  };
+  } else {
+    alert(data.mensaje || "Error en el registro");
+  }
+};
 
   return (
     <div>

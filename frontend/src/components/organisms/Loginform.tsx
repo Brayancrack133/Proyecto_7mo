@@ -1,23 +1,32 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginService } from "../../services/authService";
 import "./Loginform.css";
+
 
 const Loginform = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    // Simulación de login
-    if (email === "alex@gmail.com" && password === "12345") {
-      localStorage.setItem("usuario", JSON.stringify({ nombre: "Alex Apaza", email }));
+  const data = await loginService(email, password);
+
+  if (data.mensaje === "Login exitoso") {
+    localStorage.setItem("usuario", JSON.stringify(data.usuario));
+
+    // Redirección dependiendo del rol
+    if (data.usuario.rol === "Administrador") {
       navigate("/gest_user");
     } else {
-      alert("Credenciales incorrectas");
+      navigate("/dashboard"); // o la ruta que quieras para otros roles
     }
-  };
+  } else {
+    alert("Credenciales incorrectas");
+  }
+};
 
   return (
     <div>
