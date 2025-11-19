@@ -5,6 +5,7 @@
   box-sizing: border-box;
 }
 
+
 body {
   margin: 0; /* Esto elimina el margen predeterminado del navegador */
   padding: 0;

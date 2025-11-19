@@ -1,0 +1,48 @@
+:root {
+  --azul-marino: #0a1431;
+  --turquesa: #094855;
+  --dorado: #d4af37;
+}
+
+.register-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--azul-marino);
+}
+.imglogo {
+  width: 100px;
+  height: 100px;
+  padding: 10px;
+}
+.logo-container {
+  position: absolute;
+  top: 30px;
+  left: 50px;
+  z-index: 2;
+  background-color: white;
+  border-radius: 50%;
+}
+
+
+/* Overlay del formulario */
+.register-overlay {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.Gruporegister {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit:cover; /* Asegura que la imagen cubra toda la pantalla */
+  filter: brightness(0.6); /* oscurece un poco la imagen para que resalte el login */
+  z-index: 0;
+}
