@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import './MisProyectos.css';
 import TarjetaProyecto from '../organisms/TarjetaProyecto';
 import './Planificacion.css';
+import { useUser } from '../../context/UserContext';// <--- Importante
 
 interface Proyecto {
     id_proyecto: number;
-    nombre_proyecto: string;
+    nombre: string;        // Ahora coincide con TarjetaProyecto
     descripcion: string;
     fecha_inicio: string;
     fecha_fin: string | null;
-    rol_en_equipo: string;
+    rol: string;           // Ahora coincide con TarjetaProyecto
     nombre_equipo: string;
 }
 
@@ -17,12 +18,34 @@ const MisProyectos = () => {
 
     const [proyectos, setProyectos] = useState<Proyecto[]>([]);
 
+    // 1. Obtenemos el usuario y el estado de carga
+    const { usuario, isLoading } = useUser();
+
     useEffect(() => {
-        fetch("http://192.168.0.2:3000/api/mis-proyectos/1")
-            .then(res => res.json())
-            .then(data => setProyectos(data))
-            .catch(err => console.error(err));
-    }, []);
+        if (usuario) {
+            fetch(`http://localhost:3000/api/mis-proyectos/${usuario.id_usuario}`)
+                .then(res => {
+                    // Si la respuesta no es OK (ej: Error 500), lanzamos error manual
+                    if (!res.ok) throw new Error("Error en la respuesta del servidor");
+                    return res.json();
+                })
+                .then(data => {
+                    // PROTECCIÓN: Verificamos si lo que llegó es realmente una lista (Array)
+                    if (Array.isArray(data)) {
+                        setProyectos(data);
+                    } else {
+                        console.error("Formato de datos incorrecto:", data);
+                        setProyectos([]); // Si llega basura, ponemos lista vacía para no romper
+                    }
+                })
+                .catch(err => {
+                    console.error("Error cargando proyectos:", err);
+                    setProyectos([]); // En caso de error, lista vacía
+                });
+        }
+    }, [usuario]);
+    // Opcional: Mostrar algo mientras carga el usuario
+    if (isLoading) return <div style={{ color: 'white' }}>Cargando usuario...</div>;
 
     return (
         <div className='contplancom'>
@@ -45,10 +68,14 @@ const MisProyectos = () => {
             </div>
 
             <div className='containerproy'>
+                {/* Si no hay proyectos, podrías mostrar un mensaje */}
+                {proyectos.length === 0 && <p style={{ color: '#ccc' }}>No tienes proyectos asignados.</p>}
+
                 {proyectos.map(proy => (
                     <TarjetaProyecto key={proy.id_proyecto} proyecto={proy} />
                 ))}
             </div>
+
         </div>
     );
 }

@@ -1,18 +1,29 @@
+// src/App.tsx
 import { useState } from 'react'
-import Contenido from './components/templates/Contenido'
-import Inicio from './components/templates/Inicio'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
+// Importamos el contexto
+import { UserProvider } from './context/UserContext'; 
+
+import Contenido from './components/templates/Contenido'
+import Inicio from './components/templates/Inicio'
+
+import ContPlanificacion from './components/templates/ContPlanificacion'; 
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Inicio />} />
-        <Route path="/proyectos" element={<Contenido />} />
-      </Routes>
+      <UserProvider>
+        <Routes>
+          <Route path="/" element={<Inicio />} />
+          <Route path="/proyectos" element={<Contenido />} />
+          
+          {/* Esta ruta ahora usará tu nuevo template */}
+          <Route path="/proyecto/:id" element={<ContPlanificacion />} />
+        </Routes>
+      </UserProvider>
     </BrowserRouter>
   )
 }
