@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.tsx'; // O tu componente principal de rutas
 import './index.css';
 
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     {/* 🛑 DEBES ASEGURARTE DE QUE AQUÍ NO HAYA CÓDIGO DE PRUEBA 🛑 */}
