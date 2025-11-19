@@ -1,29 +1,22 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProjectManagementPage from "./pages/ProjectManagementPage";
-
-// 1. Necesitas BrowserRouter para que React Router funcione
-import { BrowserRouter } from 'react-router-dom'; 
-// 2. Importas el archivo de rutas que acabamos de completar
 import { AppRoutes } from './routes/AppRoutes'; 
 
 function App() {
   return (
-   <BrowserRouter>
+    <BrowserRouter>
+      {/* ESTE ES EL ÚNICO COMPONENTE <Routes> PERMITIDO */}
       <Routes>
+        {/* 1. Rutas definidas directamente en App */}
         <Route path="/" element={<Navigate to="/proyectos" replace />} />
-        <Route path="/proyectos" element={<ProjectManagementPage />} />
+        {/* Si /proyectos está definido en AppRoutes, puedes quitar esta línea de aquí: */}
+        <Route path="/proyectos" element={<ProjectManagementPage />} /> 
+        
+        {/* 2. Carga todas las rutas definidas en AppRoutes (que ahora devuelve un Fragment con solo <Route>) */}
+        <AppRoutes /> 
       </Routes>
-    </BrowserRouter>
-  );
-    // BrowserRouter debe envolver toda la aplicación para manejar las URLs
-    <BrowserRouter> 
-      {/* AppRoutes contiene todas las definiciones de <Route path="..."> */}
-      <AppRoutes /> 
     </BrowserRouter>
   );
 }
 
-export default App;
-
-// 3. Exportación por defecto, como exige main.tsx
 export default App;

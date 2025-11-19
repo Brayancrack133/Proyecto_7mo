@@ -1,18 +1,17 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { Repository } from '../pages/Repository/Repository';
-// Asumimos que has creado index.ts para Repository.
-// Para Home y Login, usaremos placeholders si no existen aún:
-// import { Home } from '../pages/Home'; 
-// import { Login } from '../pages/Login'; 
+import { Route, Navigate } from 'react-router-dom';
+import { Repository } from '../pages/Repository/Repository'; 
+// Asegúrate de que este componente exista:
+import ProjectManagementPage from "../pages/ProjectManagementPage";
 
+// IMPORTANTE: Este componente ahora retorna directamente un Fragment con las <Route>
+// y NO un componente <Routes> para poder ser usado en el archivo App.jsx
 export const AppRoutes: React.FC = () => {
     return (
-        <Routes>
-
-            {/* 🛑 RUTA RAÍZ (/) - AÑADIDA 🛑 */}
-            {/* Cuando el usuario va a '/', lo redirigimos a /repositorio temporalmente */}
-            <Route path="/" element={<Navigate to="/repositorio" replace />} />
+        <>
+            {/* RUTA RAÍZ (/) - Redirige a /proyectos (Según tu App.jsx original) */}
+            {/* Este path debe ser manejado en App.jsx, pero lo dejo aquí por si lo quieres mover: */}
+            {/* <Route path="/" element={<Navigate to="/proyectos" replace />} /> */}
 
             {/* RUTA DE LOGIN (Si existe) */}
             <Route path="/login" element={<h1>Página de Login (Pendiente)</h1>} />
@@ -23,13 +22,13 @@ export const AppRoutes: React.FC = () => {
             <Route path="/repositorio" element={<Repository />} />
 
             {/* Rutas de Módulos (Temporalmente con texto placeholder) */}
-            <Route path="/proyectos" element={<h1>Módulo: Mis Proyectos</h1>} />
+            <Route path="/proyectos" element={<ProjectManagementPage />} />
             <Route path="/planificacion" element={<h1>Módulo: Planificación</h1>} />
             <Route path="/ia" element={<h1>Módulo: IA Predictiva</h1>} />
             <Route path="/configuracion" element={<h1>Módulo: Configuración</h1>} />
 
             {/* Ruta para errores (404) */}
             <Route path="*" element={<h1>404 | Página No Encontrada</h1>} />
-        </Routes>
+        </>
     );
 };
