@@ -1,7 +1,7 @@
 .contplancom {
   display: flex;
   height: 100%;
-  width:  100%;
+  width: 100%;
   padding: 20px 20px;
   flex-direction: column;
   align-items: center;
@@ -159,14 +159,16 @@
 .agrebuttnoptn {
   display: flex;
   align-items: center;
+  width: 332.5px;
   gap: 8px;
-  padding: 13px 132px;
+  padding: 13px 0px;
   border: none;
   border-radius: 6px;
   background: #2563EB;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: background 0.2s ease-in-out;
+  justify-content: center;
 }
 
 .agrebuttnoptn:hover {
