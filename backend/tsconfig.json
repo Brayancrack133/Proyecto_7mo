@@ -28,6 +28,6 @@
     // "isolatedModules": false,      // Se elimina
     // "noUncheckedIndexedAccess": false // Se elimina
   },
-  "include": ["src/**/*"],
+  "include": ["src//*"],
   "exclude": ["node_modules", "dist"]
 }

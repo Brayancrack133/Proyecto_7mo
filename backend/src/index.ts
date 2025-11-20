@@ -1,7 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { db } from "./config/db.js";
+
+// Inicializar variables de entorno
+dotenv.config();
+
+// Inicializar DB (solo importarla para conectarse)
+import "./config/db.js";
 
 // Importamos rutas
 import proyectosRoutes from "./routes/proyectos.routes.js";
@@ -12,6 +17,7 @@ dotenv.config();
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
@@ -19,6 +25,8 @@ app.use(express.json());
 app.use("/api/proyectos", proyectosRoutes);
 app.use("/api/tareas", tareasRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/proyectos", proyectosRoutes);
+app.use("/api/tareas", tareasRoutes);
 
 // Ruta simple de prueba
 app.get("/", (req, res) => {

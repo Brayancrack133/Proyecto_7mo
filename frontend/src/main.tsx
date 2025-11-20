@@ -17,7 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     {/* Si el contador "Count: 0" está en App.tsx, cambia la importación 
        para usar tu enrutador principal, por ejemplo: 
     */}
-    <App /> 
+    
     
   </React.StrictMode>,
 );

@@ -9,12 +9,7 @@
 
 /* Estilos globales del body */
 html,
-body {
-  height: 100%;
-  width: 100%;
-  background-color: #fff; /* o el color base de tu app */
-  font-family: 'Segoe UI', sans-serif;
-}
+
 
 /* Si usas un contenedor general tipo App */
 #root, .App {
