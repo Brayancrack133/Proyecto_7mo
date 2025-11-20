@@ -25,19 +25,24 @@ interface AuthWrapperProps {
 }
 
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, isAuthenticated }) => {
+    // ✅ TEMPORAL: Desactivado para desarrollo
+    // TODO: Activar cuando el login esté funcionando
+    return <>{children}</>;
+    
+    /* 
+    // ⚠️ Descomentar esto cuando el login funcione:
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />; 
     }
     return <>{children}</>;
+    */
 };
 
 // ============================================================================
 // COMPONENTE PRINCIPAL APP
 // ============================================================================
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => !!localStorage.getItem('token')
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // ✅ Cambiado a true temporalmente
 
   return (
     <div className="principal">
@@ -55,17 +60,13 @@ function App() {
                       <li><Link to="/">Inicio</Link></li>
                       <li><Link to="/nosotros">Nosotros</Link></li>
                       <li>
-                        <Link to={isAuthenticated ? "/dashboard/proyectos" : "/login"}>
+                        <Link to="/dashboard/proyectos">
                           Mis Proyectos
                         </Link>
                       </li> 
                       <li><Link to="/contacto">Contacto</Link></li>
                       <li>
-                        {isAuthenticated ? (
-                          <Link to="/dashboard">Dashboard</Link>
-                        ) : (
-                          <Link to="/login">Iniciar Sesión</Link>
-                        )}
+                        <Link to="/dashboard">Dashboard</Link>
                       </li>
                     </ul>
                   </nav>
@@ -75,7 +76,7 @@ function App() {
                       <h1 className="logo">FUTURE PLAN</h1>
                       <p className="slogan">"La forma inteligente de organizar tus proyectos"</p>
                       <Link 
-                        to={isAuthenticated ? "/dashboard/proyectos" : "/login"} 
+                        to="/dashboard/proyectos" 
                         className="btn-main"
                       >
                         Empezar
@@ -115,7 +116,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {/* ========== DASHBOARD PROTEGIDO ========== */}
+            {/* ========== DASHBOARD (SIN PROTECCIÓN TEMPORAL) ========== */}
             <Route 
               path="/dashboard/*" 
               element={
