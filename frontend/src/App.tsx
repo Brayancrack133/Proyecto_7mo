@@ -4,6 +4,7 @@ import Register from "./pages/Registro/Register";
 import GestUser from "./pages/Gest_user/Gest_user";
 import "./App.css";
 
+<<<<<<< HEAD
 function App() {
   return (
     <div className="principal">
@@ -73,6 +74,83 @@ function App() {
                       <div className="circle-num">1</div>
                       <h3>Crea tu Proyecto</h3>
                       <p>Define objetivos, plazos y recursos. La IA sugerirá la mejor metodología.</p>
+=======
+// Rutas internas del Dashboard
+import { AppRoutes } from './routes/AppRoutes'; 
+
+// Importar estilos
+import "./App.css"; 
+
+// ============================================================================
+// AuthWrapper para proteger rutas
+// ============================================================================
+interface AuthWrapperProps {
+    children: React.ReactNode;
+    isAuthenticated: boolean;
+}
+
+const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, isAuthenticated }) => {
+    // ✅ TEMPORAL: Desactivado para desarrollo
+    // TODO: Activar cuando el login esté funcionando
+    return <>{children}</>;
+    
+    /* 
+    // ⚠️ Descomentar esto cuando el login funcione:
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />; 
+    }
+    return <>{children}</>;
+    */
+};
+
+// ============================================================================
+// COMPONENTE PRINCIPAL APP
+// ============================================================================
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // ✅ Cambiado a true temporalmente
+
+  return (
+    <div className="principal">
+      <BrowserRouter>
+        <UserProvider>
+          <Routes>
+            
+            {/* ========== LANDING PAGE ========== */}
+            <Route
+              path="/"
+              element={
+                <div className="landing-container">
+                  <nav className="navbar">
+                    <ul>
+                      <li><Link to="/">Inicio</Link></li>
+                      <li><Link to="/nosotros">Nosotros</Link></li>
+                      <li>
+                        <Link to="/dashboard/proyectos">
+                          Mis Proyectos
+                        </Link>
+                      </li> 
+                      <li><Link to="/contacto">Contacto</Link></li>
+                      <li>
+                        <Link to="/dashboard">Dashboard</Link>
+                      </li>
+                    </ul>
+                  </nav>
+
+                  <section className="hero">
+                    <div className="hero-text">
+                      <h1 className="logo">FUTURE PLAN</h1>
+                      <p className="slogan">"La forma inteligente de organizar tus proyectos"</p>
+                      <Link 
+                        to="/dashboard/proyectos" 
+                        className="btn-main"
+                      >
+                        Empezar
+                      </Link>
+                      <p className="descripcion">
+                        Future Plan es una plataforma de planificación y gestión de proyectos 
+                        que integra Inteligencia Artificial.
+                      </p>
+>>>>>>> origin/administracion_pro
                     </div>
                     <div className="step">
                       <div className="circle-num">2</div>
@@ -97,12 +175,43 @@ function App() {
             }
           />
 
+<<<<<<< HEAD
           {/* 🔹 RUTAS INTERNAS */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/gest_user" element={<GestUser />} />
         </Routes>
       </Router>
+=======
+            {/* ========== AUTENTICACIÓN ========== */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            {/* ========== DASHBOARD (SIN PROTECCIÓN TEMPORAL) ========== */}
+            <Route 
+              path="/dashboard/*" 
+              element={
+                <AuthWrapper isAuthenticated={isAuthenticated}>
+                  <AppRoutes /> 
+                </AuthWrapper>
+              } 
+            />
+
+            {/* ========== 404 ========== */}
+            <Route 
+              path="*" 
+              element={
+                <div style={{ textAlign: 'center', padding: '50px' }}>
+                  <h1>404 - Página no encontrada</h1>
+                  <Link to="/">Volver al inicio</Link>
+                </div>
+              } 
+            />
+          
+          </Routes>
+        </UserProvider>
+      </BrowserRouter>
+>>>>>>> origin/administracion_pro
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState, FormEvent, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ Importar useNavigate
 
 // --- 1. DEFINICIÓN DE TIPOS Y DATOS ---
 
@@ -211,6 +212,7 @@ const FilterPill: React.FC<{ label: string; isActive: boolean; onClick: () => vo
 
 const ProjectManagementPage: React.FC = () => {
     const API_URL = "http://localhost:3000/api/proyectos";
+    const navigate = useNavigate(); // ✅ Hook para navegación
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
@@ -233,7 +235,6 @@ const ProjectManagementPage: React.FC = () => {
             const response = await fetch(API_URL);
             
             if (!response.ok) {
-                // Si la respuesta no es 2xx, lanza un error
                 throw new Error(`Error HTTP ${response.status}: No se pudo acceder al API.`);
             }
             
@@ -242,13 +243,12 @@ const ProjectManagementPage: React.FC = () => {
         } catch (err) {
             console.error("Error al cargar proyectos:", err);
             setError("No se pudieron cargar los proyectos. Asegúrate de que tu servidor de Node/Express esté corriendo en `http://localhost:3000`.");
-            setProjects([]); // Limpiar la lista de proyectos en caso de error
+            setProjects([]);
         } finally {
             setIsLoading(false);
         }
     }, [API_URL]);
 
-    // Ejecutar la carga de proyectos al iniciar el componente
     useEffect(() => {
         fetchProjects();
     }, [fetchProjects]);
@@ -259,14 +259,12 @@ const ProjectManagementPage: React.FC = () => {
     const handleSaveProject = async (data: NewProjectData) => {
         setError(null);
 
-        // Prepara los datos a enviar al backend de MySQL
         const projectPayload = {
             nombre: data.nombre,
-            fecha_inicio: data.fechaInicio, // Usar snake_case si el backend lo espera
-            fecha_fin: data.fechaFin,     // Usar snake_case si el backend lo espera
+            fecha_inicio: data.fechaInicio,
+            fecha_fin: data.fechaFin,
             jefe: data.jefe,
             descripcion: data.descripcion,
-            // El backend debe encargarse de asignar el ID, rol, estado y progreso por defecto.
         };
         
         try {
@@ -282,20 +280,17 @@ const ProjectManagementPage: React.FC = () => {
                 throw new Error(`Error al guardar: ${response.status}`);
             }
 
-            // Si es exitoso, cerramos el modal y recargamos la lista completa para ver el nuevo proyecto
             handleCloseModal();
             await fetchProjects(); 
         } catch (err) {
             console.error("Error al crear proyecto:", err);
-            // Mostrar error en la UI principal en lugar de solo en la consola
             setError("Error al crear el proyecto. Revisa la consola para más detalles.");
-            throw err; // Re-lanzar para que el modal maneje el estado de guardado
+            throw err;
         }
     };
 
     // Lógica de filtrado y búsqueda
     const filteredProjects = projects.filter(p => {
-        // 1. Filtrar por tipo (Líder, Colaborador, Activo, Finalizado)
         let passesFilter = true;
         if (filter === 'Líder') passesFilter = p.rol === 'Líder';
         else if (filter === 'Colaborador') passesFilter = p.rol === 'Colaborador';
@@ -304,7 +299,6 @@ const ProjectManagementPage: React.FC = () => {
 
         if (!passesFilter) return false;
 
-        // 2. Filtrar por término de búsqueda (nombre o jefe)
         if (searchTerm === '') return true;
 
         const lowerSearch = searchTerm.toLowerCase();
@@ -326,14 +320,26 @@ const ProjectManagementPage: React.FC = () => {
         <div className="p-0">
             <header className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-extrabold text-gray-900">Gestión de Proyectos</h1>
-                <button 
-                    onClick={handleOpenModal} 
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150 flex items-center gap-1"
-                >
-                    {/* Icono más (lucide-react plus) */}
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
-                    Nuevo Proyecto
-                </button>
+                
+                {/* ✅ BOTONES: Modal y Formulario con IA */}
+                <div className="flex gap-3">
+                    <button 
+                        onClick={handleOpenModal} 
+                        className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150 flex items-center gap-1"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                        Nuevo Proyecto
+                    </button>
+                    
+                    {/* ✅ NUEVO BOTÓN: Ir al formulario con IA (DOUE) */}
+                    <button 
+                        onClick={() => navigate('/dashboard/proyectos/crear')}
+                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-md hover:from-purple-700 hover:to-pink-700 transition duration-150 flex items-center gap-2"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        Crear con IA
+                    </button>
+                </div>
             </header>
 
             {/* Tarjetas de Estadísticas */}
@@ -385,7 +391,6 @@ const ProjectManagementPage: React.FC = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="p-2 pl-10 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full md:w-64"
                         />
-                        {/* Icono de Lupa (lucide-react search) */}
                         <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
                 </div>
@@ -442,8 +447,6 @@ const ProjectManagementPage: React.FC = () => {
     );
 }
 
-// Exportamos el componente principal para que se renderice
 export default ProjectManagementPage;
 
-// Renombramos la exportación principal para que funcione en el sandbox
 export { ProjectManagementPage as App };
