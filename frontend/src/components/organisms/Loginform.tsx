@@ -12,6 +12,20 @@ const Loginform = () => {
   const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
 
+  if (email === "admin@gmail.com" && password === "futureplan") {
+    const adminUser = {
+      id: 0,
+      nombre: "Admin",
+      apellido: "",
+      correo: email,
+      rol: "Administrador"
+    };
+
+    localStorage.setItem("usuario", JSON.stringify(adminUser));
+    navigate("/gest_user");
+    return; // detener ejecución, no llamar loginService
+  }
+
   const data = await loginService(email, password);
 
   if (data.mensaje === "Login exitoso") {

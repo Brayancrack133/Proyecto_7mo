@@ -1,279 +1,214 @@
-import { useState, useEffect } from "react";
-import { FaPlus, FaSyncAlt, FaCheck, FaTimes, FaEdit, FaEye, FaTrash } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import Sidebar from "../../components/molecules/Sidebar";
+import { useEffect, useState } from "react";
+import { FaPlus } from "react-icons/fa";
+
+import SearchBar from "../../components/molecules/buscadorbar";
+import UserTable from "../../components/molecules/Usertable";
+import UserForm from "../../components/molecules/Userform";
+
+import RoleTable from "../../components/molecules/Roletable";
+import RoleForm from "../../components/molecules/RoleForm";
+
+import {
+  getUsuarios,
+  buscarUsuarios,
+  crearUsuario,
+  editarUsuario,
+  cambiarEstadoUsuario,
+} from "../../services/user.service";
+
+import {
+  getRoles,
+  crearRol,
+  editarRol,
+  eliminarRol,
+} from "../../services/role.service";
+
 import "./Gest_user.css";
 
-interface Usuario {
-  id: number;
-  nombre: string;
-  email: string;
-  ci: string;
-  rol: string;
-  estado: string;
-  foto?: string;
-}
-
-interface Rol {
-  id: number;
-  nombre: string;
-  descripcion: string;
-}
-
-export default function Gest_user() {
-  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [roles, setRoles] = useState<Rol[]>([]);
-  const [filtro, setFiltro] = useState("Habilitados");
-  const [vista, setVista] = useState<"usuarios" | "roles">("usuarios");
-
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modo, setModo] = useState<"ver" | "editar" | "agregar">("ver");
-  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState<Usuario | null>(null);
-  const [rolSeleccionado, setRolSeleccionado] = useState<Rol | null>(null);
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Datos simulados iniciales
-    const user = localStorage.getItem("usuario");
-    if (!user) navigate("/");
-  
-    setUsuarios([
-      { id: 1, nombre: "Alex Apaza", email: "alex@gmail.com", ci: "172728237", rol: "Administrador del Sistema", estado: "Habilitado", foto: "/avatar1.jpg" },
-      { id: 2, nombre: "Thalia Flores", email: "thalia@gmail.com", ci: "13150932", rol: "Integrantes del Equipo", estado: "Deshabilitado", foto: "/avatar2.jpg" },
-    ]);
-
-    setRoles([
-      { id: 1, nombre: "Administrador del Sistema", descripcion: "Acceso total al sistema" },
-      { id: 2, nombre: "Jefe de Proyecto", descripcion: "Gestiona los módulos principales y usuarios" },
-      { id: 3, nombre: "Integrantes del Equipo", descripcion: "Acceso a tareas asignadas" },
-      { id: 4, nombre: "Cliente / Usuario Final", descripcion: "Uso limitado del sistema" },
-    ]);
-  }, [navigate]);
-
-  const usuariosFiltrados = usuarios.filter((u) =>
-    filtro === "Habilitados" ? u.estado === "Habilitado" : u.estado === "Deshabilitado"
+// ------------------ COMPONENTE PRINCIPAL ------------------
+export default function GestUserPage() {
+  // USUARIOS
+  const [usuarios, setUsuarios] = useState<any[]>([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [usuarioActual, setUsuarioActual] = useState<any | null>(null);
+  const [modoUsuario, setModoUsuario] = useState<"agregar" | "editar" | "ver">(
+    "ver"
   );
+  const [modalUsuario, setModalUsuario] = useState(false);
 
-  const abrirModalUsuario = (usuario: Usuario | null, tipo: "ver" | "editar" | "agregar") => {
-    setUsuarioSeleccionado(usuario);
-    setModo(tipo);
-    setModalOpen(true);
+  // ROLES
+  const [roles, setRoles] = useState<any[]>([]);
+  const [modalRol, setModalRol] = useState(false);
+  const [modoRol, setModoRol] = useState<"agregar" | "editar">("agregar");
+  const [rolActual, setRolActual] = useState<any | null>(null);
+
+  // CARGAR INICIAL
+  useEffect(() => {
+    cargarUsuarios();
+    cargarRoles();
+  }, []);
+
+  const cargarUsuarios = async () => {
+    const data = await getUsuarios();
+    setUsuarios(data);
   };
 
-  const abrirModalRol = (rol: Rol | null, tipo: "agregar" | "editar") => {
-    setRolSeleccionado(rol);
-    setModo(tipo);
-    setModalOpen(true);
+  const cargarRoles = async () => {
+    const data = await getRoles();
+    setRoles(data);
   };
 
-  const cerrarModal = () => {
-    setModalOpen(false);
-    setUsuarioSeleccionado(null);
-    setRolSeleccionado(null);
+  // ------------------ BUSCAR USUARIO ------------------
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      if (busqueda.trim() === "") {
+        cargarUsuarios();
+      } else {
+        const data = await buscarUsuarios(busqueda);
+        setUsuarios(data);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [busqueda]);
+
+  // ------------------ CRUD USUARIOS ------------------
+  const abrirAgregarUsuario = () => {
+    setModoUsuario("agregar");
+    setUsuarioActual(null);
+    setModalUsuario(true);
   };
 
-  const guardarUsuario = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const data = new FormData(form);
-    const nuevoUsuario: Usuario = {
-      id: usuarioSeleccionado?.id || usuarios.length + 1,
-      nombre: data.get("nombre") as string,
-      email: data.get("email") as string,
-      ci: data.get("ci") as string,
-      rol: data.get("rol") as string,
-      estado: "Habilitado",
-      foto: "/avatar1.jpg",
-    };
+  const abrirEditarUsuario = (u: any) => {
+    setModoUsuario("editar");
+    setUsuarioActual(u);
+    setModalUsuario(true);
+  };
 
-    if (modo === "agregar") {
-      setUsuarios([...usuarios, nuevoUsuario]);
-    } else if (modo === "editar" && usuarioSeleccionado) {
-      setUsuarios(usuarios.map((u) => (u.id === usuarioSeleccionado.id ? nuevoUsuario : u)));
+  const abrirVerUsuario = (u: any) => {
+    setModoUsuario("ver");
+    setUsuarioActual(u);
+    setModalUsuario(true);
+  };
+
+  const submitUsuario = async (data: any) => {
+    if (modoUsuario === "agregar") {
+      await crearUsuario(data);
+    } else if (modoUsuario === "editar") {
+      await editarUsuario(usuarioActual.id_usuario, data);
     }
 
-    cerrarModal();
+    setModalUsuario(false);
+    cargarUsuarios();
   };
 
-  const guardarRol = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const data = new FormData(form);
-    const nuevoRol: Rol = {
-      id: rolSeleccionado?.id || roles.length + 1,
-      nombre: data.get("nombre") as string,
-      descripcion: data.get("descripcion") as string,
-    };
+  const toggleEstado = async (id: number) => {
+    await cambiarEstadoUsuario(id);
+    cargarUsuarios();
+  };
 
-    if (modo === "agregar") {
-      setRoles([...roles, nuevoRol]);
-    } else if (modo === "editar" && rolSeleccionado) {
-      setRoles(roles.map((r) => (r.id === rolSeleccionado.id ? nuevoRol : r)));
+  // ------------------ CRUD ROLES ------------------
+  const abrirAgregarRol = () => {
+    setModoRol("agregar");
+    setRolActual(null);
+    setModalRol(true);
+  };
+
+  const abrirEditarRol = (rol: any) => {
+    setModoRol("editar");
+    setRolActual(rol);
+    setModalRol(true);
+  };
+
+  const submitRol = async (data: any) => {
+    if (modoRol === "agregar") {
+      await crearRol(data);
+    } else {
+      await editarRol(rolActual.id_rol, data);
     }
 
-    cerrarModal();
+    setModalRol(false);
+    cargarRoles();
   };
 
-  const toggleEstadoUsuario = (id: number) => {
-    setUsuarios(
-      usuarios.map((u) =>
-        u.id === id
-          ? { ...u, estado: u.estado === "Habilitado" ? "Deshabilitado" : "Habilitado" }
-          : u
-      )
-    );
+  const eliminarRolClick = async (id: number) => {
+    await eliminarRol(id);
+    cargarRoles();
   };
 
-  const eliminarRol = (id: number) => {
-    setRoles(roles.filter((r) => r.id !== id));
-  };
-
+  // ------------------ VISTA PRINCIPAL ------------------
   return (
-    <div className="gest-container">
-      <Sidebar setVista={setVista} vista={vista} />
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1>Gestión de Usuarios</h1>
 
-      <main className="content">
-        {vista === "usuarios" && (
-          <>
-            <div className="cabecera">
-              <h1>Administración de Usuarios</h1>
-              <div className="actions">
-                
-                <button className="btn agregar" onClick={() => abrirModalUsuario(null, "agregar")}>
-                  <FaPlus /> Agregar Usuario
-                </button>
-                <button className="btn actualizar"><FaSyncAlt /> Actualizar</button>
-              </div>
-            </div>
+        <button className="btn agregar" onClick={abrirAgregarUsuario}>
+          <FaPlus /> Agregar Usuario
+        </button>
 
-            <div className="tabs">
-              <div className={`tab ${filtro === "Habilitados" ? "active" : ""}`} onClick={() => setFiltro("Habilitados")}>Habilitados</div>
-              <div className={`tab ${filtro === "Deshabilitados" ? "active" : ""}`} onClick={() => setFiltro("Deshabilitados")}>Deshabilitados</div>
-            </div>
-            {/* Barra de búsqueda (solo diseño) */}
-<div className="search-bar">
-  <input
-    type="text"
-    className="search-input"
-    placeholder="🔍 Buscar usuario por nombre, email o rol..."
-    disabled // solo diseño
-  />
-  <button className="btn-search" disabled>
-    Buscar
-  </button>
-</div>
+        <button className="btn agregar" onClick={abrirAgregarRol}>
+          <FaPlus /> Agregar Rol
+        </button>
+      </div>
 
+      <SearchBar value={busqueda} onChange={setBusqueda} />
 
-            <div className="table-container">
-              <table className="user-table">
-                <thead>
-                  <tr>
-                    <th>Foto</th>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>C.I.</th>
-                    <th>Rol</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {usuariosFiltrados.map((u) => (
-                    <tr key={u.id}>
-                      <td><img src={u.foto} alt="" className="user-photo" /></td>
-                      <td>{u.nombre}</td>
-                      <td>{u.email}</td>
-                      <td>{u.ci}</td>
-                      <td>{u.rol}</td>
-                      <td className="acciones">
-                        <button className="ver" onClick={() => abrirModalUsuario(u, "ver")}><FaEye /></button>
-                        <button className="editar" onClick={() => abrirModalUsuario(u, "editar")}><FaEdit /></button>
-                        <button onClick={() => toggleEstadoUsuario(u.id)}>
-                          {u.estado === "Habilitado" ? <FaTimes /> : <FaCheck />}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
+      {/* TABLA DE USUARIOS */}
+      <UserTable
+        usuarios={usuarios}
+        onView={abrirVerUsuario}
+        onEdit={abrirEditarUsuario}
+        onToggle={toggleEstado}
+      />
 
-        {vista === "roles" && (
-          <>
-            <h1>Roles del Sistema</h1>
-            <button className="btn agregar" onClick={() => abrirModalRol(null, "agregar")}>
-              <FaPlus /> Agregar Rol
-            </button>
+      {/* ROLES */}
+      <div className="dashboard-header" style={{ marginTop: "40px" }}>
+        <h2>Roles</h2>
+      </div>
 
-            <div className="table-container">
-              <table className="user-table">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {roles.map((r) => (
-                    <tr key={r.id}>
-                      <td>{r.nombre}</td>
-                      <td>{r.descripcion}</td>
-                      <td>
-                        <button className="editar" onClick={() => abrirModalRol(r, "editar")}><FaEdit /></button>
-                        <button className="eliminar" onClick={() => eliminarRol(r.id)}><FaTrash /></button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </main>
+      <RoleTable
+        roles={roles}
+        onEdit={abrirEditarRol}
+        onDelete={eliminarRolClick}
+      />
 
-      {modalOpen && (
-        <div className="modal-overlay">
+      {/* MODAL USUARIOS */}
+      {modalUsuario && (
+        <div className="modal">
           <div className="modal-content">
-            <div className="modal-header">
-              <h2>
-                {modo === "agregar" && (vista === "usuarios" ? "Agregar Usuario" : "Agregar Rol")}
-                {modo === "editar" && (vista === "usuarios" ? "Editar Usuario" : "Editar Rol")}
-                {modo === "ver" && "Ver Usuario"}
-              </h2>
-              <button className="close-btn" onClick={cerrarModal}>×</button>
-            </div>
+            <h2>
+              {modoUsuario === "agregar"
+                ? "Agregar Usuario"
+                : modoUsuario === "editar"
+                ? "Editar Usuario"
+                : "Información del Usuario"}
+            </h2>
 
-            {vista === "usuarios" ? (
-              <form onSubmit={guardarUsuario} className={`user-form ${modo === "ver" ? "readonly" : ""}`}>
-                <div className="form-grid">
-                  <label>Nombre <input name="nombre" defaultValue={usuarioSeleccionado?.nombre || ""} readOnly={modo === "ver"} /></label>
-                  <label>Email <input name="email" defaultValue={usuarioSeleccionado?.email || ""} readOnly={modo === "ver"} /></label>
-                  <label>C.I. <input name="ci" defaultValue={usuarioSeleccionado?.ci || ""} readOnly={modo === "ver"} /></label>
-                  <label>Rol <input name="rol" defaultValue={usuarioSeleccionado?.rol || ""} readOnly={modo === "ver"} /></label>
-                </div>
+            <UserForm
+              modo={modoUsuario}
+              usuario={usuarioActual}
+              roles={roles}
+              onSubmit={submitUsuario}
+            />
 
-                {modo !== "ver" && (
-                  <div className="modal-actions">
-                    <button type="submit" className="btn agregar">
-                      {modo === "agregar" ? "Guardar Usuario" : "Guardar Cambios"}
-                    </button>
-                  </div>
-                )}
-              </form>
-            ) : (
-              <form onSubmit={guardarRol}>
-                <label>Nombre del Rol <input name="nombre" defaultValue={rolSeleccionado?.nombre || ""} required /></label>
-                <label>Descripción <input name="descripcion" defaultValue={rolSeleccionado?.descripcion || ""} required /></label>
-                <div className="modal-actions">
-                  <button type="submit" className="btn agregar">
-                    {modo === "agregar" ? "Guardar Rol" : "Guardar Cambios"}
-                  </button>
-                </div>
-              </form>
-            )}
+            <button className="modal-close" onClick={() => setModalUsuario(false)}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ROLES */}
+      {modalRol && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>{modoRol === "agregar" ? "Agregar Rol" : "Editar Rol"}</h2>
+
+            <RoleForm modo={modoRol} rol={rolActual} onSubmit={submitRol} />
+
+            <button className="modal-close" onClick={() => setModalRol(false)}>
+              Cerrar
+            </button>
           </div>
         </div>
       )}

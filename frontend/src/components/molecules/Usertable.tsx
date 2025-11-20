@@ -1,55 +1,53 @@
-interface Usuario {
-  id: number;
-  nombre: string;
-  email: string;
-  direccion: string;
-  ci: string;
-  rol: string;
-  estado: string;
+import { FaEdit, FaEye, FaCheck, FaTimes } from "react-icons/fa";
+
+interface Props {
+  usuarios: any[];
+  onView: (u: any) => void;
+  onEdit: (u: any) => void;
+  onToggle: (id: number) => void;
 }
 
-interface TableProps {
-  usuarios: Usuario[];
-}
-
-export default function UserTable({ usuarios }: TableProps) {
+export default function UserTable({ usuarios, onView, onEdit, onToggle }: Props) {
   return (
     <div className="table-container">
       <table className="user-table">
         <thead>
           <tr>
+            <th>Foto</th>
             <th>Nombre</th>
             <th>Correo</th>
-            <th>Dirección</th>
-            <th>Cédula</th>
             <th>Rol</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
+
         <tbody>
-          {usuarios.length > 0 ? (
-            usuarios.map((u) => (
-              <tr key={u.id}>
-                <td>{u.nombre}</td>
-                <td>{u.email}</td>
-                <td>{u.direccion}</td>
-                <td>{u.ci}</td>
-                <td>{u.rol}</td>
-                <td className="acciones">
-                  <button className="ver">👁️</button>
-                  <button className="editar">✏️</button>
-                  <button className="eliminar">❌</button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={6} className="no-data">
-                No hay usuarios en esta categoría.
+          {usuarios.map((u) => (
+            <tr key={u.id_usuario}>
+              <td>
+                <img src="/avatar1.jpg" className="user-photo" />
+              </td>
+
+              <td>{u.nombre} {u.apellido}</td>
+
+              <td>{u.correo}</td>
+
+              <td>{u.nombre_rol}</td>
+
+              <td>{u.estado === 1 ? "Habilitado" : "Deshabilitado"}</td>
+
+              <td className="acciones">
+                <button className="ver" onClick={() => onView(u)}><FaEye /></button>
+                <button className="editar" onClick={() => onEdit(u)}><FaEdit /></button>
+                <button onClick={() => onToggle(u.id_usuario)}>
+                  {u.estado === 1 ? <FaTimes /> : <FaCheck />}
+                </button>
               </td>
             </tr>
-          )}
+          ))}
         </tbody>
+
       </table>
     </div>
   );
