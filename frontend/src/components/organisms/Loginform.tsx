@@ -35,7 +35,7 @@ const Loginform = () => {
     if (data.usuario.rol === "Administrador") {
       navigate("/gest_user");
     } else {
-      navigate("/dashboard"); // o la ruta que quieras para otros roles
+      navigate("/Repository"); // o la ruta que quieras para otros roles
     }
   } else {
     alert("Credenciales incorrectas");
