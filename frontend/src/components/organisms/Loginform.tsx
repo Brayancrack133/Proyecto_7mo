@@ -24,8 +24,10 @@ const Loginform = () => {
       navigate("/dashboard"); // o la ruta que quieras para otros roles
     }
   } else {
-    alert("Credenciales incorrectas");
-  }
+  // Esto nos dirá exactamente qué respondió el backend
+  alert(`Error del servidor: ${data.mensaje}`); 
+  console.log("Respuesta del backend:", data); // Míralo en la consola (F12)
+}
 };
 
   return (

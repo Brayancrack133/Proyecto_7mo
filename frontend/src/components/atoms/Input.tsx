@@ -1,64 +1,48 @@
 import React from 'react';
 
-interface InputProps {
-  type?: 'text' | 'email' | 'password' | 'number' | 'date' | 'time';
-  name: string;
-  value: string | number;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  label?: string;
-  error?: string;
-  required?: boolean;
-  disabled?: boolean;
-  icon?: React.ReactNode;
-  className?: string;
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
 }
 
-export const Input: React.FC<InputProps> = ({
-  type = 'text',
-  name,
-  value,
-  onChange,
-  placeholder,
-  label,
-  error,
-  required = false,
-  disabled = false,
-  icon,
-  className = ''
-}) => {
+export const Input = ({ label, ...props }: InputProps) => {
   return (
-    <div className={`w-full ${className}`}>
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-      )}
-      <div className="relative">
-        {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            {icon}
-          </div>
-        )}
-        <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          disabled={disabled}
-          required={required}
-          className={`w-full ${icon ? 'pl-10' : 'pl-4'} pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-            error 
-              ? 'border-red-500 focus:ring-red-500' 
-              : 'border-gray-300 focus:ring-blue-500'
-          } ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
-        />
-      </div>
-      {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
-      )}
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: '8px', 
+      marginBottom: '16px',
+      width: '100%' // Asegura que ocupe el ancho disponible
+    }}>
+      
+      {/* Etiqueta del input */}
+      <label style={{ 
+        fontWeight: '600', 
+        fontSize: '14px', 
+        color: '#374151', // Gris oscuro profesional
+        marginLeft: '4px'
+      }}>
+        {label}
+      </label>
+
+      {/* El campo de texto */}
+      <input 
+        {...props} // Aquí pasamos todas las props (placeholder, value, etc.) automáticamente
+        style={{
+          padding: '12px 16px',
+          border: '1px solid #E5E7EB', // Borde gris suave
+          borderRadius: '8px', // Bordes redondeados modernos
+          fontSize: '14px',
+          outline: 'none',
+          width: '100%',
+          boxSizing: 'border-box',
+          backgroundColor: '#fff',
+          color: '#1F2937',
+          transition: 'border-color 0.2s'
+        }}
+        // Añadimos un pequeño efecto al hacer foco (opcional, se puede hacer con CSS puro también)
+        onFocus={(e) => e.target.style.borderColor = '#dd9d52'} // Naranja de tu marca
+        onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
+      />
     </div>
   );
 };

@@ -1,24 +1,21 @@
-// src/App.tsx
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom"
 import React from 'react';
 
-// Importamos el contexto
+// Contexto
 import { UserProvider } from './context/UserContext'; 
 
-// Componentes de Autenticación
+// Páginas
 import Login from "./pages/Login/Login";
 import Register from "./pages/Registro/Register";
+import CrearProyecto from "./pages/CrearProyecto"; // <--- 1. IMPORTAMOS LA NUEVA PÁGINA
 
-// Rutas internas del Dashboard
+// Rutas internas
 import { AppRoutes } from './routes/AppRoutes'; 
 
-// Importar estilos
+// Estilos
 import "./App.css"; 
 
-// ============================================================================
-// AuthWrapper para proteger rutas
-// ============================================================================
 interface AuthWrapperProps {
     children: React.ReactNode;
     isAuthenticated: boolean;
@@ -31,13 +28,10 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, isAuthenticated }) 
     return <>{children}</>;
 };
 
-// ============================================================================
-// COMPONENTE PRINCIPAL APP
-// ============================================================================
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => !!localStorage.getItem('token')
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
+  ;
 
   return (
     <div className="principal">
@@ -59,6 +53,23 @@ function App() {
                           Mis Proyectos
                         </Link>
                       </li> 
+                      
+                      {/* 2. BOTÓN NUEVO: CREAR PROYECTO */}
+                      <li>
+                        <Link 
+                           to="/dashboard/crear-proyecto"
+                           style={{ 
+                             backgroundColor: '#dd9d52', 
+                             color: '#000', 
+                             padding: '8px 15px', 
+                             borderRadius: '20px',
+                             fontWeight: 'bold' 
+                           }}
+                        >
+                          + Nuevo Proyecto
+                        </Link>
+                      </li>
+
                       <li><Link to="/contacto">Contacto</Link></li>
                       <li>
                         {isAuthenticated ? (
@@ -75,47 +86,38 @@ function App() {
                       <h1 className="logo">FUTURE PLAN</h1>
                       <p className="slogan">"La forma inteligente de organizar tus proyectos"</p>
                       <Link 
-                        to={isAuthenticated ? "/dashboard/proyectos" : "/login"} 
+                        to={isAuthenticated ? "/dashboard/crear-proyecto" : "/login"} 
                         className="btn-main"
                       >
                         Empezar
                       </Link>
-                      <p className="descripcion">
-                        Future Plan es una plataforma de planificación y gestión de proyectos 
-                        que integra Inteligencia Artificial.
-                      </p>
                     </div>
                     <div className="main-image">
-                      <img 
-                        src="https://placehold.co/400x300/e0e0e0/000000?text=Future+Plan" 
-                        alt="Future Plan" 
-                      />
+                      {/* Aquí va tu imagen del dashboard o robot */}
                     </div>
                   </section>
-                  
-                  <section className="features">
-                    <div className="feature">
-                      <h3>Planificación inteligente</h3>
-                      <p>La IA sugiere metodologías según tu proyecto.</p>
-                    </div>
-                    <div className="feature">
-                      <h3>Productividad optimizada</h3>
-                      <p>KPIs y alertas tempranas automáticas.</p>
-                    </div>
-                  </section>
-
-                  <footer className="footer-landing">
-                    <p>&copy; {new Date().getFullYear()} FUTURE PLAN.</p>
-                  </footer>
                 </div>
               }
             />
 
-            {/* ========== AUTENTICACIÓN ========== */}
+            {/* ========== RUTAS AUTH ========== */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {/* ========== DASHBOARD PROTEGIDO ========== */}
+            {/* ========== RUTAS DASHBOARD ========== */}
+            
+            {/* 3. RUTA NUEVA PARA CREAR PROYECTO */}
+            {/* La ponemos fuera de AppRoutes si quieres que tenga el Layout específico que creamos */}
+            <Route 
+              path="/dashboard/crear-proyecto" 
+              element={
+                <AuthWrapper isAuthenticated={isAuthenticated}>
+                   <CrearProyecto />
+                </AuthWrapper>
+              } 
+            />
+
+            {/* Rutas generales del dashboard */}
             <Route 
               path="/dashboard/*" 
               element={
@@ -125,16 +127,8 @@ function App() {
               } 
             />
 
-            {/* ========== 404 ========== */}
-            <Route 
-              path="*" 
-              element={
-                <div style={{ textAlign: 'center', padding: '50px' }}>
-                  <h1>404 - Página no encontrada</h1>
-                  <Link to="/">Volver al inicio</Link>
-                </div>
-              } 
-            />
+            {/* 404 */}
+            <Route path="*" element={<h1>404 - No encontrado</h1>} />
           
           </Routes>
         </UserProvider>
