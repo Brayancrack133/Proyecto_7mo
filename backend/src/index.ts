@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-
+import { db } from "./config/db.js"; 
 // Inicializar variables de entorno
 dotenv.config();
 
