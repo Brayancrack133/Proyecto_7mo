@@ -3,10 +3,16 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { db } from "./config/db.js";
 
+
+import path from "path"; // <--- Agrega esto arriba si no está
+import { fileURLToPath } from 'url'; // <--- Necesario para __dirname en módulos ES
+
 // Importamos las rutas
 import proyectosRoutes from "./routes/proyectos.routes.js";
-import tareasRoutes from "./routes/tareas.routes.js"; 
-
+import tareasRoutes from "./routes/tareas.routes.js";
+import documentosRoutes from "./routes/documentos.routes.js";
+import notificacionesRoutes from "./routes/notificaciones.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 dotenv.config();
 
 const app = express();
@@ -16,7 +22,11 @@ app.use(express.json());
 // --- DEFINICIÓN DE RUTAS ---
 app.use("/api", proyectosRoutes); // Para /mis-proyectos
 app.use("/api", tareasRoutes);    // Para /tareas
+app.use("/api", notificacionesRoutes);
+app.use("/api", chatRoutes);
 
+app.use('/uploads', express.static('uploads'));
+app.use("/api", documentosRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
@@ -37,11 +47,11 @@ app.listen(PORT, () => {
 
 // Obtener proyectos de un usuario
 app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
-    const { idUsuario } = req.params;
+  const { idUsuario } = req.params;
 
-    try {
-        const [rows]: any = await db.query(
-            `
+  try {
+    const [rows]: any = await db.query(
+      `
             SELECT DISTINCT 
                 p.id_proyecto,
                 p.nombre,
@@ -50,12 +60,12 @@ app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
             JOIN miembros_equipo me ON p.id_equipo = me.id_equipo
             WHERE me.id_usuario = ?
             `,
-            [idUsuario, idUsuario]
-        );
+      [idUsuario, idUsuario]
+    );
 
-        res.json(rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Error obteniendo proyectos" });
-    }
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo proyectos" });
+  }
 });

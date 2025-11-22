@@ -1,10 +1,11 @@
 // src/organisms/Planificacion.tsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './Planificacion.css'
 import Tareas from './Tareas'
 import Documentos from './Documentos'
 import ChatInterno from './ChatInterno'
 import Notificaciones from './Notificaciones'
+import { useUser } from '../../context/UserContext';
 
 // 1. AQUÍ CREAMOS LA "MANO" PARA RECIBIR EL DATO
 interface Props {
@@ -13,8 +14,12 @@ interface Props {
 
 // 2. AQUÍ USAMOS LA INTERFAZ
 const Planificacion: React.FC<Props> = ({ idProyecto }) => {
-    
+
     const [activo, setActivo] = useState('Tareas')
+    const { usuario } = useUser(); // <--- 1. Obtenemos usuario global
+    const [esLider, setEsLider] = useState(false); // <--- 2. Estado para guardar el permiso
+
+    const [tareaParaAbrir, setTareaParaAbrir] = useState<number | null>(null);
 
     const opciones = [
         { nombre: 'Tareas', icono: '/tarea.png' },
@@ -23,16 +28,54 @@ const Planificacion: React.FC<Props> = ({ idProyecto }) => {
         { nombre: 'Notificaciones', icono: '/notificacion.png' },
     ]
 
+    const irATareas = (idTarea?: number) => {
+        setActivo('Tareas');
+        if (idTarea) {
+            setTareaParaAbrir(idTarea);
+        }
+    };
+
+    useEffect(() => {
+        if (idProyecto && usuario) {
+            fetch(`http://localhost:3000/api/proyecto/${idProyecto}/usuario/${usuario.id_usuario}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Si el rol calculado es 'Líder', ponemos true
+                    if (data.rol_calculado === 'Líder') {
+                        setEsLider(true);
+                        console.log("👑 Acceso de LÍDER concedido");
+                    } else {
+                        setEsLider(false);
+                        console.log("👤 Acceso de INTEGRANTE concedido");
+                    }
+                })
+                .catch(err => console.error("Error verificando rol:", err));
+        }
+    }, [idProyecto, usuario]);
+
+
+
     const renderContenido = () => {
         switch (activo) {
-            // 3. AHORA SÍ, SE LO PASAMOS AL COMPONENTE TAREAS
-            case 'Tareas': return <Tareas idProyecto={idProyecto} />
-            
-            // Los demás quedan igual por ahora
-            case 'Documentos': return <Documentos />
-            case 'Chat Interno': return <ChatInterno />
-            case 'Notificaciones': return <Notificaciones />
-            default: return null
+            case 'Tareas': return (
+                <Tareas
+                    idProyecto={idProyecto}
+                    esLider={esLider}
+                    // 3. PASAMOS LA "ORDEN" AL COMPONENTE TAREAS
+                    idTareaInicial={tareaParaAbrir}
+                    // Función para limpiar la orden una vez abierta
+                    limpiarSeleccion={() => setTareaParaAbrir(null)}
+                />
+            );
+            case 'Chat Interno': return <ChatInterno idProyecto={idProyecto} />
+            case 'Documentos': return <Documentos idProyecto={idProyecto} esLider={esLider} />
+            // ... otros casos
+            case 'Notificaciones': return (
+                <Notificaciones
+                    alClickEnTarea={irATareas}
+                    idProyecto={idProyecto!} // <--- AGREGAMOS ESTO (El ! es porque sabemos que existe)
+                />
+            );            // ...
         }
     }
 
