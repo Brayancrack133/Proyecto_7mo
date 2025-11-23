@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import pool from '../config/db.js';
 import type { 
   Project, 
   ProjectCreate, 
@@ -6,15 +6,12 @@ import type {
   ProjectWithDetails,
   ProjectStatus 
 } from '../types/project.types.js';
-import type { RowDataPacket, ResultSetHeader } from 'mysql2'; // CORREGIDO: Importación de tipos de mysql2
+import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export class ProjectModel {
-  
+
   // ==================== CRUD BÁSICO ====================
-  
-  /**
-   * Obtener todos los proyectos con información del jefe y estado actual
-   */
+
   static async getAll(): Promise<Project[]> {
     const query = `
       SELECT 
@@ -24,18 +21,18 @@ export class ProjectModel {
         p.fecha_inicio,
         p.fecha_fin,
         p.id_jefe,
-        CONCAT(u.nombre, ' ', u.apellido) as nombre_jefe,
-        ep.nombre_estado as estado_actual,
+        CONCAT(u.nombre, ' ', u.apellido) AS nombre_jefe,
+        ep.nombre_estado AS estado_actual,
         peh.id_estado_proyecto,
-        COUNT(DISTINCT t.id_tarea) as cantidad_tareas
+        COUNT(DISTINCT t.id_tarea) AS cantidad_tareas
       FROM Proyectos p
       LEFT JOIN Usuarios u ON p.id_jefe = u.id_usuario
       LEFT JOIN (
         SELECT id_proyecto, id_estado_proyecto, fecha_cambio
         FROM Proyecto_Estado_Historico peh1
         WHERE fecha_cambio = (
-          SELECT MAX(fecha_cambio) 
-          FROM Proyecto_Estado_Historico peh2 
+          SELECT MAX(fecha_cambio)
+          FROM Proyecto_Estado_Historico peh2
           WHERE peh2.id_proyecto = peh1.id_proyecto
         )
       ) peh ON p.id_proyecto = peh.id_proyecto
@@ -45,21 +42,19 @@ export class ProjectModel {
       ORDER BY p.fecha_inicio DESC
     `;
 
-    const [rows] = await pool.promise().query<RowDataPacket[]>(query);
+    const [rows] = await pool.query<RowDataPacket[]>(query);
     return rows as Project[];
   }
 
-  /**
-   * Obtener proyecto por ID con detalles completos
-   */
+  // ==================== OBTENER POR ID ====================
+
   static async getById(id: number): Promise<ProjectWithDetails | null> {
-    // Información básica del proyecto
     const projectQuery = `
       SELECT 
         p.*,
-        CONCAT(u.nombre, ' ', u.apellido) as nombre_jefe,
-        u.correo as correo_jefe,
-        ep.nombre_estado as estado_actual,
+        CONCAT(u.nombre, ' ', u.apellido) AS nombre_jefe,
+        u.correo AS correo_jefe,
+        ep.nombre_estado AS estado_actual,
         peh.id_estado_proyecto
       FROM Proyectos p
       LEFT JOIN Usuarios u ON p.id_jefe = u.id_usuario
@@ -67,8 +62,8 @@ export class ProjectModel {
         SELECT id_proyecto, id_estado_proyecto, fecha_cambio
         FROM Proyecto_Estado_Historico peh1
         WHERE fecha_cambio = (
-          SELECT MAX(fecha_cambio) 
-          FROM Proyecto_Estado_Historico peh2 
+          SELECT MAX(fecha_cambio)
+          FROM Proyecto_Estado_Historico peh2
           WHERE peh2.id_proyecto = peh1.id_proyecto
         )
       ) peh ON p.id_proyecto = peh.id_proyecto
@@ -76,15 +71,12 @@ export class ProjectModel {
       WHERE p.id_proyecto = ?
     `;
 
-    const [projectRows] = await pool.promise().query<RowDataPacket[]>(projectQuery, [id]);
-    
-    if (projectRows.length === 0) {
-      return null;
-    }
+    const [projectRows] = await pool.query<RowDataPacket[]>(projectQuery, [id]);
+
+    if (projectRows.length === 0) return null;
 
     const project = projectRows[0] as ProjectWithDetails;
 
-    // Obtener equipo del proyecto
     const teamQuery = `
       SELECT 
         me.id_miembro,
@@ -101,15 +93,14 @@ export class ProjectModel {
       )
     `;
 
-    const [teamRows] = await pool.promise().query<RowDataPacket[]>(teamQuery, [project.nombre]);
+    const [teamRows] = await pool.query<RowDataPacket[]>(teamQuery, [project.nombre]);
     project.equipo = teamRows as any;
 
-    // Obtener tareas del proyecto
     const tasksQuery = `
       SELECT 
         t.*,
-        CONCAT(u.nombre, ' ', u.apellido) as nombre_responsable,
-        pr.nombre_prioridad as prioridad_actual
+        CONCAT(u.nombre, ' ', u.apellido) AS nombre_responsable,
+        pr.nombre_prioridad AS prioridad_actual
       FROM Tareas t
       LEFT JOIN Usuarios u ON t.id_responsable = u.id_usuario
       LEFT JOIN (
@@ -126,81 +117,64 @@ export class ProjectModel {
       ORDER BY t.fecha_inicio DESC
     `;
 
-    const [tasksRows] = await pool.promise().query<RowDataPacket[]>(tasksQuery, [id]);
+    const [tasksRows] = await pool.query<RowDataPacket[]>(tasksQuery, [id]);
     project.tareas = tasksRows as any;
 
     return project;
   }
 
-  /**
-   * Crear nuevo proyecto
-   */
+  // ==================== CREAR ====================
+
   static async create(data: ProjectCreate): Promise<Project> {
-    const connection = await pool.promise().getConnection();
-    
+    const connection = await pool.getConnection();
+
     try {
       await connection.beginTransaction();
 
-      // 1. Insertar proyecto
       const insertQuery = `
         INSERT INTO Proyectos (nombre, descripcion, fecha_inicio, fecha_fin, id_jefe)
         VALUES (?, ?, ?, ?, ?)
       `;
 
-      const [result] = await connection.query<ResultSetHeader>(
-        insertQuery,
-        [
-          data.nombre,
-          data.descripcion || null,
-          data.fecha_inicio,
-          data.fecha_fin || null,
-          data.id_jefe
-        ]
-      );
+      const [result] = await connection.query<ResultSetHeader>(insertQuery, [
+        data.nombre,
+        data.descripcion || null,
+        data.fecha_inicio,
+        data.fecha_fin || null,
+        data.id_jefe
+      ]);
 
       const projectId = result.insertId;
 
-      // 2. Asignar estado inicial (Planificación por defecto)
-      const estadoId = data.id_estado_proyecto || 1; // 1 = Planificación
-      
       await connection.query(
         'INSERT INTO Proyecto_Estado_Historico (id_proyecto, id_estado_proyecto) VALUES (?, ?)',
-        [projectId, estadoId]
+        [projectId, data.id_estado_proyecto || 1]
       );
 
-      // 3. Crear equipo para el proyecto
       await connection.query(
         'INSERT INTO Equipos (nombre_equipo) VALUES (?)',
         [`Equipo ${data.nombre}`]
       );
 
-      const [equipoResult] = await connection.query<RowDataPacket[]>(
-        'SELECT LAST_INSERT_ID() as id_equipo'
+      const [equipoRows] = await connection.query<RowDataPacket[]>(
+        'SELECT LAST_INSERT_ID() AS id_equipo'
       );
 
-      // CORREGIDO: Manejar posible undefined si equipoResult está vacío (aunque es muy improbable después de un INSERT)
-      const equipoId = (equipoResult[0] as { id_equipo: number } | undefined)?.id_equipo;
-      
-      if (!equipoId) {
-        throw new Error('No se pudo obtener el ID del equipo recién creado');
-      }
+      const equipoId = (equipoRows[0] as { id_equipo: number }).id_equipo;
 
-      // 4. Agregar al jefe como líder del equipo
       await connection.query(
         'INSERT INTO Miembros_Equipo (id_equipo, id_usuario, rol_en_equipo) VALUES (?, ?, ?)',
         [equipoId, data.id_jefe, 'Jefe de Proyecto']
       );
 
-      // 5. Registrar en auditoría
       await connection.query(
         `INSERT INTO Logs_Auditoria (id_usuario, accion, tabla_afectada, registro_id, detalles)
-          VALUES (?, 'CREATE_PROYECTO', 'Proyectos', ?, ?)`,
+         VALUES (?, 'CREATE_PROYECTO', 'Proyectos', ?, ?)`,
         [data.id_jefe, projectId, JSON.stringify(data)]
       );
 
       await connection.commit();
 
-      // Obtener proyecto creado
       const project = await this.getById(projectId);
       return project as Project;
 
@@ -212,11 +186,10 @@ export class ProjectModel {
     }
   }
 
-  /**
-   * Actualizar proyecto
-   */
+  // ==================== ACTUALIZAR ====================
+
   static async update(id: number, data: ProjectUpdate, userId: number): Promise<Project | null> {
-    const connection = await pool.promise().getConnection();
+    const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -224,30 +197,17 @@ export class ProjectModel {
       const fields: string[] = [];
       const values: any[] = [];
 
-      if (data.nombre !== undefined) {
-        fields.push('nombre = ?');
-        values.push(data.nombre);
-      }
-      if (data.descripcion !== undefined) {
-        fields.push('descripcion = ?');
-        values.push(data.descripcion);
-      }
-      if (data.fecha_inicio !== undefined) {
-        fields.push('fecha_inicio = ?');
-        values.push(data.fecha_inicio);
-      }
-      if (data.fecha_fin !== undefined) {
-        fields.push('fecha_fin = ?');
-        values.push(data.fecha_fin);
-      }
-      if (data.id_jefe !== undefined) {
-        fields.push('id_jefe = ?');
-        values.push(data.id_jefe);
+      for (const key of Object.keys(data)) {
+        const value = data[key as keyof ProjectUpdate];
+        if (value !== undefined) {
+          fields.push(`${key} = ?`);
+          values.push(value);
+        }
       }
 
       if (fields.length === 0) {
         await connection.rollback();
-        return this.getById(id) as any;
+        return await this.getById(id);
       }
 
       values.push(id);
@@ -257,16 +217,15 @@ export class ProjectModel {
         values
       );
 
-      // Registrar en auditoría
       await connection.query(
         `INSERT INTO Logs_Auditoria (id_usuario, accion, tabla_afectada, registro_id, detalles)
-          VALUES (?, 'UPDATE_PROYECTO', 'Proyectos', ?, ?)`,
+         VALUES (?, 'UPDATE_PROYECTO', 'Proyectos', ?, ?)`,
         [userId, id, JSON.stringify(data)]
       );
 
       await connection.commit();
 
-      return this.getById(id) as any;
+      return await this.getById(id);
 
     } catch (error) {
       await connection.rollback();
@@ -276,16 +235,14 @@ export class ProjectModel {
     }
   }
 
-  /**
-   * Eliminar proyecto (soft delete o cascada según configuración)
-   */
+  // ==================== ELIMINAR ====================
+
   static async delete(id: number, userId: number): Promise<boolean> {
-    const connection = await pool.promise().getConnection();
+    const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
 
-      // Verificar que el proyecto existe
       const [projectRows] = await connection.query<RowDataPacket[]>(
         'SELECT * FROM Proyectos WHERE id_proyecto = ?',
         [id]
@@ -296,14 +253,12 @@ export class ProjectModel {
         return false;
       }
 
-      // Registrar en auditoría antes de eliminar
       await connection.query(
         `INSERT INTO Logs_Auditoria (id_usuario, accion, tabla_afectada, registro_id, detalles)
-          VALUES (?, 'DELETE_PROYECTO', 'Proyectos', ?, ?)`,
+         VALUES (?, 'DELETE_PROYECTO', 'Proyectos', ?, ?)`,
         [userId, id, JSON.stringify(projectRows[0])]
       );
 
-      // Eliminar proyecto (CASCADE eliminará tareas, documentos, etc.)
       const [result] = await connection.query<ResultSetHeader>(
         'DELETE FROM Proyectos WHERE id_proyecto = ?',
         [id]
@@ -321,26 +276,23 @@ export class ProjectModel {
     }
   }
 
-  // ==================== MÉTODOS ADICIONALES ====================
+  // ==================== GET POR JEFE ====================
 
-  /**
-   * Obtener proyectos por jefe
-   */
   static async getByJefe(jefeId: number): Promise<Project[]> {
     const query = `
       SELECT 
         p.*,
-        CONCAT(u.nombre, ' ', u.apellido) as nombre_jefe,
-        ep.nombre_estado as estado_actual,
-        COUNT(DISTINCT t.id_tarea) as cantidad_tareas
+        CONCAT(u.nombre, ' ', u.apellido) AS nombre_jefe,
+        ep.nombre_estado AS estado_actual,
+        COUNT(DISTINCT t.id_tarea) AS cantidad_tareas
       FROM Proyectos p
       LEFT JOIN Usuarios u ON p.id_jefe = u.id_usuario
       LEFT JOIN (
         SELECT id_proyecto, id_estado_proyecto
         FROM Proyecto_Estado_Historico peh1
         WHERE fecha_cambio = (
-          SELECT MAX(fecha_cambio) 
-          FROM Proyecto_Estado_Historico peh2 
+          SELECT MAX(fecha_cambio)
+          FROM Proyecto_Estado_Historico peh2
           WHERE peh2.id_proyecto = peh1.id_proyecto
         )
       ) peh ON p.id_proyecto = peh.id_proyecto
@@ -351,19 +303,18 @@ export class ProjectModel {
       ORDER BY p.fecha_inicio DESC
     `;
 
-    const [rows] = await pool.promise().query<RowDataPacket[]>(query, [jefeId]);
+    const [rows] = await pool.query<RowDataPacket[]>(query, [jefeId]);
     return rows as Project[];
   }
 
-  /**
-   * Obtener proyectos donde el usuario es colaborador
-   */
+  // ==================== GET POR COLABORADOR ====================
+
   static async getByColaborador(userId: number): Promise<Project[]> {
     const query = `
       SELECT DISTINCT
         p.*,
-        CONCAT(u.nombre, ' ', u.apellido) as nombre_jefe,
-        ep.nombre_estado as estado_actual,
+        CONCAT(u.nombre, ' ', u.apellido) AS nombre_jefe,
+        ep.nombre_estado AS estado_actual,
         me.rol_en_equipo
       FROM Proyectos p
       INNER JOIN Equipos eq ON eq.nombre_equipo LIKE CONCAT('%', p.nombre, '%')
@@ -373,8 +324,8 @@ export class ProjectModel {
         SELECT id_proyecto, id_estado_proyecto
         FROM Proyecto_Estado_Historico peh1
         WHERE fecha_cambio = (
-          SELECT MAX(fecha_cambio) 
-          FROM Proyecto_Estado_Historico peh2 
+          SELECT MAX(fecha_cambio)
+          FROM Proyecto_Estado_Historico peh2
           WHERE peh2.id_proyecto = peh1.id_proyecto
         )
       ) peh ON p.id_proyecto = peh.id_proyecto
@@ -383,29 +334,26 @@ export class ProjectModel {
       ORDER BY p.fecha_inicio DESC
     `;
 
-    const [rows] = await pool.promise().query<RowDataPacket[]>(query, [userId, userId]);
+    const [rows] = await pool.query<RowDataPacket[]>(query, [userId, userId]);
     return rows as Project[];
   }
 
-  /**
-   * Cambiar estado del proyecto
-   */
+  // ==================== CAMBIAR ESTADO ====================
+
   static async changeStatus(projectId: number, nuevoEstadoId: number, userId: number): Promise<boolean> {
-    const connection = await pool.promise().getConnection();
+    const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
 
-      // Insertar nuevo estado en el histórico
       await connection.query(
         'INSERT INTO Proyecto_Estado_Historico (id_proyecto, id_estado_proyecto) VALUES (?, ?)',
         [projectId, nuevoEstadoId]
       );
 
-      // Registrar en auditoría
       await connection.query(
         `INSERT INTO Logs_Auditoria (id_usuario, accion, tabla_afectada, registro_id, detalles)
-          VALUES (?, 'CHANGE_STATUS_PROYECTO', 'Proyecto_Estado_Historico', ?, ?)`,
+         VALUES (?, 'CHANGE_STATUS_PROYECTO', 'Proyecto_Estado_Historico', ?, ?)`,
         [userId, projectId, `Nuevo estado: ${nuevoEstadoId}`]
       );
 
@@ -420,58 +368,49 @@ export class ProjectModel {
     }
   }
 
-  /**
-   * Obtener todos los estados disponibles
-   */
+  // ==================== ESTADOS ====================
+
   static async getAllStatuses(): Promise<ProjectStatus[]> {
-    const [rows] = await pool.promise().query<RowDataPacket[]>(
+    const [rows] = await pool.query<RowDataPacket[]>(
       'SELECT * FROM Estados_Proyecto ORDER BY id_estado_proyecto'
     );
     return rows as ProjectStatus[];
   }
 
-  /**
-   * Agregar miembro al equipo del proyecto
-   */
+  // ==================== MIEMBROS DE EQUIPO ====================
+
   static async addTeamMember(
-    projectId: number, 
-    userId: number, 
+    projectId: number,
+    userId: number,
     rolEnEquipo: string,
     adminId: number
   ): Promise<boolean> {
-    const connection = await pool.promise().getConnection();
+    const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
 
-      // Obtener el equipo del proyecto
       const [equipoRows] = await connection.query<RowDataPacket[]>(
-        `SELECT e.id_equipo 
-          FROM Equipos e 
-          INNER JOIN Proyectos p ON e.nombre_equipo LIKE CONCAT('%', p.nombre, '%')
-          WHERE p.id_proyecto = ? 
-          LIMIT 1`,
+        `SELECT e.id_equipo
+         FROM Equipos e
+         INNER JOIN Proyectos p ON e.nombre_equipo LIKE CONCAT('%', p.nombre, '%')
+         WHERE p.id_proyecto = ?
+         LIMIT 1`,
         [projectId]
       );
 
-      if (equipoRows.length === 0) {
-        throw new Error('No se encontró el equipo del proyecto');
-      }
+      if (equipoRows.length === 0) throw new Error('No se encontró el equipo del proyecto');
 
-      // CORREGIDO: Usamos una aserción de tipo para asegurar a TypeScript que el objeto existe 
-      // y tiene la propiedad 'id_equipo'.
-      const equipoId = (equipoRows[0] as { id_equipo: number }).id_equipo; 
+      const equipoId = (equipoRows[0] as { id_equipo: number }).id_equipo;
 
-      // Agregar miembro
       await connection.query(
         'INSERT INTO Miembros_Equipo (id_equipo, id_usuario, rol_en_equipo) VALUES (?, ?, ?)',
         [equipoId, userId, rolEnEquipo]
       );
 
-      // Registrar en auditoría
       await connection.query(
         `INSERT INTO Logs_Auditoria (id_usuario, accion, tabla_afectada, registro_id, detalles)
-          VALUES (?, 'ADD_TEAM_MEMBER', 'Miembros_Equipo', ?, ?)`,
+         VALUES (?, 'ADD_TEAM_MEMBER', 'Miembros_Equipo', ?, ?)`,
         [adminId, projectId, `Usuario ${userId} agregado como ${rolEnEquipo}`]
       );
 
@@ -486,16 +425,15 @@ export class ProjectModel {
     }
   }
 
-  /**
-   * Obtener estadísticas del proyecto
-   */
+  // ==================== ESTADÍSTICAS ====================
+
   static async getStatistics(projectId: number) {
     const query = `
       SELECT 
-        COUNT(DISTINCT t.id_tarea) as total_tareas,
-        COUNT(DISTINCT CASE WHEN t.fecha_fin < NOW() THEN t.id_tarea END) as tareas_vencidas,
-        COUNT(DISTINCT me.id_usuario) as total_miembros,
-        COUNT(DISTINCT d.id_doc) as total_documentos
+        COUNT(DISTINCT t.id_tarea) AS total_tareas,
+        COUNT(DISTINCT CASE WHEN t.fecha_fin < NOW() THEN t.id_tarea END) AS tareas_vencidas,
+        COUNT(DISTINCT me.id_usuario) AS total_miembros,
+        COUNT(DISTINCT d.id_doc) AS total_documentos
       FROM Proyectos p
       LEFT JOIN Tareas t ON p.id_proyecto = t.id_proyecto
       LEFT JOIN Equipos e ON e.nombre_equipo LIKE CONCAT('%', p.nombre, '%')
@@ -505,7 +443,7 @@ export class ProjectModel {
       GROUP BY p.id_proyecto
     `;
 
-    const [rows] = await pool.promise().query<RowDataPacket[]>(query, [projectId]);
+    const [rows] = await pool.query<RowDataPacket[]>(query, [projectId]);
     return rows[0] || {};
   }
 }
