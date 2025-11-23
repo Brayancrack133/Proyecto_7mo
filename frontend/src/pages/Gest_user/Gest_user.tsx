@@ -95,7 +95,7 @@ export default function GestUserPage() {
     if (modoUsuario === "agregar") {
       await crearUsuario(data);
     } else if (modoUsuario === "editar") {
-      await editarUsuario(usuarioActual.id_usuario, data);
+      await editarUsuario(usuarioActual.id, data);
     }
 
     setModalUsuario(false);
@@ -192,7 +192,7 @@ export default function GestUserPage() {
             />
 
             <button className="modal-close" onClick={() => setModalUsuario(false)}>
-              Cerrar
+              X
             </button>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function GestUserPage() {
             <RoleForm modo={modoRol} rol={rolActual} onSubmit={submitRol} />
 
             <button className="modal-close" onClick={() => setModalRol(false)}>
-              Cerrar
+              X
             </button>
           </div>
         </div>

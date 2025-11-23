@@ -12,17 +12,21 @@ export const buscarUsuarios = async (query: string) => {
   return res.data;
 };
 
+// Crear un nuevo usuario
 export const crearUsuario = async (data: any) => {
   const res = await axios.post(API_URL, data);
   return res.data;
 };
 
+// Editar un usuario existente (solo modificar datos, no el estado)
 export const editarUsuario = async (id: number, data: any) => {
   const res = await axios.put(`${API_URL}/${id}`, data);
   return res.data;
 };
 
+// Cambiar el estado de un usuario (habilitado/deshabilitado)
 export const cambiarEstadoUsuario = async (id: number) => {
   const res = await axios.patch(`${API_URL}/${id}/estado`);
   return res.data;
 };
+

@@ -9,10 +9,11 @@ export default function UserForm({ modo, roles, usuario, onSubmit }: Props) {
   return (
     <form onSubmit={(e) => {
       e.preventDefault();
-
+      
       const form = e.currentTarget;
       const data = new FormData(form);
 
+      // Enviar los datos al backend
       onSubmit({
         nombre: data.get("nombre"),
         apellido: data.get("apellido"),
@@ -24,15 +25,15 @@ export default function UserForm({ modo, roles, usuario, onSubmit }: Props) {
 
       <div className="form-grid">
         <label>Nombre
-          <input name="nombre" defaultValue={usuario?.nombre} readOnly={modo==="ver"} required />
+          <input name="nombre" defaultValue={usuario?.nombre} readOnly={modo === "ver"} required />
         </label>
 
         <label>Apellido
-          <input name="apellido" defaultValue={usuario?.apellido} readOnly={modo==="ver"} required />
+          <input name="apellido" defaultValue={usuario?.apellido} readOnly={modo === "ver"} required />
         </label>
 
         <label>Correo
-          <input name="correo" defaultValue={usuario?.correo} readOnly={modo==="ver"} required />
+          <input name="correo" defaultValue={usuario?.correo} readOnly={modo === "ver"} required />
         </label>
 
         {modo === "agregar" && (
@@ -42,7 +43,7 @@ export default function UserForm({ modo, roles, usuario, onSubmit }: Props) {
         )}
 
         <label>Rol
-          <select name="id_rol" defaultValue={usuario?.id_rol} disabled={modo==="ver"} required>
+          <select name="id_rol" defaultValue={usuario?.id_rol} disabled={modo === "ver"} required>
             {roles.map((r) => (
               <option key={r.id_rol} value={r.id_rol}>{r.nombre_rol}</option>
             ))}
@@ -57,7 +58,6 @@ export default function UserForm({ modo, roles, usuario, onSubmit }: Props) {
           </button>
         </div>
       )}
-
     </form>
   );
 }

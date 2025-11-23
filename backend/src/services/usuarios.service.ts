@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 export const obtenerUsuarios = async () => {
   const [rows] = await db.query(`
     SELECT u.id_usuario AS id, u.nombre, u.apellido, u.correo,
-           '******' AS contraseña, u.estado, r.nombre_rol AS rol, u.fecha_creacion
+           '******' AS contraseña, u.estado, r.nombre_rol AS rol,ur.id_rol, u.fecha_creacion
     FROM usuarios u
     LEFT JOIN usuario_rol ur ON u.id_usuario = ur.id_usuario
     LEFT JOIN roles r ON ur.id_rol = r.id_rol
@@ -25,39 +25,46 @@ export const buscarUsuarios = async (q: string) => {
   return rows;
 };
 
+// Función para crear un usuario
 export const crearUsuario = async (data: any) => {
- const { nombre, apellido, correo, contraseña, id_rol } = data;
-
+  const { nombre, apellido, correo, contraseña, id_rol } = data;
 
   const hash = await bcrypt.hash(contraseña, 10);
 
+  // Insertamos el usuario en la tabla `usuarios`
   const [result]: any = await db.query(`
     INSERT INTO usuarios (nombre, apellido, correo, contraseña, estado, fecha_creacion)
-    VALUES (?, ?, ?, ?, 'Habilitado', NOW())
+    VALUES (?, ?, ?, ?, 1, NOW()) 
   `, [nombre, apellido, correo, hash]);
 
-  await db.query(`INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)`, [
-    result.insertId,
-    id_rol
-  ]);
+  // Insertamos la relación con el rol en la tabla `usuario_rol`
+  await db.query(`
+    INSERT INTO usuario_rol (id_usuario, id_rol)
+    VALUES (?, ?)
+  `, [result.insertId, id_rol]);
 
   return { id: result.insertId, nombre, apellido, correo, id_rol };
 };
 
+// Función para editar un usuario
 export const editarUsuario = async (id: number, data: any) => {
-  const { nombre, apellido, correo, rol } = data;
+  const { nombre, apellido, correo, id_rol } = data;
 
+  // Actualizamos los detalles del usuario en la tabla `usuarios`
   await db.query(`
     UPDATE usuarios SET nombre=?, apellido=?, correo=? WHERE id_usuario=?
   `, [nombre, apellido, correo, id]);
 
+  // Actualizamos el rol del usuario en la tabla `usuario_rol`
   await db.query(`
     UPDATE usuario_rol SET id_rol=? WHERE id_usuario=?
-  `, [rol, id]);
+  `, [id_rol, id]);
 
-  return { id, nombre, apellido, correo, rol };
+  return { id, nombre, apellido, correo, id_rol };
 };
 
+
+// Función para cambiar el estado de un usuario
 export const cambiarEstadoUsuario = async (id: number) => {
   await db.query(`
     UPDATE usuarios

@@ -20,6 +20,7 @@ export const buscarUsuarios = async (req: Request, res: Response) => {
   }
 };
 
+// Controlador para crear un usuario
 export const crearUsuario = async (req: Request, res: Response) => {
   try {
     const nuevo = await usuarioService.crearUsuario(req.body);
@@ -29,15 +30,21 @@ export const crearUsuario = async (req: Request, res: Response) => {
   }
 };
 
+
+// Controlador para editar un usuario
 export const editarUsuario = async (req: Request, res: Response) => {
   try {
+    // Intentamos actualizar los datos del usuario
     const actualizado = await usuarioService.editarUsuario(Number(req.params.id), req.body);
     res.json(actualizado);
   } catch (error) {
+    console.error("Error editando usuario:", error);
     res.status(500).json({ error: "Error editando usuario" });
   }
 };
 
+
+// Controlador para cambiar el estado del usuario
 export const cambiarEstadoUsuario = async (req: Request, res: Response) => {
   try {
     const actualizado = await usuarioService.cambiarEstadoUsuario(Number(req.params.id));
