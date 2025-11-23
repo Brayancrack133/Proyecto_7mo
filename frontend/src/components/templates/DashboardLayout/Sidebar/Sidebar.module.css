@@ -1,0 +1,51 @@
+.sidebar {
+  width: 250px; 
+  background-color: #071739; /* Azul oscuro del diseño */
+  color: #fff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0; 
+  height: 100vh; /* Ocupa el 100% de la altura de la vista */
+  padding-top: 10px;
+  /* 🛑 Asegura que los enlaces se apilen 🛑 */
+  display: flex;
+  flex-direction: column;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+.navLink {
+  /* 🛑 CORRECCIÓN DE ALINEACIÓN 🛑 */
+  display: flex;
+  align-items: center; /* Alinea icono y texto verticalmente */
+  gap: 15px; /* Espacio entre el icono y el texto */
+  
+  padding: 12px 20px;
+  text-decoration: none;
+  color: #c9d6ff; 
+  font-size: 15px;
+  transition: background-color 0.2s, color 0.2s;
+  
+  /* Asegura que el icono sea el primer elemento y el texto lo siga */
+  white-space: nowrap; 
+}
+
+.navLink:hover {
+  background-color: #2c4273; 
+  color: white;
+}
+
+.active {
+  /* Estilo activo para el elemento seleccionado (ej. Repositorio) */
+  background-color: #DD9D52; /* Fondo naranja */
+  color: #071739; /* Texto azul oscuro sobre naranja */
+  font-weight: bold;
+}
+
+.icon {
+  /* Estilo del icono (ajustado por el SVG) */
+  min-width: 20px; /* Evita que el SVG se comprima */
+}

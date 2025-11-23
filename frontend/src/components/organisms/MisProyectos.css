@@ -1,0 +1,39 @@
+.opcionesproyecto {
+    display: flex;
+    width: 680px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.containerproy {
+    display: flex;
+    width: 80%;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    flex: 1 0 0;
+    /* Esto hace que ocupe el espacio restante */
+
+    /* --- NUEVAS PROPIEDADES --- */
+
+    /* 1. Habilitar el scroll vertical solo aquí */
+    overflow-y: auto;
+
+    /* 2. Asegurar que no se salga del contenedor padre */
+    max-height: 100%;
+    padding-bottom: 20px;
+    /* Un poco de aire al final */
+
+    /* 3. Ocultar la barra de scroll (Firefox) */
+    scrollbar-width: none;
+
+    /* 4. Ocultar la barra de scroll (IE/Edge antiguo) */
+    -ms-overflow-style: none;
+}
+
+/* 5. Ocultar la barra de scroll (Chrome, Safari, Opera) */
+.containerproy::-webkit-scrollbar {
+    display: none;
+}

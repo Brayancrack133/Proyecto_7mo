@@ -1,0 +1,52 @@
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  /* El diseño es plano, reducimos la sombra y usamos borde */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  padding: 20px; /* Más padding */
+  border: 1px solid #e0e0e0;
+  transition: border-color 0.2s;
+  /* Removido margin-bottom, el grid lo maneja */
+}
+
+.card:hover {
+  border-color: #ff9800; /* Borde naranja al pasar el ratón */
+  transform: translateY(-1px);
+}
+
+.title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #1a237e; /* Título en color corporativo */
+  margin-bottom: 8px;
+}
+
+.description {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.meta {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 15px;
+  display: block; /* Para que la fecha y versión no estén pegadas */
+}
+
+.downloadButton {
+  background: none;
+  border: none;
+  color: #1a237e; /* Color de acento azul */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.downloadButton:hover {
+  text-decoration: underline;
+  color: #ff9800;
+}

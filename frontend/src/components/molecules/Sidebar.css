@@ -1,0 +1,117 @@
+:root {
+  --azul-marino: #0b132b;
+  --turquesa: #00a8cc;
+  --dorado: #d4af37;
+  --blanco: #ffffff;
+  --gris-suave: #f2f5f9;
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--azul-marino);
+  color: var(--blanco);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+/* HEADER */
+.sidebar-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 1.5rem 0;
+  color: var(--blanco);
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* NAV */
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1.2rem;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-nav li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  margin: 5px 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+}
+
+.sidebar-nav li svg {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Hover y Active */
+.sidebar-nav li:hover {
+  background: rgba(0, 168, 204, 0.15);
+  color: var(--turquesa);
+  transform: translateX(4px);
+}
+
+.sidebar-nav li.active {
+  background: linear-gradient(90deg, var(--turquesa) 0%, var(--azul-marino) 100%);
+  color: var(--blanco);
+  font-weight: 600;
+}
+
+/* ICONOS DORADOS AL ACTIVAR */
+.sidebar-nav li.active svg {
+  color: var(--dorado);
+}
+
+/* SCROLL para listas largas */
+.sidebar-nav {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--turquesa) transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--turquesa);
+  border-radius: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 70px;
+  }
+
+  .sidebar-header {
+    font-size: 1rem;
+    padding: 1rem 0;
+  }
+
+  .sidebar-nav li {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .sidebar-nav li span {
+    display: none;
+  }
+}

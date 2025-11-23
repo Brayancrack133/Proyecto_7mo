@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { db } from "../config/db.js";
+import  db  from "../config/db.js";
 import type { ResultSetHeader } from "mysql2";
 
 const router = Router();

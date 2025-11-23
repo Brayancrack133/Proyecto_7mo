@@ -1,32 +1,44 @@
-import React from "react";
-import { Home, Folder, Calendar, Users, Database, BarChart2, Settings } from "lucide-react";
+// src/components/organisms/Sidebar.tsx
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import './sidebar.css';
 
-const Sidebar: React.FC = () => {
-  const items = [
-    { name: "Inicio", icon: <Home /> },
-    { name: "Proyectos", icon: <Folder /> },
-    { name: "Planificación", icon: <Calendar /> },
-    { name: "Colaboración", icon: <Users /> },
-    { name: "Repositorio", icon: <Database /> },
-    { name: "IA Predictiva", icon: <BarChart2 /> },
-    { name: "Configuración", icon: <Settings /> },
+const Sidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); 
+
+  const opciones = [
+    { nombre: 'Inicio', ruta: '/' },
+    { nombre: 'Proyectos', ruta: '/proyectos' },
+    // BORRAMOS LA LÍNEA DE PLANIFICACIÓN PORQUE YA NO ES UN MENÚ DIRECTO
   ];
 
+  // Ajustamos la lógica para que "Proyectos" se quede encendido 
+  // cuando estás dentro de un proyecto (opcional, pero se ve mejor)
+  const isActive = (opcion: { nombre: string; ruta: string }) => {
+    if (location.pathname === opcion.ruta) return true;
+    
+    // Si estamos viendo el detalle de un proyecto (/proyecto/1), 
+    // mantenemos iluminado el botón "Proyectos" para que sepa de dónde viene.
+    if (opcion.nombre === 'Proyectos' && location.pathname.includes('/proyecto/')) {
+        return true;
+    }
+    return false;
+  };
+
   return (
-    <aside className="w-60 bg-[#0D1730] text-white h-screen flex flex-col">
-      <div className="p-4 text-2xl font-bold">F</div>
-      <nav className="flex flex-col gap-2 mt-4">
-        {items.map((item, i) => (
-          <button
-            key={i}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#F9A825] transition"
-          >
-            {item.icon}
-            <span>{item.name}</span>
-          </button>
-        ))}
-      </nav>
-    </aside>
+    <div className="optioncont">
+      {opciones.map((opcion) => (
+        <button
+          key={opcion.nombre}
+          className={`option ${isActive(opcion) ? 'active' : ''}`}
+          onClick={() => navigate(opcion.ruta)}
+        >
+          {/* Iconos (Puedes agregar lógica para iconos aquí si quieres) */}
+          <p className="opttxt">{opcion.nombre}</p>
+        </button>
+      ))}
+    </div>
   );
 };
 

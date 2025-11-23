@@ -3,25 +3,30 @@
     "rootDir": "./src",
     "outDir": "./dist",
     
-    "module": "nodenext",
-    "target": "esnext",
-    "lib": ["esnext"],
-    "types": ["node"],
+    // Módulos y target
+    "module": "ESNext",
+    "target": "ES2020",
+    "moduleResolution": "bundler",
     
+    // Source maps y declaraciones
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
     
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    
+    // Strict mode y limpieza
     "strict": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
     "skipLibCheck": true,
+    
+    // Interoperabilidad
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Se eliminan opciones experimentales o conflictivas para asegurar estabilidad
+    // "verbatimModuleSyntax": false, // Se elimina
+    // "isolatedModules": false,      // Se elimina
+    // "noUncheckedIndexedAccess": false // Se elimina
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

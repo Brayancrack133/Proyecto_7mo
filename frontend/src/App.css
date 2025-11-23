@@ -1,74 +1,173 @@
-/* App.css */
+.principal {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(180deg, #050a30, #0b3d91);
+  color: white;
+  min-height: 100vh;
+}
 
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f9fafb;
+/* 🔹 NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: center;
+  padding: 1.2rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+}
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
   margin: 0;
   padding: 0;
 }
+.navbar li a {
+  color: #ffcc80;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+.navbar li a:hover {
+  color: #ffffff;
+}
 
-.header {
-  background-color: #1A1A1A;
-  color: white;
-  padding: 1rem 2rem;
+/* 🔹 HERO SECTION */
+.hero {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 10;
-  height: 64px;
+  padding: 4rem 8%;
+  position: relative;
 }
-
-.sidebar {
-  width: 16rem;
-  background-color: #333333;
+.hero-text {
+  max-width: 550px;
+}
+.logo {
+  font-size: 3rem;
   color: white;
-  position: fixed;
-  top: 64px;
-  bottom: 0;
-  overflow-y: auto;
-  border-right: 1px solid #222;
-  padding: 1rem;
 }
-
-.main {
-  margin-left: 16rem;
-  padding: 4rem 2rem 2rem 2rem; /* top padding = header height */
+.slogan {
+  font-style: italic;
+  color: #f2c879;
+  margin: 1rem 0;
 }
-
-.card {
-  background-color: white;
-  padding: 1rem;
-  border-radius: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.button {
-  background-color: #ff7b00;
+.btn-main {
+  background-color: #f4a261;
+  padding: 12px 30px;
+  border-radius: 25px;
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: none;
-  cursor: pointer;
-}
-
-.button:hover {
-  background-color: #e56a00;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table th, .table td {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-}
-
-.table th {
-  background-color: #f3f4f6;
+  text-decoration: none;
   font-weight: bold;
+  transition: 0.3s;
 }
+.btn-main:hover {
+  background-color: #e76f51;
+  transform: translateY(-5px);
+}
+.descripcion {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  color: #ddd;
+}
+.circle {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle at center, #b38728, #6f4e00);
+  border-radius: 50%;
+}
+
+/* 🔹 FEATURES */
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin: 4rem 0;
+}
+.feature {
+  width: 250px;
+  text-align: center;
+}
+.feature img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  transition: transform 0.3s;
+  
+}
+.feature:hover img {
+  transform: scale(1.05);
+}
+.feature h3 {
+  color: #f2c879;
+}
+
+/* 🔹 HOW IT WORKS */
+.how-it-works {
+  
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 3rem 2rem;
+  border-radius: 10px;
+  max-width: 80%;
+  text-align: center;
+  margin: 0 auto;
+}
+.how-it-works h2 {
+  color: #fff;
+  margin-bottom: 2rem;
+}
+.steps {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.step {
+  background: white;
+  color: #0a1a3d;
+  padding: 1.5rem;
+  border-radius: 10px;
+  width: 250px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.circle-num {
+  width: 40px;
+  height: 40px;
+  background: #f2c879;
+  color: #0a1a3d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+}
+
+/* 🔹 CTA */
+.cta {
+  text-align: center;
+  background: linear-gradient(135deg, #0b3d91, #050a30);
+  padding: 3rem 1rem;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+.cta h3 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.cta p {
+  margin-bottom: 2rem;
+}
+.btn-gradient {
+  padding: 12px 35px;
+  border-radius: 25px;
+  background: linear-gradient(90deg, #a97100, #ffcc80);
+  color: #0a1a3d;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.btn-gradient:hover {
+  transform: translateY(-5px);
+  background: linear-gradient(90deg, #ffcc80, #a97100);
+}
+/* Animación fadeIn para las características */ @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } } /* Contenedor para aplicar la perspectiva */ .parent { width: 500px; height: 500px; perspective: 1000px; /* Esto define el "campo de visión" 3D */ } .main-image{ display: flex; justify-content: center; /* Centrado horizontal */ align-items: center; } .card { height: 100%; background: linear-gradient(135deg, #040684, #cbaa18); /* Fondo bonito */ transition: transform 0.3s ease-in-out; /* Suaviza el movimiento */ transform-style: preserve-3d; border-radius: 15px; overflow: hidden; /* Para que el efecto no se desborde */ box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 30px; } .card img { width: 100%; /* Para que la imagen ocupe todo el contenedor */ height: 100%; object-fit: cover; /* Asegura que la imagen se ajuste bien */ transition: transform 0.3s ease-out; transform-origin: center; border-radius: 15px; } /* Efecto cuando el cursor se mueve sobre el contenedor */ .parent:hover .card { transform: rotateY(10deg) rotateX(10deg); /* Gira la carta en el eje X y Y */ box-shadow: rgba(0, 0, 0, 0.4) 0px 20px 40px; } .parent:hover .card img { transform: scale(1.1) rotateY(10deg) rotateX(10deg); /* Aumenta el tamaño y da un pequeño giro */ } /* Efecto cuando el cursor se acerca */ .card:hover { transform: translate3d(0, 0, 100px); /* Eleva la carta en Z */ } .landing { display: flex; height: 100vh; background-color: #fafafa; }

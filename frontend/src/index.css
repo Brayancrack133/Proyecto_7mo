@@ -1,1 +1,52 @@
-@import 'tailwindcss'
+/* Reset básico para eliminar márgenes blancos */
+@import 'tailwindcss';
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+/* Estilos globales del body */
+html,
+body {
+  height: 100%;
+  width: 100%;
+  background-color: #fff; /* o el color base de tu app */
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Si usas un contenedor general tipo App */
+#root, .App {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0; /* Esto elimina el margen predeterminado del navegador */
+  padding: 0;
+  font-family: 'Inter', sans-serif; /* Usar una fuente moderna */
+  /* Asegura que el color de fondo sea el mismo que el del layout principal */
+  background-color: #f0f2f5; 
+}
+
+/* Opcional: Box Sizing para manejo de layout más fácil */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.App {
+  text-align: center;
+}
+
+.contnt {
+  display: flex;
+  flex-direction: row; /* importante */
+  height: 100%;
+  width: 100%;
+}
+.inicio-page {
+  display: flex;
+  flex-direction: column; /* Header arriba */
+  height: 100vh;
+  width: 100%;
+}
