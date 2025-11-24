@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-// Importamos el contexto
+// Importamos el contexto  HOLA SI VES ESTO, ESTAS EN UN LUGAR SEGURO :D
 import { UserProvider } from './context/UserContext'; 
 
 import Contenido from './components/templates/Contenido'
