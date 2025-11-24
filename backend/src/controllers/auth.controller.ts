@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { db } from "../config/db.js";
+import  {db}  from "../config/db.js";
 
 
 import { hashPassword, comparePassword } from "../utils/bcrypt.js";
