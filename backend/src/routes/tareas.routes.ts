@@ -3,10 +3,11 @@ import { db } from "../config/db.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 const router = Router();
 
-// --- CORRECCIÓN 1: Tipos en los callbacks (req: any, file: any, cb: any) ---
+// --- CONFIGURACIÓN DE MULTER ---
 const storage = multer.diskStorage({
     destination: (req: any, file: any, cb: any) => {
         const uploadPath = 'uploads/';
@@ -23,12 +24,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// RUTA GET TAREAS
-router.get("/tareas/:idProyecto", (req, res) => {
+// 1. OBTENER TAREAS DE UN PROYECTO
+router.get("/tareas/:idProyecto", async (req, res) => {
     const { idProyecto } = req.params;
 
-    // --- CORRECCIÓN 2: AGREGUÉ t.id_responsable ---
-    // Si no lo pides aquí, en el frontend llegará undefined y nadie podrá editar nada.
     const query = `
         SELECT 
             t.id_tarea,
@@ -44,17 +43,17 @@ router.get("/tareas/:idProyecto", (req, res) => {
         WHERE t.id_proyecto = ?
     `;
 
-    db.query(query, [idProyecto], (err, results) => {
-        if (err) {
-            console.error("Error al obtener tareas:", err);
-            return res.status(500).json({ error: "Error al obtener tareas" });
-        }
+    try {
+        const [results] = await db.query(query, [idProyecto]);
         res.json(results);
-    });
+    } catch (err) {
+        console.error("Error al obtener tareas:", err);
+        res.status(500).json({ error: "Error al obtener tareas" });
+    }
 });
 
-
-router.post("/tareas", (req, res) => {
+// 2. CREAR NUEVA TAREA
+router.post("/tareas", async (req, res) => {
     const { id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable } = req.body;
 
     const query = `
@@ -62,86 +61,83 @@ router.post("/tareas", (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(query, [id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable], (err, result: any) => {
-        if (err) {
-            return res.status(500).json({ error: "Error al crear la tarea" });
-        }
-
+    try {
+        // 1. Insertar la tarea
+        const [result] = await db.query<ResultSetHeader>(query, [id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable]);
         const idTarea = result.insertId;
 
-        // --- NUEVO: CREAR NOTIFICACIÓN PARA EL RESPONSABLE ---
-        // Tipo 1 = Tarea Asignada
+        // 2. Crear notificación para el responsable
         const notiQuery = `
-                INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_tarea)
-                VALUES (?, 1, ?, ?)
-            `;
+            INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_tarea)
+            VALUES (?, 1, ?, ?)
+        `;
         const contenido = `Se te ha asignado una nueva tarea: "${titulo}"`;
 
-        db.query(notiQuery, [id_responsable, contenido, idTarea], (errNoti) => {
-            if (errNoti) console.error("Error creando notificación:", errNoti);
-            // Respondemos éxito aunque la notificación falle (no es crítico)
-            res.json({ message: "Tarea creada y notificada", id: idTarea });
-        });
-    });
+        // Ejecutamos la notificación sin esperar bloqueante (opcional poner await si quieres asegurar que se cree)
+        await db.query(notiQuery, [id_responsable, contenido, idTarea]);
+
+        res.json({ message: "Tarea creada y notificada", id: idTarea });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error al crear la tarea" });
+    }
 });
 
-// RUTA SUBIR AVANCE
-// --- CORRECCIÓN 3: (req as any) para que detecte .file ---
-router.post("/tareas/subir-avance", upload.single('archivo'), (req, res) => {
+// 3. SUBIR AVANCE (DOCUMENTO)
+router.post("/tareas/subir-avance", upload.single('archivo'), async (req, res) => {
     const file = (req as any).file;
     const { id_tarea, id_usuario, comentario } = req.body;
 
     if (!file) return res.status(400).json({ error: "Sin archivo" });
 
-    // 1. Guardar documento (IGUAL QUE ANTES)
-    const queryDoc = `
-        INSERT INTO Documentos (id_proyecto, nombre_archivo, url, id_tipo_doc, id_usuario_subida, comentario)
-        SELECT id_proyecto, ?, ?, 1, ?, ? FROM Tareas WHERE id_tarea = ?
-    `;
+    try {
+        // 1. Guardar documento en BD
+        const queryDoc = `
+            INSERT INTO Documentos (id_proyecto, nombre_archivo, url, id_tipo_doc, id_usuario_subida, comentario)
+            SELECT id_proyecto, ?, ?, 1, ?, ? FROM Tareas WHERE id_tarea = ?
+        `;
 
-    db.query(queryDoc, [file.originalname, file.path, id_usuario, comentario, id_tarea], (err, result: any) => {
-        if (err) return res.status(500).json({ error: "Error guardando documento" });
-
+        const [result] = await db.query<ResultSetHeader>(queryDoc, [file.originalname, file.path, id_usuario, comentario, id_tarea]);
         const idDoc = result.insertId;
 
-        // 2. Relacionar documento (IGUAL QUE ANTES)
-        db.query("INSERT INTO Documento_Tarea (id_doc, id_tarea) VALUES (?, ?)", [idDoc, id_tarea], (errRel) => {
-            if (errRel) return res.status(500).json({ error: "Error relacionando" });
+        // 2. Relacionar documento con la tarea
+        await db.query("INSERT INTO Documento_Tarea (id_doc, id_tarea) VALUES (?, ?)", [idDoc, id_tarea]);
 
-            // --- NUEVO: AVISAR AL LÍDER ---
-            // Primero: Averiguamos quién es el jefe del proyecto de esta tarea
-            const queryJefe = `
-                SELECT p.id_jefe, t.titulo 
-                FROM Proyectos p 
-                JOIN Tareas t ON p.id_proyecto = t.id_proyecto 
-                WHERE t.id_tarea = ?
-            `;
+        // 3. Avisar al Líder del Proyecto
+        const queryJefe = `
+            SELECT p.id_jefe, t.titulo 
+            FROM Proyectos p 
+            JOIN Tareas t ON p.id_proyecto = t.id_proyecto 
+            WHERE t.id_tarea = ?
+        `;
 
-            db.query(queryJefe, [id_tarea], (errJefe, rows: any) => {
-                if (!errJefe && rows.length > 0) {
-                    const { id_jefe, titulo } = rows[0];
+        const [rows] = await db.query<RowDataPacket[]>(queryJefe, [id_tarea]);
 
-                    // Solo notificamos si el que sube NO es el mismo jefe (para no auto-notificarse)
-                    if (id_jefe != id_usuario) {
-                        // CAMBIO AQUÍ: Agregamos id_tarea
-                        const notiQuery = `
-                        INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_tarea)
-                        VALUES (?, 2, ?, ?)
-                    `;
-                        const msg = `El usuario ha subido un avance en la tarea: "${titulo}"`;
+        if (rows.length > 0) {
+            const { id_jefe, titulo } = rows[0];
 
-                        // Pasamos id_tarea como 4to parámetro
-                        db.query(notiQuery, [id_jefe, msg, id_tarea]);
-                    }
-                }
-                res.json({ message: "Avance subido y notificado" });
-            });
-        });
-    });
+            // Solo notificamos si el que sube NO es el mismo jefe
+            if (id_jefe != id_usuario) {
+                const notiQuery = `
+                    INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_tarea)
+                    VALUES (?, 2, ?, ?)
+                `;
+                const msg = `El usuario ha subido un avance en la tarea: "${titulo}"`;
+                await db.query(notiQuery, [id_jefe, msg, id_tarea]);
+            }
+        }
+
+        res.json({ message: "Avance subido y notificado" });
+
+    } catch (err) {
+        console.error("Error subiendo avance:", err);
+        res.status(500).json({ error: "Error procesando el avance" });
+    }
 });
 
-// RUTA 4: Obtener documentos de una tarea
-router.get("/tareas/:idTarea/documentos", (req, res) => {
+// 4. OBTENER DOCUMENTOS DE UNA TAREA
+router.get("/tareas/:idTarea/documentos", async (req, res) => {
     const { idTarea } = req.params;
 
     const query = `
@@ -150,7 +146,7 @@ router.get("/tareas/:idTarea/documentos", (req, res) => {
             d.nombre_archivo,
             d.url,
             d.fecha_subida,
-            d.comentario,  /* <--- AGREGAMOS ESTO */
+            d.comentario,
             u.nombre as usuario_nombre,
             u.apellido as usuario_apellido
         FROM Documentos d
@@ -160,25 +156,31 @@ router.get("/tareas/:idTarea/documentos", (req, res) => {
         ORDER BY d.fecha_subida DESC
     `;
 
-    db.query(query, [idTarea], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Error obteniendo documentos" });
-        }
+    try {
+        const [results] = await db.query(query, [idTarea]);
         res.json(results);
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error obteniendo documentos" });
+    }
 });
-// RUTA 5: Obtener detalles de UNA sola tarea (Para el Modal independiente)
-router.get("/tarea/:id", (req, res) => {
+
+// 5. OBTENER DETALLES DE UNA SOLA TAREA
+router.get("/tarea/:id", async (req, res) => {
     const { id } = req.params;
     const query = `
         SELECT id_tarea, titulo, descripcion, id_responsable 
         FROM Tareas WHERE id_tarea = ?
     `;
-    db.query(query, [id], (err, result: any) => {
-        if (err || result.length === 0) return res.status(404).json({ error: "No encontrada" });
+    
+    try {
+        const [result] = await db.query<RowDataPacket[]>(query, [id]);
+        if (result.length === 0) return res.status(404).json({ error: "No encontrada" });
         res.json(result[0]);
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error buscando tarea" });
+    }
 });
 
 export default router;

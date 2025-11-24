@@ -6,7 +6,7 @@ import type {
   ProjectWithDetails,
   ProjectStatus 
 } from '../types/project.types.js';
-import type { RowDataPacket, ResultSetHeader } from 'mysql2'; // CORREGIDO: Importación de tipos de mysql2
+import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export class ProjectModel {
   
@@ -45,7 +45,8 @@ export class ProjectModel {
       ORDER BY p.fecha_inicio DESC
     `;
 
-    const [rows] = await pool.promise().query<RowDataPacket[]>(query);
+    // CORREGIDO: Eliminado .promise()
+    const [rows] = await pool.query<RowDataPacket[]>(query);
     return rows as Project[];
   }
 
@@ -76,7 +77,8 @@ export class ProjectModel {
       WHERE p.id_proyecto = ?
     `;
 
-    const [projectRows] = await pool.promise().query<RowDataPacket[]>(projectQuery, [id]);
+    // CORREGIDO: Eliminado .promise()
+    const [projectRows] = await pool.query<RowDataPacket[]>(projectQuery, [id]);
     
     if (projectRows.length === 0) {
       return null;
@@ -101,7 +103,8 @@ export class ProjectModel {
       )
     `;
 
-    const [teamRows] = await pool.promise().query<RowDataPacket[]>(teamQuery, [project.nombre]);
+    // CORREGIDO: Eliminado .promise()
+    const [teamRows] = await pool.query<RowDataPacket[]>(teamQuery, [project.nombre]);
     project.equipo = teamRows as any;
 
     // Obtener tareas del proyecto
@@ -126,7 +129,8 @@ export class ProjectModel {
       ORDER BY t.fecha_inicio DESC
     `;
 
-    const [tasksRows] = await pool.promise().query<RowDataPacket[]>(tasksQuery, [id]);
+    // CORREGIDO: Eliminado .promise()
+    const [tasksRows] = await pool.query<RowDataPacket[]>(tasksQuery, [id]);
     project.tareas = tasksRows as any;
 
     return project;
@@ -136,7 +140,8 @@ export class ProjectModel {
    * Crear nuevo proyecto
    */
   static async create(data: ProjectCreate): Promise<Project> {
-    const connection = await pool.promise().getConnection();
+    // CORREGIDO: Eliminado .promise()
+    const connection = await pool.getConnection();
     
     try {
       await connection.beginTransaction();
@@ -178,7 +183,6 @@ export class ProjectModel {
         'SELECT LAST_INSERT_ID() as id_equipo'
       );
 
-      // CORREGIDO: Manejar posible undefined si equipoResult está vacío (aunque es muy improbable después de un INSERT)
       const equipoId = (equipoResult[0] as { id_equipo: number } | undefined)?.id_equipo;
       
       if (!equipoId) {
@@ -216,7 +220,8 @@ export class ProjectModel {
    * Actualizar proyecto
    */
   static async update(id: number, data: ProjectUpdate, userId: number): Promise<Project | null> {
-    const connection = await pool.promise().getConnection();
+    // CORREGIDO: Eliminado .promise()
+    const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -280,7 +285,8 @@ export class ProjectModel {
    * Eliminar proyecto (soft delete o cascada según configuración)
    */
   static async delete(id: number, userId: number): Promise<boolean> {
-    const connection = await pool.promise().getConnection();
+    // CORREGIDO: Eliminado .promise()
+    const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -351,7 +357,8 @@ export class ProjectModel {
       ORDER BY p.fecha_inicio DESC
     `;
 
-    const [rows] = await pool.promise().query<RowDataPacket[]>(query, [jefeId]);
+    // CORREGIDO: Eliminado .promise()
+    const [rows] = await pool.query<RowDataPacket[]>(query, [jefeId]);
     return rows as Project[];
   }
 
@@ -383,7 +390,8 @@ export class ProjectModel {
       ORDER BY p.fecha_inicio DESC
     `;
 
-    const [rows] = await pool.promise().query<RowDataPacket[]>(query, [userId, userId]);
+    // CORREGIDO: Eliminado .promise()
+    const [rows] = await pool.query<RowDataPacket[]>(query, [userId, userId]);
     return rows as Project[];
   }
 
@@ -391,7 +399,8 @@ export class ProjectModel {
    * Cambiar estado del proyecto
    */
   static async changeStatus(projectId: number, nuevoEstadoId: number, userId: number): Promise<boolean> {
-    const connection = await pool.promise().getConnection();
+    // CORREGIDO: Eliminado .promise()
+    const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -424,7 +433,8 @@ export class ProjectModel {
    * Obtener todos los estados disponibles
    */
   static async getAllStatuses(): Promise<ProjectStatus[]> {
-    const [rows] = await pool.promise().query<RowDataPacket[]>(
+    // CORREGIDO: Eliminado .promise()
+    const [rows] = await pool.query<RowDataPacket[]>(
       'SELECT * FROM Estados_Proyecto ORDER BY id_estado_proyecto'
     );
     return rows as ProjectStatus[];
@@ -439,7 +449,8 @@ export class ProjectModel {
     rolEnEquipo: string,
     adminId: number
   ): Promise<boolean> {
-    const connection = await pool.promise().getConnection();
+    // CORREGIDO: Eliminado .promise()
+    const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -458,8 +469,6 @@ export class ProjectModel {
         throw new Error('No se encontró el equipo del proyecto');
       }
 
-      // CORREGIDO: Usamos una aserción de tipo para asegurar a TypeScript que el objeto existe 
-      // y tiene la propiedad 'id_equipo'.
       const equipoId = (equipoRows[0] as { id_equipo: number }).id_equipo; 
 
       // Agregar miembro
@@ -505,7 +514,8 @@ export class ProjectModel {
       GROUP BY p.id_proyecto
     `;
 
-    const [rows] = await pool.promise().query<RowDataPacket[]>(query, [projectId]);
+    // CORREGIDO: Eliminado .promise()
+    const [rows] = await pool.query<RowDataPacket[]>(query, [projectId]);
     return rows[0] || {};
   }
 }

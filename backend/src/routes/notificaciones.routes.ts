@@ -4,7 +4,7 @@ import { db } from "../config/db.js";
 const router = Router();
 
 // Obtener notificaciones de un usuario (Ordenadas por la más nueva primero)
-router.get("/notificaciones/:idUsuario", (req, res) => {
+router.get("/notificaciones/:idUsuario", async (req, res) => {
     const { idUsuario } = req.params;
 
     const query = `
@@ -23,16 +23,16 @@ router.get("/notificaciones/:idUsuario", (req, res) => {
         ORDER BY n.fecha_creacion DESC
     `;
 
-    db.query(query, [idUsuario], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Error server" });
-        }
+    try {
+        const [results] = await db.query(query, [idUsuario]);
         res.json(results);
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error server" });
+    }
 });
 
-router.get("/notificaciones/usuario/:idUsuario/proyecto/:idProyecto", (req, res) => {
+router.get("/notificaciones/usuario/:idUsuario/proyecto/:idProyecto", async (req, res) => {
     const { idUsuario, idProyecto } = req.params;
 
     const query = `
@@ -61,13 +61,13 @@ router.get("/notificaciones/usuario/:idUsuario/proyecto/:idProyecto", (req, res)
         ORDER BY n.fecha_creacion DESC
     `;
 
-    db.query(query, [idUsuario, idProyecto, idProyecto], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Error server" });
-        }
+    try {
+        const [results] = await db.query(query, [idUsuario, idProyecto, idProyecto]);
         res.json(results);
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error server" });
+    }
 });
 
 export default router;
