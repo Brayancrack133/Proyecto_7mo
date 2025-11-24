@@ -43,12 +43,15 @@ app.use("/api", chatRoutes);
 
 app.use('/uploads', express.static('uploads'));
 app.use("/api", documentosRoutes);
-const PORT = process.env.PORT || 3000;
+
 
 // Ruta simple de prueba
 app.get("/", (req, res) => {
   res.send("🚀 Backend funcionando y DB conectada");
 });
+
+const PORT = process.env.PORT || 3000;
+
 
 // --- Obtener proyectos de un usuario ---
 app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
@@ -100,4 +103,8 @@ app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Error obteniendo proyectos" });
   }
+});
+// Iniciar servidor
+app.listen(PORT, () => {
+  console.log(`🔥 Servidor escuchando en puerto ${PORT}`);
 });
