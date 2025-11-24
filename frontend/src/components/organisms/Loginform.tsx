@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginService } from "../../services/authService";
 import "./Loginform.css";
-import {FormProject} from "../../pages/gestion_proyectos/ProjectManagementPage"
+import FormProject from "../../pages/gestion_proyectos/ProjectManagementPage";
 
 const Loginform = () => {
   const [email, setEmail] = useState("");
