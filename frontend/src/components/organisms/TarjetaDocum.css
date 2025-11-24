@@ -1,10 +1,101 @@
-.tarjeta {
+
+
+/* Contenedor de la cuadrícula */
+.docs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* La Tarjeta Individual */
+.tarjeta-doc {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
-    width: 80%;
-    padding: 21px;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    border-radius: 8px;
-    background: #FFF;
+    position: relative;
+
+
+    width: 100%;
+    
+}
+
+
+
+.doc-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+    color: #e3342f;
+    /* Rojo tipo PDF */
+}
+
+.doc-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doc-meta {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.doc-desc {
+    font-size: 13px;
+    color: #555;
+    background: #f9f9f9;
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    
+    /* --- SOLUCIÓN --- */
+    min-height: 40px;      /* Altura mínima */
+    max-height: 100px;     /* Altura máxima (para que no crezca infinito) */
+    overflow-y: auto;      /* Scroll vertical si se pasa de la altura máxima */
+    word-break: break-word; /* Rompe palabras largas (como "aaaaaa...") */
+    white-space: pre-wrap;  /* Respeta los saltos de línea que ponga el usuario */
+}
+
+.btn-download {
+    text-decoration: none;
+    background-color: #eef2ff;
+    color: #2563eb;
+    padding: 8px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    display: block;
+    margin-top: auto;
+    /* Empuja el botón al fondo */
+}
+
+.btn-download:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón de eliminar (X) */
+.btn-delete-doc {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.btn-delete-doc:hover {
+    color: red;
 }

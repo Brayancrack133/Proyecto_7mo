@@ -1,13 +1,34 @@
-// src/routes/tareas.routes.ts
 import { Router } from "express";
 import { db } from "../config/db.js";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 const router = Router();
 
-// Obtener tareas de un proyecto específico
+// --- CORRECCIÓN 1: Tipos en los callbacks (req: any, file: any, cb: any) ---
+const storage = multer.diskStorage({
+    destination: (req: any, file: any, cb: any) => {
+        const uploadPath = 'uploads/';
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath);
+        }
+        cb(null, uploadPath);
+    },
+    filename: (req: any, file: any, cb: any) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// RUTA GET TAREAS
 router.get("/tareas/:idProyecto", (req, res) => {
     const { idProyecto } = req.params;
 
+    // --- CORRECCIÓN 2: AGREGUÉ t.id_responsable ---
+    // Si no lo pides aquí, en el frontend llegará undefined y nadie podrá editar nada.
     const query = `
         SELECT 
             t.id_tarea,
@@ -15,6 +36,7 @@ router.get("/tareas/:idProyecto", (req, res) => {
             t.descripcion,
             t.fecha_inicio,
             t.fecha_fin,
+            t.id_responsable, 
             u.nombre AS nombre_responsable,
             u.apellido AS apellido_responsable
         FROM Tareas t
@@ -28,6 +50,134 @@ router.get("/tareas/:idProyecto", (req, res) => {
             return res.status(500).json({ error: "Error al obtener tareas" });
         }
         res.json(results);
+    });
+});
+
+
+router.post("/tareas", (req, res) => {
+    const { id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable } = req.body;
+
+    const query = `
+        INSERT INTO Tareas (id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, [id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable], (err, result: any) => {
+        if (err) {
+            return res.status(500).json({ error: "Error al crear la tarea" });
+        }
+
+        const idTarea = result.insertId;
+
+        // --- NUEVO: CREAR NOTIFICACIÓN PARA EL RESPONSABLE ---
+        // Tipo 1 = Tarea Asignada
+        const notiQuery = `
+                INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_tarea)
+                VALUES (?, 1, ?, ?)
+            `;
+        const contenido = `Se te ha asignado una nueva tarea: "${titulo}"`;
+
+        db.query(notiQuery, [id_responsable, contenido, idTarea], (errNoti) => {
+            if (errNoti) console.error("Error creando notificación:", errNoti);
+            // Respondemos éxito aunque la notificación falle (no es crítico)
+            res.json({ message: "Tarea creada y notificada", id: idTarea });
+        });
+    });
+});
+
+// RUTA SUBIR AVANCE
+// --- CORRECCIÓN 3: (req as any) para que detecte .file ---
+router.post("/tareas/subir-avance", upload.single('archivo'), (req, res) => {
+    const file = (req as any).file;
+    const { id_tarea, id_usuario, comentario } = req.body;
+
+    if (!file) return res.status(400).json({ error: "Sin archivo" });
+
+    // 1. Guardar documento (IGUAL QUE ANTES)
+    const queryDoc = `
+        INSERT INTO Documentos (id_proyecto, nombre_archivo, url, id_tipo_doc, id_usuario_subida, comentario)
+        SELECT id_proyecto, ?, ?, 1, ?, ? FROM Tareas WHERE id_tarea = ?
+    `;
+
+    db.query(queryDoc, [file.originalname, file.path, id_usuario, comentario, id_tarea], (err, result: any) => {
+        if (err) return res.status(500).json({ error: "Error guardando documento" });
+
+        const idDoc = result.insertId;
+
+        // 2. Relacionar documento (IGUAL QUE ANTES)
+        db.query("INSERT INTO Documento_Tarea (id_doc, id_tarea) VALUES (?, ?)", [idDoc, id_tarea], (errRel) => {
+            if (errRel) return res.status(500).json({ error: "Error relacionando" });
+
+            // --- NUEVO: AVISAR AL LÍDER ---
+            // Primero: Averiguamos quién es el jefe del proyecto de esta tarea
+            const queryJefe = `
+                SELECT p.id_jefe, t.titulo 
+                FROM Proyectos p 
+                JOIN Tareas t ON p.id_proyecto = t.id_proyecto 
+                WHERE t.id_tarea = ?
+            `;
+
+            db.query(queryJefe, [id_tarea], (errJefe, rows: any) => {
+                if (!errJefe && rows.length > 0) {
+                    const { id_jefe, titulo } = rows[0];
+
+                    // Solo notificamos si el que sube NO es el mismo jefe (para no auto-notificarse)
+                    if (id_jefe != id_usuario) {
+                        // CAMBIO AQUÍ: Agregamos id_tarea
+                        const notiQuery = `
+                        INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_tarea)
+                        VALUES (?, 2, ?, ?)
+                    `;
+                        const msg = `El usuario ha subido un avance en la tarea: "${titulo}"`;
+
+                        // Pasamos id_tarea como 4to parámetro
+                        db.query(notiQuery, [id_jefe, msg, id_tarea]);
+                    }
+                }
+                res.json({ message: "Avance subido y notificado" });
+            });
+        });
+    });
+});
+
+// RUTA 4: Obtener documentos de una tarea
+router.get("/tareas/:idTarea/documentos", (req, res) => {
+    const { idTarea } = req.params;
+
+    const query = `
+        SELECT 
+            d.id_doc,
+            d.nombre_archivo,
+            d.url,
+            d.fecha_subida,
+            d.comentario,  /* <--- AGREGAMOS ESTO */
+            u.nombre as usuario_nombre,
+            u.apellido as usuario_apellido
+        FROM Documentos d
+        JOIN Documento_Tarea dt ON d.id_doc = dt.id_doc
+        JOIN Usuarios u ON d.id_usuario_subida = u.id_usuario
+        WHERE dt.id_tarea = ?
+        ORDER BY d.fecha_subida DESC
+    `;
+
+    db.query(query, [idTarea], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Error obteniendo documentos" });
+        }
+        res.json(results);
+    });
+});
+// RUTA 5: Obtener detalles de UNA sola tarea (Para el Modal independiente)
+router.get("/tarea/:id", (req, res) => {
+    const { id } = req.params;
+    const query = `
+        SELECT id_tarea, titulo, descripcion, id_responsable 
+        FROM Tareas WHERE id_tarea = ?
+    `;
+    db.query(query, [id], (err, result: any) => {
+        if (err || result.length === 0) return res.status(404).json({ error: "No encontrada" });
+        res.json(result[0]);
     });
 });
 

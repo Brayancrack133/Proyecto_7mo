@@ -1,4 +1,3 @@
-// src/context/UserContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // 1. Definimos la forma de nuestro usuario
@@ -7,10 +6,10 @@ interface User {
     nombre: string;
     apellido: string;
     email: string;
-    rol?: string; // Opcional: si quieres guardar si es admin o user
+    rol?: string; 
 }
 
-// 2. Definimos qué funciones tendrá nuestro contexto
+// 2. Definimos qué funciones tendrá nuestro contexto (listo para el futuro)
 interface UserContextType {
     usuario: User | null;
     login: (userData: User) => void;
@@ -25,16 +24,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     // ==================================================================
-    // ZONA DE SIMULACIÓN (BORRAR ESTO CUANDO TENGAS LOGIN REAL)
+    // ZONA DE SIMULACIÓN (ESTO ES LO QUE ELIMINARÁS CUANDO TENGAS LOGIN)
     // ==================================================================
     useEffect(() => {
-        // Simulamos que verificamos una sesión guardada o hacemos login automático
+        // Simulamos que el Backend nos respondió "Login Exitoso" con estos datos
+        // que COINCIDEN con lo que insertaste en MySQL (ID 1 = Andrés)
         const usuarioSimulado: User = {
-            id_usuario: 1, // <--- Aquí cambiamos el ID para probar otros usuarios
-            nombre: "Usuario",
-            apellido: "Prueba",
-            email: "test@futureplan.com",
-            rol: "admin"
+            id_usuario: 4, 
+            nombre: "Andrés",
+            apellido: "Castillo",
+            email: "andres@futureplan.com",
+            rol: "usuario"
         };
 
         console.log("⚡ MODO DESARROLLO: Sesión simulada activa para ID:", usuarioSimulado.id_usuario);
@@ -45,17 +45,22 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
 
     // ==================================================================
-    // ZONA FUTURA (DESCOMENTAR O USAR CUANDO TENGAS EL FORMULARIO DE LOGIN)
+    // ZONA FUTURA (ESTO YA ESTÁ LISTO PARA USARSE)
     // ==================================================================
-    
     const login = (userData: User) => {
-        // FUTURO: Aquí guardarías el token en localStorage
-        // localStorage.setItem('token', 'token_que_viene_del_backend');
+        // En el futuro, cuando tengas tu formulario de Login:
+        // 1. El usuario pone sus datos.
+        // 2. El backend responde con el objeto de usuario.
+        // 3. Tú llamas a esta función: login(datosDelBackend).
+        
+        // Opcional: Guardar token en localStorage aquí
+        // localStorage.setItem('token', '...');
+        
         setUsuario(userData);
     };
 
     const logout = () => {
-        // FUTURO: Limpiar localStorage
+        // Opcional: Limpiar token
         // localStorage.removeItem('token');
         setUsuario(null);
     };

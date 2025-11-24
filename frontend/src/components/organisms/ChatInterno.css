@@ -1,0 +1,265 @@
+/* Contenedor Principal */
+.chat-layout {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    background-color: #f0f2f5;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+/* --- BARRA LATERAL (Lista de Miembros) --- */
+.chat-sidebar {
+    width: 30%;
+    background-color: white;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background-color: #f0f2f5;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+}
+
+.members-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.member-item {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.member-item:hover {
+    background-color: #f9f9f9;
+}
+
+/* Canal Activo (Estilo visual) */
+.channel-active {
+    background-color: #e7f3ff;
+    border-left: 4px solid #2563eb;
+}
+
+/* --- ZONA DE CHAT (Derecha) --- */
+.chat-main {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    /* Quitamos el fondo del contenedor para ponerlo en el área de mensajes */
+    background-color: white;
+}
+
+/* NUEVA: Cabecera interna del chat (Tipo WhatsApp) */
+.chat-main-header {
+    padding: 10px 20px;
+    background-color: #f0f2f5;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    height: 60px;
+}
+
+.header-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #555;
+}
+
+.header-info h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.header-info span {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Área de mensajes */
+.messages-area {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* Movemos el fondo aquí */
+    background-color: #efeae2;
+
+    /*ocultar el scroll vertical */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* CORRECCIÓN: Burbujas de Mensaje */
+.message-bubble {
+    max-width: 60%;
+    padding: 10px 15px;
+    border-radius: 10px;
+    position: relative;
+    font-size: 14px;
+    line-height: 1.4;
+
+    /* ESTO SOLUCIONA EL TEXTO LARGO */
+    word-break: break-word;
+    /* Rompe palabras eternas */
+    white-space: pre-wrap;
+    /* Respeta saltos de línea */
+}
+
+/* Mis mensajes (Derecha - Verde/Azul) */
+.msg-mine {
+    align-self: flex-end;
+    background-color: #dcf8c6;
+    /* Verde WhatsApp */
+    color: #333;
+    border-radius: 10px 0 10px 10px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Mensajes de otros (Izquierda - Blanco) */
+.msg-other {
+    align-self: flex-start;
+    background-color: white;
+    color: #333;
+    border-radius: 0 10px 10px 10px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.msg-sender {
+    font-size: 11px;
+    font-weight: bold;
+    color: #e59a5a;
+    /* Color distintivo para el nombre */
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* Input de Texto */
+.chat-input-area {
+    /* Asegúrate de que el área tenga padding para que respire */
+    padding: 15px 20px;
+    background-color: #f0f2f5;
+    display: flex;
+    align-items: center;
+    /* Centra verticalmente los elementos */
+    gap: 12px;
+    border-top: 1px solid #ddd;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 24px;
+    /* Más redondeado */
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 15px;
+    transition: border-color 0.2s;
+}
+
+.chat-input:focus {
+    border-color: #2563eb;
+    /* Azul al escribir */
+}
+
+.btn-send {
+    background-color: #2563eb;
+    /* Tu azul corporativo */
+    color: white;
+    border: none;
+    width: 45px;
+    /* Ancho fijo */
+    height: 45px;
+    /* Alto fijo igual al ancho para que sea círculo */
+    border-radius: 50%;
+    /* Círculo perfecto */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    /* Sombrita sutil */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Animación con rebote */
+    padding-left: 4px;
+    /* Ajuste óptico para centrar la flecha ➤ */
+}
+
+.btn-send:hover {
+    background-color: #1d4ed8;
+    transform: scale(1.1);
+    /* Crece un 10% */
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
+    /* Sombra azulada */
+}
+
+/* ACTIVE: Se encoge al hacer clic */
+.btn-send:active {
+    transform: scale(0.95);
+    background-color: #1e40af;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.containerproychat {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    flex: 1 0 0;
+    /* Esto hace que ocupe el espacio restante */
+
+    /* --- NUEVAS PROPIEDADES --- */
+
+    /* 1. Habilitar el scroll vertical solo aquí */
+    overflow-y: auto;
+
+    /* 2. Asegurar que no se salga del contenedor padre */
+    max-height: 100%;
+    padding-bottom: 20px;
+    /* Un poco de aire al final */
+
+    /* 3. Ocultar la barra de scroll (Firefox) */
+    scrollbar-width: none;
+
+    /* 4. Ocultar la barra de scroll (IE/Edge antiguo) */
+    -ms-overflow-style: none;
+}
+
+/* 5. Ocultar la barra de scroll (Chrome, Safari, Opera) */
+.containerproychat::-webkit-scrollbar {
+    display: none;
+}
+
+.headermiembro {
+    width: 100%;
+    height: 10%;
+    background-color: #ffffff;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+}
