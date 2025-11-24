@@ -31,7 +31,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, isAuthenticated }) 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
-  ;
+
 
   return (
     <div className="principal">

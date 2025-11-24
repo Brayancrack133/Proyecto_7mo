@@ -53,14 +53,15 @@ app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
 // --- INICIAR SERVIDOR ---
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🔥 Servidor escuchando en puerto ${PORT}`);
 
-  db.connect((err) => {
-    if (err) {
-      console.error("❌ Error de conexión a la base de datos:", err);
-    } else {
-      console.log("✅ Conectado a la base de datos MySQL");
-    }
-  });
+  try {
+    // Probamos la conexión pidiendo una prestada al pool
+    const connection = await db.getConnection();
+    console.log("✅ Conexión a TiDB Cloud exitosa 🎉");
+    connection.release(); // La devolvemos al pool
+  } catch (err) {
+    console.error("❌ Error al conectar a la base de datos:", err);
+  }
 });
