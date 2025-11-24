@@ -14,6 +14,9 @@ import documentosRoutes from "./routes/documentos.routes.js";
 import notificacionesRoutes from "./routes/notificaciones.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+//con ia
+import proyectosiaRoutes from "./routes/proyectosia.routes.js";
+
 dotenv.config();
 
 // Inicializar DB (solo importarla para conectarse)
@@ -43,6 +46,10 @@ app.use("/api", chatRoutes);
 
 app.use('/uploads', express.static('uploads'));
 app.use("/api", documentosRoutes);
+
+//con ia
+app.use("/api/proyectos", proyectosiaRoutes);
+
 
 
 // Ruta simple de prueba
