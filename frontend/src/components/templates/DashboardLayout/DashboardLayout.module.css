@@ -1,0 +1,20 @@
+.layoutContainer {
+  min-height: 100vh;
+  background-color: #f0f2f5; /* Fondo gris muy claro para todo el layout */
+  display: flex;
+  flex-direction: column;
+}
+
+.contentArea {
+  display: flex;
+  flex-grow: 1;
+}
+
+.mainContent {
+  flex-grow: 1;
+  /* 🛑 ELIMINAR EL PADDING HORIZONTAL AQUÍ 🛑 */
+  padding: 20px 0; /* Padding solo vertical, el contenido interno gestiona el horizontal */
+  background-color: transparent; 
+  border: none;
+}
+/* ... (otros media queries) ... */

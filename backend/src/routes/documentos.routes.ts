@@ -3,10 +3,11 @@ import { db } from "../config/db.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { ResultSetHeader } from "mysql2";
 
 const router = Router();
 
-// Configuración de Multer (Para guardar archivos en la carpeta uploads)
+// --- CONFIGURACIÓN DE MULTER (Conservamos la tuya, es mejor) ---
 const storage = multer.diskStorage({
     destination: (req: any, file: any, cb: any) => {
         const uploadPath = 'uploads/';
@@ -20,25 +21,29 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// 1. OBTENER SOLO DOCUMENTOS OFICIALES (El filtro mágico)
-router.get("/documentos/proyecto/:idProyecto", (req, res) => {
+// 1. OBTENER SOLO DOCUMENTOS OFICIALES (Adaptado a async/await)
+router.get("/documentos/proyecto/:idProyecto", async (req, res) => {
     const { idProyecto } = req.params;
     const query = `
         SELECT d.*, u.nombre, u.apellido 
         FROM Documentos d
         LEFT JOIN Documento_Tarea dt ON d.id_doc = dt.id_doc
         JOIN Usuarios u ON d.id_usuario_subida = u.id_usuario
-        WHERE d.id_proyecto = ? AND dt.id_tarea IS NULL  -- <--- AQUÍ ESTÁ LA CLAVE
+        WHERE d.id_proyecto = ? AND dt.id_tarea IS NULL 
         ORDER BY d.fecha_subida DESC
     `;
-    db.query(query, [idProyecto], (err, results) => {
-        if (err) return res.status(500).json({ error: "Error cargando docs" });
+    
+    try {
+        const [results] = await db.query(query, [idProyecto]);
         res.json(results);
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error cargando docs" });
+    }
 });
 
-// 2. SUBIR DOCUMENTO OFICIAL
-router.post("/documentos/general", upload.single('archivo'), (req, res) => {
+// 2. SUBIR DOCUMENTO OFICIAL (Adaptado a async/await)
+router.post("/documentos/general", upload.single('archivo'), async (req, res) => {
     const file = (req as any).file;
     const { id_proyecto, id_usuario, comentario } = req.body;
 
@@ -50,19 +55,26 @@ router.post("/documentos/general", upload.single('archivo'), (req, res) => {
         VALUES (?, ?, ?, 1, ?, ?)
     `;
 
-    db.query(query, [id_proyecto, file.originalname, file.path, id_usuario, comentario], (err, result) => {
-        if (err) return res.status(500).json({ error: "Error subiendo" });
-        res.json({ message: "Documento oficial subido" });
-    });
+    try {
+        const [result] = await db.query<ResultSetHeader>(query, [id_proyecto, file.originalname, file.path, id_usuario, comentario]);
+        res.json({ message: "Documento oficial subido", id: result.insertId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error subiendo documento" });
+    }
 });
 
-// 3. ELIMINAR DOCUMENTO
-router.delete("/documentos/:idDoc", (req, res) => {
+// 3. ELIMINAR DOCUMENTO (Adaptado a async/await)
+router.delete("/documentos/:idDoc", async (req, res) => {
     const { idDoc } = req.params;
-    db.query("DELETE FROM Documentos WHERE id_doc = ?", [idDoc], (err) => {
-        if (err) return res.status(500).json({ error: "Error borrando" });
+    
+    try {
+        await db.query("DELETE FROM Documentos WHERE id_doc = ?", [idDoc]);
         res.json({ message: "Documento eliminado" });
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error borrando documento" });
+    }
 });
 
 export default router;

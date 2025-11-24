@@ -3,63 +3,66 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { db } from "./config/db.js";
 
+// --- IMPORTACIONES (Fusionadas) ---
+import path from "path";
+import { fileURLToPath } from 'url';
 
-import path from "path"; // <--- Agrega esto arriba si no está
-import { fileURLToPath } from 'url'; // <--- Necesario para __dirname en módulos ES
-
-// Importamos las rutas
+// Rutas
 import proyectosRoutes from "./routes/proyectos.routes.js";
 import tareasRoutes from "./routes/tareas.routes.js";
-import documentosRoutes from "./routes/documentos.routes.js";
-import notificacionesRoutes from "./routes/notificaciones.routes.js";
-import chatRoutes from "./routes/chat.routes.js";
+import authRoutes from "./routes/auth.routes.js"; // Nuevo de Main
+import documentosRoutes from "./routes/documentos.routes.js"; // Tuyo
+import notificacionesRoutes from "./routes/notificaciones.routes.js"; // Tuyo
+import chatRoutes from "./routes/chat.routes.js"; // Tuyo
+
 dotenv.config();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
 // --- DEFINICIÓN DE RUTAS ---
-app.use("/api", proyectosRoutes); // Para /mis-proyectos
-app.use("/api", tareasRoutes);    // Para /tareas
+
+// 1. Rutas Estándar del equipo (Main)
+// Nota: Tus compañeros cambiaron "/api" por "/api/proyectos".
+// Si tu frontend falla al cargar proyectos, revisa si necesitas ajustar la URL ahí.
+app.use("/api/proyectos", proyectosRoutes);
+app.use("/api/tareas", tareasRoutes);
+app.use("/api/auth", authRoutes);
+
+// 2. Tus Rutas Nuevas (HEAD)
 app.use("/api", notificacionesRoutes);
 app.use("/api", chatRoutes);
-
-app.use('/uploads', express.static('uploads'));
 app.use("/api", documentosRoutes);
-const PORT = process.env.PORT || 3000;
 
+// 3. Configuración de Archivos Estáticos (Uploads)
+// Definimos __dirname para ES Modules por si lo necesitas, aunque express.static directo funciona
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static('uploads'));
+
+// Ruta simple de prueba
 app.get("/", (req, res) => {
-  res.send("Backend corriendo correctamente 🚀");
+  res.send("🚀 Backend funcionando y DB conectada");
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
-  db.connect((err) => {
-    if (err) {
-      console.error("❌ Error de conexión a la base de datos:", err);
-    } else {
-      console.log("✅ Conectado a la base de datos MySQL");
-    }
-  });
-});
-
-
-// Obtener proyectos de un usuario
+// --- Obtener proyectos de un usuario (Query Manual) ---
 app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
   const { idUsuario } = req.params;
 
   try {
     const [rows]: any = await db.query(
       `
-            SELECT DISTINCT 
-                p.id_proyecto,
-                p.nombre,
-                IF(p.id_jefe = ?, 'Líder', 'Integrante') AS rol
-            FROM proyectos p
-            JOIN miembros_equipo me ON p.id_equipo = me.id_equipo
-            WHERE me.id_usuario = ?
-            `,
+      SELECT DISTINCT 
+          p.id_proyecto,
+          p.nombre,
+          p.fecha_creacion,
+          IF(p.id_jefe = ?, 'Líder', 'Integrante') AS rol
+      FROM proyectos p
+      JOIN miembros_equipo me ON p.id_equipo = me.id_equipo
+      WHERE me.id_usuario = ?
+      `,
       [idUsuario, idUsuario]
     );
 
@@ -68,4 +71,19 @@ app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Error obteniendo proyectos" });
   }
+});
+
+// --- INICIAR SERVIDOR ---
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🔥 Servidor escuchando en puerto ${PORT}`);
+
+  db.connect((err) => {
+    if (err) {
+      console.error("❌ Error de conexión a la base de datos:", err);
+    } else {
+      console.log("✅ Conectado a la base de datos MySQL");
+    }
+  });
 });

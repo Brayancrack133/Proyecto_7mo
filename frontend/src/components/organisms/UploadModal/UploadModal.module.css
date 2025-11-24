@@ -1,0 +1,27 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.label {
+  font-weight: 600;
+  color: #333;
+  margin-top: 5px;
+}
+
+/* Estilo para el campo select (Dropdown) */
+.select {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+.submitButton {
+  margin-top: 20px;
+  align-self: flex-end;
+  /* El color lo tomará del 'variant="primary"' del Button atom */
+}

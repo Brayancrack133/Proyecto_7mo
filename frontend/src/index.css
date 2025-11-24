@@ -1,9 +1,11 @@
 /* Reset básico para eliminar márgenes blancos */
+@import 'tailwindcss';
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 
 /* Estilos globales del body */
 html,
@@ -20,6 +22,20 @@ body {
   width: 100%;
   display: flex;
   flex-direction: column;
+  margin: 0; /* Esto elimina el margen predeterminado del navegador */
+  padding: 0;
+  font-family: 'Inter', sans-serif; /* Usar una fuente moderna */
+  /* Asegura que el color de fondo sea el mismo que el del layout principal */
+  background-color: #f0f2f5; 
+}
+
+/* Opcional: Box Sizing para manejo de layout más fácil */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.App {
+  text-align: center;
 }
 
 .contnt {
