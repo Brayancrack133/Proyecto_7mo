@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginService } from "../../services/authService";
 import "./Loginform.css";
-import FormProject from "../../pages/gestion_proyectos/ProjectManagementPage";
-
 const Loginform = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +33,7 @@ const Loginform = () => {
     if (data.usuario.rol === "Administrador") {
       navigate("/gest_user");
     } else {
-      navigate("/FormProject"); // o la ruta que quieras para otros roles
+      navigate("/proyectos"); // o la ruta que quieras para otros roles
     }
   } else {
     alert("Credenciales incorrectas");

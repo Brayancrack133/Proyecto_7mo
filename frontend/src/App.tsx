@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Registro/Register";
 import GestUser from "./pages/Gest_user/Gest_user";
+import { AppRoutes } from "./routes/AppRoutes";
 import "./App.css";
 
 function App() {
@@ -101,6 +102,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/gest_user" element={<GestUser />} />
+          <Route path="/*" element={<AppRoutes />} />
         </Routes>
       </Router>
     </div>
