@@ -30,7 +30,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         // Simulamos que el Backend nos respondió "Login Exitoso" con estos datos
         // que COINCIDEN con lo que insertaste en MySQL (ID 1 = Andrés)
         const usuarioSimulado: User = {
-            id_usuario: 4, 
+            id_usuario: 1, 
             nombre: "Andrés",
             apellido: "Castillo",
             email: "andres@futureplan.com",
@@ -41,7 +41,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUsuario(usuarioSimulado);
         setIsLoading(false);
     }, []);
-    // ==================================================================
+    // ==================================================================chupala frailex
 
 
     // ==================================================================
