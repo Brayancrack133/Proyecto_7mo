@@ -5,7 +5,7 @@ import { DashboardLayout } from '../components/templates/DashboardLayout/Dashboa
 
 // Importar páginas
 import { Repository } from '../pages/Repository/Repository'; 
-import ProjectManagementPage from "../pages/ProjectManagementPage";
+import ProjectManagementPage from "../pages/gestion_proyectos/ProjectManagementPage";
 import ProjectCreationForm from "../pages/ProjectCreationForm"; // ✅ Esta línea
 
 export const AppRoutes: React.FC = () => {
