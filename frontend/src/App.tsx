@@ -2,6 +2,11 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Registro/Register";
 import GestUser from "./pages/Gest_user/Gest_user";
+import MetScrum from './pages/Metodologias/metScrum';
+import MetXP from './pages/Metodologias/metXP';
+import MetKanban from './pages/Metodologias/metKanvan';
+import MetCascada from './pages/Metodologias/metCascada';
+
 import "./App.css";
 
 function App() {
@@ -101,6 +106,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/gest_user" element={<GestUser />} />
+          <Route path="/metodologia/scrum" element={<MetScrum />} />
+        <Route path="/metodologia/xp" element={<MetXP />} />
+        <Route path="/metodologia/kanban" element={<MetKanban />} />
+        <Route path="/metodologia/cascada" element={<MetCascada />} />
         </Routes>
       </Router>
     </div>

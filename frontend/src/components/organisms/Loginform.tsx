@@ -9,6 +9,10 @@ const Loginform = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  const loginGitHub = () => {
+    window.location.href = "http://localhost:3000/auth/github";
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
 
@@ -35,7 +39,7 @@ const Loginform = () => {
     if (data.usuario.rol === "Administrador") {
       navigate("/gest_user");
     } else {
-      navigate("/Repository"); // o la ruta que quieras para otros roles
+      navigate("/proyectos"); // o la ruta que quieras para otros roles
     }
   } else {
     alert("Credenciales incorrectas");
@@ -94,14 +98,18 @@ const Loginform = () => {
         <div className="social-login">
           <p className="divider">o inicia sesión con</p>
           <div className="social-buttons">
-            <button type="button" className="btn-google">
+            
+            <button type="button" className="btn-google" onClick={() => window.location.href = "http://localhost:3000/auth/google"}>
               <img src="/Images/google.png" alt="Google" className="icon" />
-              Google
-            </button>
-            <button type="button" className="btn-github">
+  Google
+</button>
+
+           
+            <button type="button" className="btn-github" onClick={loginGitHub}>
               <img src="/Images/github.png" alt="GitHub" className="icon" />
-              GitHub
-            </button>
+  GitHub
+</button>
+
           </div>
         </div>
         {/* --------------------------------------- */}
