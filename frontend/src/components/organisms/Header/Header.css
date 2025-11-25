@@ -1,0 +1,87 @@
+/* Barra superior */
+.header {
+  width: 100%;
+  background: #1d3557;
+  color: white;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* Lado izquierdo */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.loguito{
+  width:40px;
+  height:auto;
+
+}
+.logoF {
+  font-size: 20px;
+  font-weight: bold;
+  background-color: #ffffff;
+  border-radius: 50%;
+  text-decoration: none;
+}
+
+/* Navegación */
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #a8dadc;
+}
+
+/* Lado derecho */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Nombre */
+.user-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Foto */
+.user-photo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  object-fit: cover;
+  background: white;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .nav-links {
+    display: none; /* puedes reemplazar por menú hamburguesa si quieres */
+  }
+
+  .header {
+    padding: 10px 15px;
+  }
+
+  .user-name {
+    font-size: 14px;
+  }
+}

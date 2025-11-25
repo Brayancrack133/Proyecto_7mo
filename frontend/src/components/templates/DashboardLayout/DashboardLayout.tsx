@@ -1,5 +1,5 @@
 import React from 'react';
-import { Header } from '../../organisms/Header/Header'; // Asumiendo que Header existe
+// Asumiendo que Header existe
 import { Sidebar } from '../../templates/DashboardLayout/Sidebar/Sidebar'; // Asumiendo que Sidebar existe
 
 interface DashboardLayoutProps {
@@ -14,7 +14,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f0f2f5' }}>
       
       {/* 1. Barra superior (Header en tus diseños) */}
-      <Header /> 
+      
       
       {/* 2. Contenido Principal y Sidebar */}
       <div style={{ display: 'flex', flexGrow: 1 }}>

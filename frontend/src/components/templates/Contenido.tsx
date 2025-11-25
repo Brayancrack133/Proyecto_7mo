@@ -2,7 +2,7 @@ import React from 'react'
 import Sidebar from '../organisms/Sidebar'
 import './Contenido.css'
 import Planificacion from '../organisms/Planificacion'
-import Header from '../organisms/Header'
+import Header from '../organisms/Head'
 import MisProyectos from '../organisms/MisProyectos'
 
 const Contenido = () => {

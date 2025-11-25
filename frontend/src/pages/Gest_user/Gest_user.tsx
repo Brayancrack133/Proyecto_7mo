@@ -7,6 +7,7 @@ import UserForm from "../../components/molecules/Userform";
 
 import RoleTable from "../../components/molecules/Roletable";
 import RoleForm from "../../components/molecules/RoleForm";
+import Header from "../../components/organisms/Header/Header";
 
 import {
   getUsuarios,
@@ -138,7 +139,10 @@ export default function GestUserPage() {
 
   // ------------------ VISTA PRINCIPAL ------------------
   return (
+    <div>
+      <Header u={null} /> 
     <div className="dashboard-container">
+       
       <div className="dashboard-header">
         <h1>Gestión de Usuarios</h1>
 <div>
@@ -212,6 +216,7 @@ export default function GestUserPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }
