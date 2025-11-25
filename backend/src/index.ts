@@ -1,11 +1,9 @@
 // index.ts
-
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 // Solución al TypeError: Importa la exportación por defecto
 import {db} from "./config/db.js"; 
-
 
 import path from "path"; // <--- Agrega esto arriba si no está
 import { fileURLToPath } from 'url'; // <--- Necesario para __dirname en módulos ES
@@ -52,7 +50,7 @@ app.use('/uploads', express.static('uploads'));
 app.use("/api", documentosRoutes);
 
 //con ia
-app.use("/api/proyectos", proyectosiaRoutes);
+app.use("/api/proyectos-ia", proyectosiaRoutes);
 
 
 
