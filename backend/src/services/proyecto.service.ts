@@ -1,48 +1,75 @@
-// src/services/proyectos.service.js
+// src/services/proyectos.service.ts
 
-// 1. Importa el tipo ResultSetHeader de mysql2/promise
-import type { ResultSetHeader } from 'mysql2/promise'; 
+import type { ResultSetHeader } from "mysql2/promise";
 import { db } from "../config/db.js";
 
-// 2. Define una interfaz o tipo para los datos de entrada (ProyectoData)
-interface ProyectoMetadata {
-  tipo?: string;
-  tamano?: string;
-  complejidad?: string;
-}
-
-interface ProyectoData {
+// Define la interfaz de los datos que recibimos para crear un proyecto
+export interface ProyectoData {
   nombre: string;
   descripcion?: string;
-  fecha_inicio?: string;
+  fecha_inicio: string; // obligatorio
   fecha_fin?: string;
-  id_jefe?: number; // Asumiendo que es un ID numérico
-  metodologia_id?: number; // Asumiendo que es un ID numérico
-  metadata?: ProyectoMetadata;
+  id_jefe: number; // obligatorio
+  metodologia_id?: number;
 }
 
-// 3. Aplica el tipado a la función
-export const crearProyecto = async (data: ProyectoData) => { // ⬅️ Soluciona el error de 'any' implícito
-  const { nombre, descripcion, fecha_inicio, fecha_fin, id_jefe, metodologia_id, metadata } = data;
+// Función para crear el proyecto
+export const crearProyecto = async (data: ProyectoData) => {
+  try {
+    // Validaciones
+    if (!data.nombre?.trim()) {
+      throw new Error("El nombre del proyecto es obligatorio.");
+    }
 
-  // Insert base proyecto
-  // 4. Se usa la aserción 'as' para indicarle a TypeScript que el resultado es ResultSetHeader
-  const [result] = await db.query(
-    `INSERT INTO proyectos (nombre, descripcion, fecha_inicio, fecha_fin, id_jefe, metodologia_id)
-      VALUES (?, ?, ?, ?, ?, ?)`,
-    [nombre, descripcion, fecha_inicio || null, fecha_fin || null, id_jefe || null, metodologia_id || null]
-  ) as [ResultSetHeader, any]; 
+    if (!data.fecha_inicio) {
+      throw new Error("La fecha de inicio es obligatoria.");
+    }
 
-  const id_proyecto = result.insertId; // ⬅️ Ahora 'insertId' existe en el tipo
+    if (!data.id_jefe) {
+      throw new Error("El ID del jefe del proyecto es obligatorio.");
+    }
 
-  // Si tienes metadata
-  if (metadata) {
-    await db.query(
-      `INSERT INTO proyectos_metadata (id_proyecto, tipo, tamano, complejidad) VALUES (?, ?, ?, ?)`,
-      [id_proyecto, metadata.tipo, metadata.tamano, metadata.complejidad]
-    );
+    // Desestructuramos los datos recibidos
+    const {
+      nombre,
+      descripcion,
+      fecha_inicio,
+      fecha_fin,
+      id_jefe,
+      metodologia_id,
+    } = data;
+
+    // Realizamos la inserción en la tabla `proyectos`
+    const [result] = await db.query(
+      `
+      INSERT INTO proyectos 
+      (nombre, descripcion, fecha_inicio, fecha_fin, id_jefe, metodologia_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      [
+        nombre,
+        descripcion || null,
+        fecha_inicio,
+        fecha_fin || null,
+        id_jefe,
+        metodologia_id || null,
+      ]
+    ) as [ResultSetHeader, any];
+
+    const id_proyecto = result.insertId;
+
+    // Devolvemos los datos del proyecto creado (incluyendo el ID generado)
+    return {
+      id_proyecto,
+      nombre,
+      descripcion,
+      fecha_inicio,
+      fecha_fin,
+      id_jefe,
+      metodologia_id,
+    };
+  } catch (error: any) {
+    console.error("❌ Error en crearProyecto:", error.message);
+    throw new Error(error.message || "Error creando el proyecto.");
   }
-
-  // Retornar el id y datos mínimos
-  return { id_proyecto, nombre, descripcion, fecha_inicio, fecha_fin, metodologia_id };
 };

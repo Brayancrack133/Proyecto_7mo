@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { db } from "../config/db.js";
+// Importamos dbRaw
+import { dbRaw } from "../config/db.js";
+
+// Forzamos a que 'db' sea cualquier cosa para que TS no moleste con los métodos
+const db: any = dbRaw;
 
 const router = Router();
 
-// 1. OBTENER CHAT GRUPAL (Mensajes donde id_destinatario es NULL)
+// 1. OBTENER CHAT GRUPAL
 router.get("/chat/:idProyecto/general", (req, res) => {
     const { idProyecto } = req.params;
 
@@ -15,13 +19,14 @@ router.get("/chat/:idProyecto/general", (req, res) => {
         ORDER BY m.fecha_envio ASC
     `;
 
-    db.query(query, [idProyecto], (err, results) => {
+    // AGREGAMOS ': any' AQUÍ 👇
+    db.query(query, [idProyecto], (err: any, results: any) => {
         if (err) return res.status(500).json({ error: "Error cargando chat general" });
         res.json(results);
     });
 });
 
-// 2. OBTENER CHAT PRIVADO (Entre YO y OTRO usuario en este proyecto)
+// 2. OBTENER CHAT PRIVADO
 router.get("/chat/:idProyecto/privado/:idYo/:idOtro", (req, res) => {
     const { idProyecto, idYo, idOtro } = req.params;
 
@@ -37,26 +42,26 @@ router.get("/chat/:idProyecto/privado/:idYo/:idOtro", (req, res) => {
         ORDER BY m.fecha_envio ASC
     `;
 
-    db.query(query, [idProyecto, idYo, idOtro, idOtro, idYo], (err, results) => {
+    // AGREGAMOS ': any' AQUÍ 👇
+    db.query(query, [idProyecto, idYo, idOtro, idOtro, idYo], (err: any, results: any) => {
         if (err) return res.status(500).json({ error: "Error cargando chat privado" });
         res.json(results);
     });
 });
 
-// 3. ENVIAR MENSAJE (Soporta Grupal y Privado)
+// 3. ENVIAR MENSAJE
 router.post("/chat", (req, res) => {
-    // Recibimos id_destinatario (puede ser null o un numero)
-    const { id_proyecto, id_usuario, mensaje, id_destinatario } = req.body; 
+    const { id_proyecto, id_usuario, mensaje, id_destinatario } = req.body;
 
     const query = `
         INSERT INTO Mensajes (id_proyecto, id_usuario, mensaje, id_destinatario)
         VALUES (?, ?, ?, ?)
     `;
 
-    // Si id_destinatario no viene, se guarda como NULL (Chat General)
     const dest = id_destinatario || null;
 
-    db.query(query, [id_proyecto, id_usuario, mensaje, dest], (err, result) => {
+    // AGREGAMOS ': any' AQUÍ 👇
+    db.query(query, [id_proyecto, id_usuario, mensaje, dest], (err: any, result: any) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: "Error enviando mensaje" });

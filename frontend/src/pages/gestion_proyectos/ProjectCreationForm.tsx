@@ -1,22 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
-import { crearProyecto } from "../../services/projectos_ia.service";
+import { useUser } from "../../context/UserContext"; // Asegúrate de que la ruta sea correcta
+import { crearProyecto, listarMetodologias as apiListMetodologias } from "../../services/projectos_ia.service";
 
-interface ProjectFormData {
-  nombre: string;
-  tipo: string;
-  tamano: string;
-  complejidad: string;
-  descripcion: string;
-}
-
+// El componente de creación de proyectos
 const ProjectCreationForm: React.FC = () => {
-  const [formData, setFormData] = useState<ProjectFormData>({
+  const { usuario, isLoading } = useUser(); // Accede al usuario desde el contexto
+
+  // Muestra un mensaje mientras los datos se cargan
+  if (isLoading) {
+    return <div>Cargando...</div>;
+  }
+
+  // Si no hay usuario, muestra un mensaje
+  if (!usuario) {
+    return <div>❌ No estás autenticado. Por favor, inicia sesión.</div>;
+  }
+
+  const [formData, setFormData] = useState({
     nombre: "",
     tipo: "",
     tamano: "",
     complejidad: "",
     descripcion: "",
+    metodologia_id: "",
+    fecha_inicio: "",
+    fecha_fin: "",
   });
 
   const tiposProyecto = [
@@ -38,10 +47,31 @@ const ProjectCreationForm: React.FC = () => {
 
   const complejidades = ["Baja", "Media", "Alta", "Muy Alta"];
 
+  interface Metodologia {
+    id: number;
+    nombre: string;
+    tipo?: string;
+  }
+
+  const [metodologias, setMetodologias] = useState<Metodologia[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Obtener las metodologías desde la API
+  useEffect(() => {
+    const fetchMetodologias = async () => {
+      try {
+        const data: Metodologia[] = await apiListMetodologias();
+        setMetodologias(data);
+      } catch (err) {
+        console.error("No se pudieron cargar metodologías", err);
+      }
+    };
+    fetchMetodologias();
+  }, []);
+
+  // Manejo de cambios en los inputs
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -50,42 +80,43 @@ const ProjectCreationForm: React.FC = () => {
     }));
   };
 
-  // ------------------------------
-  // CORREGIDO: ÚNICO handleSubmit
-  // ------------------------------
+  // Manejo del submit del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const projectData = {
+    const payload = {
       nombre: formData.nombre,
       descripcion: formData.descripcion,
-      fecha_inicio: new Date().toISOString().split("T")[0],
-      fecha_fin: null,
-      id_jefe: 1,
-      metadata: {
-        tipo: formData.tipo,
-        tamano: formData.tamano,
-        complejidad: formData.complejidad,
-      },
+      fecha_inicio: formData.fecha_inicio || new Date().toISOString().split("T")[0],
+      fecha_fin: formData.fecha_fin || null,
+      id_jefe: usuario?.id_usuario || 1, // Usamos el ID del usuario autenticado (o 1 como valor por defecto)
+      metodologia_id: formData.metodologia_id ? Number(formData.metodologia_id) : null,
     };
 
     try {
-      await crearProyecto(projectData);
-      alert("Proyecto creado exitosamente");
-
+      await crearProyecto(payload); // Enviar el proyecto al backend
+      setIsSubmitting(false);
+      // Limpiar el formulario
       setFormData({
         nombre: "",
         tipo: "",
         tamano: "",
         complejidad: "",
         descripcion: "",
+        metodologia_id: "",
+        fecha_inicio: "",
+        fecha_fin: "",
       });
-    } catch (error) {
-      console.error("Error creando proyecto:", error);
-      alert("Error al crear proyecto");
+      alert("✅ Proyecto creado correctamente");
+    } catch (err) {
+      console.error("Error creando proyecto:", err);
+      setIsSubmitting(false);
+      alert("❌ Error creando proyecto");
     }
   };
 
+  // Manejo de cancelación del formulario
   const handleCancel = () => {
     setFormData({
       nombre: "",
@@ -93,166 +124,192 @@ const ProjectCreationForm: React.FC = () => {
       tamano: "",
       complejidad: "",
       descripcion: "",
+      metodologia_id: "",
+      fecha_inicio: "",
+      fecha_fin: "",
     });
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-6">
+    <div className="w-full min-h-screen bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex gap-8 items-start">
-          <div className="flex-1 bg-white rounded-xl shadow-lg p-8 border-2 border-dashed border-blue-400">
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="flex-1 bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+            <h1 className="text-3xl font-extrabold mb-6 text-gray-900 flex items-center gap-2">
+              Crear Proyecto <span>🚀</span>
+            </h1>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Nombre */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-2 tracking-wide">
                   Nombre del Proyecto
                 </label>
                 <input
-                  type="text"
                   name="nombre"
                   value={formData.nombre}
                   onChange={handleInputChange}
                   placeholder="Ej: Desarrollo de App Móvil"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base"
+                  className="w-full px-4 py-3 border border-gray-300 bg-white rounded-xl shadow-sm text-gray-900
+                    focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-400 transition-all duration-200"
                 />
               </div>
 
+              {/* Fechas */}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2 tracking-wide">
+                    Fecha Inicio
+                  </label>
+                  <input
+                    type="date"
+                    name="fecha_inicio"
+                    value={formData.fecha_inicio}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 bg-white rounded-xl shadow-sm text-gray-900
+                      focus:ring-2 focus:ring-blue-600 hover:border-gray-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2 tracking-wide">
+                    Fecha Fin
+                  </label>
+                  <input
+                    type="date"
+                    name="fecha_fin"
+                    value={formData.fecha_fin}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 bg-white rounded-xl shadow-sm text-gray-900
+                      focus:ring-2 focus:ring-blue-600 hover:border-gray-400"
+                  />
+                </div>
+              </div>
+
+              {/* Metodología */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-2 tracking-wide">
+                  Metodología
+                </label>
+                <select
+                  name="metodologia_id"
+                  value={formData.metodologia_id}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 bg-white rounded-xl shadow-sm text-gray-900 cursor-pointer hover:border-gray-400 focus:ring-2 focus:ring-blue-600 transition"
+                >
+                  <option value="">-- Seleccionar metodología --</option>
+                  {metodologias.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.nombre} {m.tipo ? `· ${m.tipo}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Tipo */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2 tracking-wide">
                   Tipo de Proyecto
                 </label>
                 <select
                   name="tipo"
                   value={formData.tipo}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white text-base cursor-pointer"
+                  className="w-full px-4 py-3 border border-gray-300 bg-white rounded-xl shadow-sm text-gray-900 cursor-pointer hover:border-gray-400 focus:ring-2 focus:ring-blue-600"
                 >
                   <option value="">Seleccionar tipo</option>
-                  {tiposProyecto.map((tipo) => (
-                    <option key={tipo} value={tipo}>
-                      {tipo}
+                  {tiposProyecto.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-5">
+              {/* Tamaño + Complejidad */}
+              <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-900 mb-2 tracking-wide">
                     Tamaño
                   </label>
                   <select
                     name="tamano"
                     value={formData.tamano}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white text-base cursor-pointer"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white shadow-sm text-gray-900 cursor-pointer hover:border-gray-400 focus:ring-2 focus:ring-blue-600"
                   >
                     <option value="">Seleccionar tamaño</option>
-                    {tamanos.map((tamano) => (
-                      <option key={tamano} value={tamano}>
-                        {tamano}
+                    {tamanos.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-900 mb-2 tracking-wide">
                     Complejidad
                   </label>
                   <select
                     name="complejidad"
                     value={formData.complejidad}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white text-base cursor-pointer"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white shadow-sm text-gray-900 cursor-pointer hover:border-gray-400 focus:ring-2 focus:ring-blue-600"
                   >
                     <option value="">Seleccionar complejidad</option>
-                    {complejidades.map((comp) => (
-                      <option key={comp} value={comp}>
-                        {comp}
+                    {complejidades.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
+              {/* Descripción */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-2 tracking-wide">
                   Descripción y Contexto
                 </label>
                 <textarea
                   name="descripcion"
                   value={formData.descripcion}
                   onChange={handleInputChange}
-                  placeholder="Describe los objetivos, requisitos y contexto del proyecto..."
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-base"
-                />
+                  placeholder="Describe los objetivos..."
+                  className="w-full px-4 py-3 border border-gray-300 bg-white rounded-xl shadow-sm text-gray-900 resize-none hover:border-gray-400 focus:ring-2 focus:ring-blue-600"
+                ></textarea>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="text-purple-600" size={20} />
-                  <span className="text-sm font-semibold text-purple-800">
-                    IA recomendación
-                  </span>
-                </div>
-                <textarea
-                  placeholder="Basado en tus datos te recomendaremos una Metodología para tu caso"
-                  rows={3}
-                  className="w-full px-3 py-2 border border-purple-200 rounded-md text-sm bg-white outline-none resize-none"
-                  readOnly
-                />
-              </div>
-
-              <div className="flex gap-4 pt-3">
+              {/* BOTONES */}
+              <div className="flex justify-end gap-4 pt-6">
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-base"
+                  className="px-5 py-3 rounded-xl bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition shadow-sm"
                 >
                   Cancelar
                 </button>
+
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition font-medium text-base"
+                  disabled={isSubmitting}
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:from-blue-700 hover:to-indigo-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  Crear Proyecto
+                  {isSubmitting ? (
+                    <>
+                      <Sparkles className="animate-spin" size={18} />
+                      Creando...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={18} />
+                      Crear Proyecto
+                    </>
+                  )}
                 </button>
               </div>
             </form>
-          </div>
-
-          {/* DOUE UI (sin cambios) */}
-          <div className="w-96 flex-shrink-0">
-            <div className="sticky top-6">
-              <div className="bg-gradient-to-br from-purple-400 via-pink-400 to-purple-500 rounded-2xl p-8 shadow-2xl border-2 border-dashed border-purple-300 mb-8">
-                <div className="text-white text-center">
-                  <p className="text-xl font-light">Holaa, me llamo</p>
-                  <p className="text-6xl font-bold my-2">DOUE</p>
-                  <p className="text-xl font-light">déjame ayudarte</p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-center gap-6">
-                <div className="w-24 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl">
-                  <span className="text-5xl">💡</span>
-                </div>
-
-                <div className="w-40 h-40 bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl flex items-center justify-center shadow-2xl">
-                  <div className="text-white">
-                    <div className="flex gap-3 justify-center mb-3">
-                      <div className="w-4 h-4 bg-cyan-400 rounded-full"></div>
-                      <div className="w-4 h-4 bg-cyan-400 rounded-full"></div>
-                    </div>
-                    <div className="w-20 h-2 bg-cyan-400 rounded-full mx-auto"></div>
-                  </div>
-                </div>
-
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-300 to-blue-500 rounded-full flex items-center justify-center shadow-2xl">
-                  <span className="text-5xl">🔧</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

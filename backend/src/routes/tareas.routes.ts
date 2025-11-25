@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { db } from "../config/db.js";
-import multer from "multer";
+// Importamos dbRaw (la que acepta callbacks) y la renombramos a 'db'
+import { dbRaw } from "../config/db.js";
+const db: any = dbRaw; import multer from "multer";
 import path from "path";
 import fs from "fs";
 
@@ -44,7 +45,7 @@ router.get("/tareas/:idProyecto", (req, res) => {
         WHERE t.id_proyecto = ?
     `;
 
-    db.query(query, [idProyecto], (err, results) => {
+    db.query(query, [idProyecto], (err: any, results: any) => {
         if (err) {
             console.error("Error al obtener tareas:", err);
             return res.status(500).json({ error: "Error al obtener tareas" });
@@ -62,7 +63,7 @@ router.post("/tareas", (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(query, [id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable], (err, result: any) => {
+    db.query(query, [id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable], (err:any, result: any) => {
         if (err) {
             return res.status(500).json({ error: "Error al crear la tarea" });
         }
@@ -77,7 +78,7 @@ router.post("/tareas", (req, res) => {
             `;
         const contenido = `Se te ha asignado una nueva tarea: "${titulo}"`;
 
-        db.query(notiQuery, [id_responsable, contenido, idTarea], (errNoti) => {
+        db.query(notiQuery, [id_responsable, contenido, idTarea], (errNoti:any) => {
             if (errNoti) console.error("Error creando notificación:", errNoti);
             // Respondemos éxito aunque la notificación falle (no es crítico)
             res.json({ message: "Tarea creada y notificada", id: idTarea });
@@ -99,13 +100,13 @@ router.post("/tareas/subir-avance", upload.single('archivo'), (req, res) => {
         SELECT id_proyecto, ?, ?, 1, ?, ? FROM Tareas WHERE id_tarea = ?
     `;
 
-    db.query(queryDoc, [file.originalname, file.path, id_usuario, comentario, id_tarea], (err, result: any) => {
+    db.query(queryDoc, [file.originalname, file.path, id_usuario, comentario, id_tarea], (err:any, result: any) => {
         if (err) return res.status(500).json({ error: "Error guardando documento" });
 
         const idDoc = result.insertId;
 
         // 2. Relacionar documento (IGUAL QUE ANTES)
-        db.query("INSERT INTO Documento_Tarea (id_doc, id_tarea) VALUES (?, ?)", [idDoc, id_tarea], (errRel) => {
+        db.query("INSERT INTO Documento_Tarea (id_doc, id_tarea) VALUES (?, ?)", [idDoc, id_tarea], (errRel:any) => {
             if (errRel) return res.status(500).json({ error: "Error relacionando" });
 
             // --- NUEVO: AVISAR AL LÍDER ---
@@ -117,7 +118,7 @@ router.post("/tareas/subir-avance", upload.single('archivo'), (req, res) => {
                 WHERE t.id_tarea = ?
             `;
 
-            db.query(queryJefe, [id_tarea], (errJefe, rows: any) => {
+            db.query(queryJefe, [id_tarea], (errJefe:any, rows: any) => {
                 if (!errJefe && rows.length > 0) {
                     const { id_jefe, titulo } = rows[0];
 
@@ -160,7 +161,7 @@ router.get("/tareas/:idTarea/documentos", (req, res) => {
         ORDER BY d.fecha_subida DESC
     `;
 
-    db.query(query, [idTarea], (err, results) => {
+    db.query(query, [idTarea], (err:any, results:any) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: "Error obteniendo documentos" });
@@ -175,7 +176,7 @@ router.get("/tarea/:id", (req, res) => {
         SELECT id_tarea, titulo, descripcion, id_responsable 
         FROM Tareas WHERE id_tarea = ?
     `;
-    db.query(query, [id], (err, result: any) => {
+    db.query(query, [id], (err:any, result: any) => {
         if (err || result.length === 0) return res.status(404).json({ error: "No encontrada" });
         res.json(result[0]);
     });

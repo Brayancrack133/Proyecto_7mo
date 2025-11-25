@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { db } from "../config/db.js";
-
-const router = Router();
+// Importamos dbRaw (la que acepta callbacks) y la renombramos a 'db'
+import { dbRaw } from "../config/db.js";
+const db: any = dbRaw; const router = Router();
 
 // ==============================================================
-// RUTA 1: Obtener lista de proyectos (Para la pantalla "Mis Proyectos")
+// RUTA 1: Obtener lista de proyectos (Para la pantalla "Mis Proyectos") 
 // ==============================================================
 router.get("/mis-proyectos/:idUsuario", (req, res) => {
     const { idUsuario } = req.params;
@@ -24,7 +24,7 @@ router.get("/mis-proyectos/:idUsuario", (req, res) => {
         WHERE me.id_usuario = ?
     `;
 
-    db.query(query, [idUsuario], (err, results) => {
+    db.query(query, [idUsuario], (err: any, results: any) => {
         if (err) {
             console.error("Error DB:", err);
             return res.status(500).json({ error: "Error al obtener proyectos" });
@@ -49,7 +49,7 @@ router.get("/proyecto/:idProyecto/usuario/:idUsuario", (req, res) => {
         WHERE p.id_proyecto = ?
     `;
 
-    db.query(query, [idUsuario, idProyecto], (err, results: any) => {
+    db.query(query, [idUsuario, idProyecto], (err: any, results: any) => {
         if (err) {
             console.error("Error:", err);
             return res.status(500).json({ error: "Error DB" });
@@ -79,7 +79,7 @@ router.get("/proyecto/:idProyecto/miembros", (req, res) => {
         WHERE p.id_proyecto = ?
     `;
 
-    db.query(query, [idProyecto], (err, results) => {
+    db.query(query, [idProyecto], (err: any, results: any) => {
         if (err) return res.status(500).json({ error: "Error al obtener miembros" });
         res.json(results);
     });
@@ -94,7 +94,7 @@ router.post("/proyectos", (req, res) => {
     // 1. Primero creamos el Equipo 
     const queryEquipo = "INSERT INTO Equipos (nombre_equipo) VALUES (?)";
 
-    db.query(queryEquipo, [nombre], (err, resultEq: any) => {
+    db.query(queryEquipo, [nombre], (err: any, resultEq: any) => {
         if (err) return res.status(500).json({ error: "Error creando equipo" });
 
         const idEquipo = resultEq.insertId;
@@ -105,7 +105,7 @@ router.post("/proyectos", (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?)
         `;
 
-        db.query(queryProy, [nombre, descripcion, fecha_inicio, fecha_fin, id_usuario, idEquipo], (errProy, resultProy) => {
+        db.query(queryProy, [nombre, descripcion, fecha_inicio, fecha_fin, id_usuario, idEquipo], (errProy:any, resultProy:any) => {
             if (errProy) return res.status(500).json({ error: "Error creando proyecto" });
 
             // 3. Agregamos al usuario como Líder
@@ -114,7 +114,7 @@ router.post("/proyectos", (req, res) => {
                 VALUES (?, ?, 'Líder de Proyecto')
             `;
 
-            db.query(queryMiembro, [idEquipo, id_usuario], (errMiembro) => {
+            db.query(queryMiembro, [idEquipo, id_usuario], (errMiembro: any) => {
                 if (errMiembro) return res.status(500).json({ error: "Error asignando líder" });
                 res.json({ message: "Proyecto creado exitosamente" });
             });
@@ -135,7 +135,7 @@ router.get("/proyectos/otros/:idUsuario", (req, res) => {
             SELECT id_equipo FROM Miembros_Equipo WHERE id_usuario = ?
         )
     `;
-    db.query(query, [idUsuario], (err, results) => {
+    db.query(query, [idUsuario], (err: any, results: any) => {
         if (err) return res.status(500).json({ error: "Error buscando proyectos" });
         res.json(results);
     });
@@ -154,7 +154,7 @@ router.post("/proyectos/solicitar-union", (req, res) => {
         WHERE p.id_proyecto = ?
     `;
 
-    db.query(queryDatos, [id_usuario_solicitante, id_proyecto], (err, results: any) => {
+    db.query(queryDatos, [id_usuario_solicitante, id_proyecto], (err: any, results: any) => {
         if (err || results.length === 0) return res.status(500).json({ error: "Error datos" });
 
         const { id_jefe, nombre, apellido, nombre_proyecto } = results[0];
@@ -165,7 +165,7 @@ router.post("/proyectos/solicitar-union", (req, res) => {
             VALUES (?, 4, ?, ?, ?)
         `;
 
-        db.query(queryNoti, [id_jefe, contenido, id_proyecto, id_usuario_solicitante], (errNoti) => {
+        db.query(queryNoti, [id_jefe, contenido, id_proyecto, id_usuario_solicitante], (errNoti:any) => {
             if (errNoti) return res.status(500).json({ error: "Error enviando solicitud" });
             res.json({ message: "Solicitud enviada al líder" });
         });
@@ -185,7 +185,7 @@ router.post("/proyectos/aceptar-union", (req, res) => {
         FROM Proyectos WHERE id_proyecto = ?
     `;
 
-    db.query(query, [id_usuario_nuevo, id_proyecto], (err, result) => {
+    db.query(query, [id_usuario_nuevo, id_proyecto], (err: any, results: any) => {
         if (err) {
             // Si ya existe (error duplicado), no pasa nada, devolvemos éxito igual
             if ((err as any).code === 'ER_DUP_ENTRY') {

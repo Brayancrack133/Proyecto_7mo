@@ -1,6 +1,6 @@
 // src/controllers/metodologias.controller.js
 import type { Request, Response } from 'express';
-import * as metodologiasService from "../services/metodologias.service.js";
+import * as metodologiasService from "../services/metodologias.service";
 
 export const getMetodologias = async (req: Request, res: Response) => {
   try {

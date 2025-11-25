@@ -11,16 +11,16 @@ import path from "path"; // <--- Agrega esto arriba si no está
 import { fileURLToPath } from 'url'; // <--- Necesario para __dirname en módulos ES
 
 // Importamos las rutas
-import proyectosRoutes from "./routes/proyectos.routes.js";
-import tareasRoutes from "./routes/tareas.routes.js";
-import documentosRoutes from "./routes/documentos.routes.js";
-import notificacionesRoutes from "./routes/notificaciones.routes.js";
-import chatRoutes from "./routes/chat.routes.js";
-import authRoutes from "./routes/auth.routes.js";
+import proyectosRoutes from "./routes/proyectos.routes";
+import tareasRoutes from "./routes/tareas.routes";
+import documentosRoutes from "./routes/documentos.routes";
+import notificacionesRoutes from "./routes/notificaciones.routes";
+import chatRoutes from "./routes/chat.routes";
+import authRoutes from "./routes/auth.routes";
 //con ia
-import proyectosiaRoutes from "./routes/proyectosia.routes.js";
+import proyectosiaRoutes from "./routes/proyectosia.routes";
 //metodologias
-import metodologiasRoutes from "./routes/metodologias.routes.js";
+import metodologiasRoutes from "./routes/metodologias.routes";
 
 
 // Cargar variables de entorno (Solo aquí)
@@ -30,8 +30,8 @@ dotenv.config();
 import "./config/db.js";
 
 // Importamos rutas
-import userRoutes from "./routes/usuarios.routes.js";
-import roleRoutes from "./routes/roles.routes.js";
+import userRoutes from "./routes/usuarios.routes";
+import roleRoutes from "./routes/roles.routes";
 
 const app = express();
 
@@ -41,7 +41,7 @@ app.use(express.json());
 
 // 🔥 Ahora sí, rutas
 app.use("/api/auth", authRoutes);
-app.use("/api/proyectos", proyectosRoutes);
+//app.use("/api/proyectos", proyectosRoutes);
 app.use("/api/tareas", tareasRoutes);
 app.use("/api/usuarios", userRoutes);
 app.use("/api/roles", roleRoutes);

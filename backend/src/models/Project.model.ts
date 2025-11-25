@@ -1,10 +1,10 @@
-import pool from '../config/db.js';
-import type { 
-  Project, 
-  ProjectCreate, 
-  ProjectUpdate, 
+import { db as pool } from '../config/db.js';
+import type {
+  Project,
+  ProjectCreate,
+  ProjectUpdate,
   ProjectWithDetails,
-  ProjectStatus 
+  ProjectStatus
 } from '../types/project.types.js';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 

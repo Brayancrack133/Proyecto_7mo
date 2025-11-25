@@ -1,20 +1,25 @@
 import React from 'react'
 import Sidebar from '../organisms/Sidebar'
 import './Contenido.css'
-import Planificacion from '../organisms/Planificacion'
 import Header from '../organisms/Header'
-import MisProyectos from '../organisms/MisProyectos'
 
-const Contenido = () => {
-    return (
-        <div className="inicio-page">
-            <Header />
-            <div className="contnt">
-                <Sidebar />
-                <MisProyectos />
-            </div>
-        </div>
-    )
+interface ContenidoProps {
+  children?: React.ReactNode;
 }
 
-export default Contenido
+const Contenido: React.FC<ContenidoProps> = ({ children }) => {
+  return (
+    <div className="inicio-page">
+      <Header />
+      <div className="contnt">
+        <Sidebar />
+
+        <div className="contenido-principal">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Contenido;

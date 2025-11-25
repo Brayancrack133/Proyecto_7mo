@@ -1,15 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// 1. Definimos la forma de nuestro usuario
+// Aseguramos que la interfaz coincida con lo que devuelve tu Backend
 interface User {
-    id_usuario: number;
+    id_usuario: number; // Ojo: Verifica si tu backend devuelve "id" o "id_usuario"
     nombre: string;
     apellido: string;
-    email: string;
+    email: string; // O "correo", verifica tu respuesta del backend
     rol?: string; 
 }
 
-// 2. Definimos qué funciones tendrá nuestro contexto (listo para el futuro)
 interface UserContextType {
     usuario: User | null;
     login: (userData: User) => void;
@@ -24,45 +23,44 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     // ==================================================================
-    // ZONA DE SIMULACIÓN (ESTO ES LO QUE ELIMINARÁS CUANDO TENGAS LOGIN)
+    // 1. EFECTO DE INICIO: RECUPERAR SESIÓN (PERSISTENCIA)
     // ==================================================================
     useEffect(() => {
-        // Simulamos que el Backend nos respondió "Login Exitoso" con estos datos
-        // que COINCIDEN con lo que insertaste en MySQL (ID 1 = Andrés)
-        const usuarioSimulado: User = {
-            id_usuario: 4, 
-            nombre: "Andrés",
-            apellido: "Castillo",
-            email: "andres@futureplan.com",
-            rol: "usuario"
-        };
-
-        console.log("⚡ MODO DESARROLLO: Sesión simulada activa para ID:", usuarioSimulado.id_usuario);
-        setUsuario(usuarioSimulado);
+        // Al cargar la página (F5), verificamos si hay un usuario guardado
+        const usuarioGuardado = localStorage.getItem("usuario");
+        
+        if (usuarioGuardado) {
+            try {
+                const parsedUser = JSON.parse(usuarioGuardado);
+                console.log("✅ Sesión recuperada del almacenamiento:", parsedUser);
+                setUsuario(parsedUser);
+            } catch (error) {
+                console.error("Error al leer usuario del storage:", error);
+                localStorage.removeItem("usuario"); // Si está corrupto, lo borramos
+            }
+        }
         setIsLoading(false);
     }, []);
-    // ==================================================================
-
 
     // ==================================================================
-    // ZONA FUTURA (ESTO YA ESTÁ LISTO PARA USARSE)
+    // 2. FUNCIÓN LOGIN (CONECTA EL FORMULARIO CON REACT)
     // ==================================================================
     const login = (userData: User) => {
-        // En el futuro, cuando tengas tu formulario de Login:
-        // 1. El usuario pone sus datos.
-        // 2. El backend responde con el objeto de usuario.
-        // 3. Tú llamas a esta función: login(datosDelBackend).
-        
-        // Opcional: Guardar token en localStorage aquí
-        // localStorage.setItem('token', '...');
-        
+        // A. Guardamos en el estado de React (para que la UI se actualice al instante)
         setUsuario(userData);
+        
+        // B. Guardamos en el navegador (para que no se pierda al recargar)
+        localStorage.setItem("usuario", JSON.stringify(userData));
     };
 
+    // ==================================================================
+    // 3. FUNCIÓN LOGOUT
+    // ==================================================================
     const logout = () => {
-        // Opcional: Limpiar token
-        // localStorage.removeItem('token');
         setUsuario(null);
+        localStorage.removeItem("usuario");
+        // Opcional: Redirigir al login aquí o manejarlo en la vista
+        window.location.href = "/login"; 
     };
 
     return (
@@ -72,7 +70,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
-// Hook personalizado para usar el contexto fácil
 export const useUser = () => {
     const context = useContext(UserContext);
     if (!context) {
