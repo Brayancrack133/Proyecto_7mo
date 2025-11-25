@@ -19,6 +19,9 @@ import chatRoutes from "./routes/chat.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 //con ia
 import proyectosiaRoutes from "./routes/proyectosia.routes.js";
+//metodologias
+import metodologiasRoutes from "./routes/metodologias.routes.js";
+
 
 // Cargar variables de entorno (Solo aquí)
 dotenv.config();
@@ -54,7 +57,9 @@ app.use("/api", documentosRoutes);
 //con ia
 app.use("/api/proyectos", proyectosiaRoutes);
 
+//Metodologias
 
+app.use("/api/metodologias", metodologiasRoutes);
 
 // Ruta simple de prueba
 app.get("/", (req, res) => {
