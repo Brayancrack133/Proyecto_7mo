@@ -2,45 +2,51 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginService } from "../../services/authService";
 import "./Loginform.css";
-import {FormProject} from "../../pages/gestion_proyectos/ProjectManagementPage"
+// import { FormProject } from "../../pages/gestion_proyectos/ProjectManagementPage";
+import { useUser } from "../../context/UserContext";
+
 
 const Loginform = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useUser();
+
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (email === "admin@gmail.com" && password === "futureplan") {
-    const adminUser = {
-      id: 0,
-      nombre: "Admin",
-      apellido: "",
-      correo: email,
-      rol: "Administrador"
-    };
+    if (email === "admin@gmail.com" && password === "futureplan") {
+      const adminUser = {
+        id: 0,
+        nombre: "Admin",
+        apellido: "",
+        correo: email,
+        rol: "Administrador"
+      };
+      localStorage.setItem("usuario", JSON.stringify(adminUser));
 
-    localStorage.setItem("usuario", JSON.stringify(adminUser));
-    navigate("/gest_user");
-    return; // detener ejecución, no llamar loginService
-  }
+      // AQUÍ DEBERÍAS ACTUALIZAR EL CONTEXTO TAMBIÉN (veremos esto luego)
 
-  const data = await loginService(email, password);
-
-  if (data.mensaje === "Login exitoso") {
-    localStorage.setItem("usuario", JSON.stringify(data.usuario));
-
-    // Redirección dependiendo del rol
-    if (data.usuario.rol === "Administrador") {
       navigate("/gest_user");
-    } else {
-      navigate("/FormProject"); // o la ruta que quieras para otros roles
+      return;
     }
-  } else {
-    alert("Credenciales incorrectas");
-  }
-};
+
+    const data = await loginService(email, password);
+
+    if (data.mensaje === "Login exitoso") {
+      login(data.usuario); // Actualizamos contexto
+
+      if (data.usuario.rol === "Administrador") {
+        navigate("/gest_user");
+      } else {
+        // CORRECCIÓN: Ahora redirige a /inicio
+        navigate("/inicio");
+      }
+    } else {
+      alert("Credenciales incorrectas");
+    }
+  };
 
   return (
     <div>

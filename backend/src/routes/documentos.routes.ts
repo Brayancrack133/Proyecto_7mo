@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { db } from "../config/db.js";
+// Importamos dbRaw (la que acepta callbacks) y la renombramos a 'db'
+import { dbRaw } from "../config/db.js";
+const db: any = dbRaw;
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -31,7 +33,7 @@ router.get("/documentos/proyecto/:idProyecto", (req, res) => {
         WHERE d.id_proyecto = ? AND dt.id_tarea IS NULL  -- <--- AQUÍ ESTÁ LA CLAVE
         ORDER BY d.fecha_subida DESC
     `;
-    db.query(query, [idProyecto], (err, results) => {
+    db.query(query, [idProyecto], (err: any, results: any) => {
         if (err) return res.status(500).json({ error: "Error cargando docs" });
         res.json(results);
     });
@@ -50,7 +52,7 @@ router.post("/documentos/general", upload.single('archivo'), (req, res) => {
         VALUES (?, ?, ?, 1, ?, ?)
     `;
 
-    db.query(query, [id_proyecto, file.originalname, file.path, id_usuario, comentario], (err, result) => {
+    db.query(query, [id_proyecto, file.originalname, file.path, id_usuario, comentario], (err: any, result: any) => {
         if (err) return res.status(500).json({ error: "Error subiendo" });
         res.json({ message: "Documento oficial subido" });
     });
@@ -59,7 +61,7 @@ router.post("/documentos/general", upload.single('archivo'), (req, res) => {
 // 3. ELIMINAR DOCUMENTO
 router.delete("/documentos/:idDoc", (req, res) => {
     const { idDoc } = req.params;
-    db.query("DELETE FROM Documentos WHERE id_doc = ?", [idDoc], (err) => {
+    db.query("DELETE FROM Documentos WHERE id_doc = ?", [idDoc], (err: any) => {
         if (err) return res.status(500).json({ error: "Error borrando" });
         res.json({ message: "Documento eliminado" });
     });
