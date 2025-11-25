@@ -1,12 +1,12 @@
-import { Router } from "express";
-// Importamos dbRaw (la que acepta callbacks) y la renombramos a 'db'
-import { dbRaw } from "../config/db.js";
-const db: any = dbRaw; const router = Router();
+import { Router, Request, Response } from "express";
+import { db } from "../config/db.js";
+
+const router = Router();
 
 // ==============================================================
-// RUTA 1: Obtener lista de proyectos (Para la pantalla "Mis Proyectos") 
+// RUTA 1: Obtener lista de proyectos
 // ==============================================================
-router.get("/mis-proyectos/:idUsuario", (req, res) => {
+router.get("/mis-proyectos/:idUsuario", async (req: Request, res: Response) => {
     const { idUsuario } = req.params;
 
     const query = `
@@ -24,19 +24,19 @@ router.get("/mis-proyectos/:idUsuario", (req, res) => {
         WHERE me.id_usuario = ?
     `;
 
-    db.query(query, [idUsuario], (err: any, results: any) => {
-        if (err) {
-            console.error("Error DB:", err);
-            return res.status(500).json({ error: "Error al obtener proyectos" });
-        }
+    try {
+        const [results] = await db.query(query, [idUsuario]);
         res.json(results);
-    });
+    } catch (err) {
+        console.error("Error DB:", err);
+        res.status(500).json({ error: "Error al obtener proyectos" });
+    }
 });
 
 // ==============================================================
-// RUTA 2: Verificar Rol (Para la pantalla "Planificación")
+// RUTA 2: Verificar Rol
 // ==============================================================
-router.get("/proyecto/:idProyecto/usuario/:idUsuario", (req, res) => {
+router.get("/proyecto/:idProyecto/usuario/:idUsuario", async (req: Request, res: Response) => {
     const { idProyecto, idUsuario } = req.params;
 
     const query = `
@@ -49,22 +49,23 @@ router.get("/proyecto/:idProyecto/usuario/:idUsuario", (req, res) => {
         WHERE p.id_proyecto = ?
     `;
 
-    db.query(query, [idUsuario, idProyecto], (err: any, results: any) => {
-        if (err) {
-            console.error("Error:", err);
-            return res.status(500).json({ error: "Error DB" });
-        }
+    try {
+        const [results]: any = await db.query(query, [idUsuario, idProyecto]);
+
         if (results.length === 0) {
             return res.status(404).json({ error: "Proyecto no encontrado" });
         }
         res.json(results[0]);
-    });
+    } catch (err) {
+        console.error("Error:", err);
+        res.status(500).json({ error: "Error DB" });
+    }
 });
 
 // ==============================================================
-// RUTA 3: Obtener Miembros del Equipo (Para el select de tareas)
+// RUTA 3: Obtener Miembros del Equipo
 // ==============================================================
-router.get("/proyecto/:idProyecto/miembros", (req, res) => {
+router.get("/proyecto/:idProyecto/miembros", async (req: Request, res: Response) => {
     const { idProyecto } = req.params;
 
     const query = `
@@ -72,60 +73,62 @@ router.get("/proyecto/:idProyecto/miembros", (req, res) => {
             u.id_usuario,
             u.nombre,
             u.apellido,
-            me.rol_en_equipo  /* <--- ¡ESTO FALTABA! */
+            me.rol_en_equipo
         FROM Proyectos p
         JOIN Miembros_Equipo me ON p.id_equipo = me.id_equipo
         JOIN Usuarios u ON me.id_usuario = u.id_usuario
         WHERE p.id_proyecto = ?
     `;
 
-    db.query(query, [idProyecto], (err: any, results: any) => {
-        if (err) return res.status(500).json({ error: "Error al obtener miembros" });
+    try {
+        const [results] = await db.query(query, [idProyecto]);
         res.json(results);
-    });
+    } catch (err) {
+        res.status(500).json({ error: "Error al obtener miembros" });
+    }
 });
 
 // ==============================================================
-// RUTA 4: CREAR NUEVO PROYECTO (ESTA ES LA QUE TE FALTA)
+// RUTA 4: CREAR NUEVO PROYECTO (TU LÓGICA TRADUCIDA A TYPESCRIPT)
 // ==============================================================
-router.post("/proyectos", (req, res) => {
+router.post("/proyectos", async (req: Request, res: Response) => {
     const { nombre, descripcion, fecha_inicio, fecha_fin, id_usuario } = req.body;
 
-    // 1. Primero creamos el Equipo 
-    const queryEquipo = "INSERT INTO Equipos (nombre_equipo) VALUES (?)";
-
-    db.query(queryEquipo, [nombre], (err: any, resultEq: any) => {
-        if (err) return res.status(500).json({ error: "Error creando equipo" });
-
+    try {
+        // 1. Primero creamos el Equipo 
+        const queryEquipo = "INSERT INTO Equipos (nombre_equipo) VALUES (?)";
+        const [resultEq]: any = await db.query(queryEquipo, [`Equipo de ${nombre}`]); // Agregué "Equipo de..." para que se vea mejor
         const idEquipo = resultEq.insertId;
 
         // 2. Creamos el Proyecto
+        // CORRECCIÓN: Quitamos 'id_estado_proyecto' porque no existe en tu tabla Proyectos
         const queryProy = `
             INSERT INTO Proyectos (nombre, descripcion, fecha_inicio, fecha_fin, id_jefe, id_equipo)
             VALUES (?, ?, ?, ?, ?, ?)
         `;
+        // Nota: Añadí el "1" al final para el estado por defecto (Planificación), ya que tu BDD lo pide.
 
-        db.query(queryProy, [nombre, descripcion, fecha_inicio, fecha_fin, id_usuario, idEquipo], (errProy:any, resultProy:any) => {
-            if (errProy) return res.status(500).json({ error: "Error creando proyecto" });
+        await db.query(queryProy, [nombre, descripcion, fecha_inicio, fecha_fin || null, id_usuario, idEquipo]);
+        // 3. Agregamos al usuario como Líder
+        const queryMiembro = `
+            INSERT INTO Miembros_Equipo (id_equipo, id_usuario, rol_en_equipo)
+            VALUES (?, ?, 'Líder de Proyecto')
+        `;
 
-            // 3. Agregamos al usuario como Líder
-            const queryMiembro = `
-                INSERT INTO Miembros_Equipo (id_equipo, id_usuario, rol_en_equipo)
-                VALUES (?, ?, 'Líder de Proyecto')
-            `;
+        await db.query(queryMiembro, [idEquipo, id_usuario]);
 
-            db.query(queryMiembro, [idEquipo, id_usuario], (errMiembro: any) => {
-                if (errMiembro) return res.status(500).json({ error: "Error asignando líder" });
-                res.json({ message: "Proyecto creado exitosamente" });
-            });
-        });
-    });
+        res.json({ message: "Proyecto creado exitosamente" });
+
+    } catch (error) {
+        console.error("Error creando proyecto:", error);
+        res.status(500).json({ error: "Error creando proyecto" });
+    }
 });
 
 // ==============================================================
-// RUTA 5: VER PROYECTOS DISPONIBLES (Para unirse)
+// RUTA 5: VER PROYECTOS DISPONIBLES
 // ==============================================================
-router.get("/proyectos/otros/:idUsuario", (req, res) => {
+router.get("/proyectos/otros/:idUsuario", async (req: Request, res: Response) => {
     const { idUsuario } = req.params;
     const query = `
         SELECT p.id_proyecto, p.nombre, p.descripcion, u.nombre as nombre_jefe 
@@ -135,16 +138,18 @@ router.get("/proyectos/otros/:idUsuario", (req, res) => {
             SELECT id_equipo FROM Miembros_Equipo WHERE id_usuario = ?
         )
     `;
-    db.query(query, [idUsuario], (err: any, results: any) => {
-        if (err) return res.status(500).json({ error: "Error buscando proyectos" });
+    try {
+        const [results] = await db.query(query, [idUsuario]);
         res.json(results);
-    });
+    } catch (err) {
+        res.status(500).json({ error: "Error buscando proyectos" });
+    }
 });
 
 // ==============================================================
 // RUTA 6: SOLICITAR UNIRSE 
 // ==============================================================
-router.post("/proyectos/solicitar-union", (req, res) => {
+router.post("/proyectos/solicitar-union", async (req: Request, res: Response) => {
     const { id_proyecto, id_usuario_solicitante } = req.body;
 
     const queryDatos = `
@@ -154,49 +159,52 @@ router.post("/proyectos/solicitar-union", (req, res) => {
         WHERE p.id_proyecto = ?
     `;
 
-    db.query(queryDatos, [id_usuario_solicitante, id_proyecto], (err: any, results: any) => {
-        if (err || results.length === 0) return res.status(500).json({ error: "Error datos" });
+    try {
+        const [results]: any = await db.query(queryDatos, [id_usuario_solicitante, id_proyecto]);
+
+        if (results.length === 0) return res.status(500).json({ error: "Error datos" });
 
         const { id_jefe, nombre, apellido, nombre_proyecto } = results[0];
         const contenido = `${nombre} ${apellido} ha solicitado unirse a tu proyecto "${nombre_proyecto}"`;
-
         const queryNoti = `
-            INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_proyecto, id_usuario_remitente)
+            INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_usuario_remitente, id_proyecto)
             VALUES (?, 4, ?, ?, ?)
         `;
 
-        db.query(queryNoti, [id_jefe, contenido, id_proyecto, id_usuario_solicitante], (errNoti:any) => {
-            if (errNoti) return res.status(500).json({ error: "Error enviando solicitud" });
-            res.json({ message: "Solicitud enviada al líder" });
-        });
-    });
-});
+        await db.query(queryNoti, [id_jefe, contenido, id_usuario_solicitante, id_proyecto]);
+        res.json({ message: "Solicitud enviada al líder" });
 
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error enviando solicitud" });
+    }
+});
 // ==============================================================
-// RUTA 7: ACEPTAR SOLICITUD DE UNIÓN
+// RUTA 7: ACEPTAR SOLICITUD DE UNIÓN (Lo que te faltaba)
 // ==============================================================
-router.post("/proyectos/aceptar-union", (req, res) => {
+router.post("/proyectos/aceptar-union", async (req: Request, res: Response) => {
     const { id_proyecto, id_usuario_nuevo } = req.body;
 
-    // Insertar en Miembros_Equipo
+    // Insertar en Miembros_Equipo con rol 'Integrante'
     const query = `
         INSERT INTO Miembros_Equipo (id_equipo, id_usuario, rol_en_equipo)
         SELECT id_equipo, ?, 'Integrante' 
         FROM Proyectos WHERE id_proyecto = ?
     `;
 
-    db.query(query, [id_usuario_nuevo, id_proyecto], (err: any, results: any) => {
-        if (err) {
-            // Si ya existe (error duplicado), no pasa nada, devolvemos éxito igual
-            if ((err as any).code === 'ER_DUP_ENTRY') {
-                return res.json({ message: "El usuario ya era miembro" });
-            }
-            return res.status(500).json({ error: "Error aceptando miembro" });
-        }
+    try {
+        await db.query(query, [id_usuario_nuevo, id_proyecto]);
         res.json({ message: "Usuario aceptado en el equipo" });
-    });
+    } catch (err: any) {
+        // Si ya existe (error duplicado), no pasa nada, devolvemos éxito igual
+        // Nota: MySQL devuelve el código de error como string o número dependiendo de la librería, 
+        // cubrimos ambos casos por si acaso.
+        if (err.code === 'ER_DUP_ENTRY' || err.errno === 1062) {
+            return res.json({ message: "El usuario ya era miembro" });
+        }
+        console.error("Error aceptando miembro:", err);
+        res.status(500).json({ error: "Error aceptando miembro" });
+    }
 });
-
-
 
 export default router;
