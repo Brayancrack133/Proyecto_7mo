@@ -1,4 +1,5 @@
 import { FaEdit, FaEye, FaCheck, FaTimes } from "react-icons/fa";
+import "./usertable.css";
 
 interface Props {
   usuarios: any[];
@@ -16,7 +17,7 @@ export default function UserTable({ usuarios, onView, onEdit, onToggle }: Props)
             <th>Foto</th>
             <th>Nombre</th>
             <th>Correo</th>
-            <th>Rol</th>
+            
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -26,14 +27,14 @@ export default function UserTable({ usuarios, onView, onEdit, onToggle }: Props)
           {usuarios.map((u) => (
             <tr key={u.id_usuario}>
               <td>
-                <img src="/avatar1.jpg" className="user-photo" />
+                <img src="/Images/User.png" className="user-photo" />
               </td>
 
               <td>{u.nombre} {u.apellido}</td>
 
               <td>{u.correo}</td>
 
-              <td>{u.nombre_rol}</td>
+              
 
               <td>{u.estado === 1 ? "Habilitado" : "Deshabilitado"}</td>
 

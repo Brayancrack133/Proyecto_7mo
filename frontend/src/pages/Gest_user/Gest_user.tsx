@@ -141,7 +141,7 @@ export default function GestUserPage() {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1>Gestión de Usuarios</h1>
-
+<div>
         <button className="btn agregar" onClick={abrirAgregarUsuario}>
           <FaPlus /> Agregar Usuario
         </button>
@@ -150,7 +150,7 @@ export default function GestUserPage() {
           <FaPlus /> Agregar Rol
         </button>
       </div>
-
+</div>
       <SearchBar value={busqueda} onChange={setBusqueda} />
 
       {/* TABLA DE USUARIOS */}
