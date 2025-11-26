@@ -5,9 +5,11 @@ import { projectService, Project } from '../services';
 import { useUser } from '../context/UserContext'; // <-- ¡IMPORTA ESTO!
 
 export const useProjects = () => {
-  // 1. Obtener el estado del usuario del contexto
-  const { usuario, isLoading: isUserLoading } = useUser(); 
-  const userId = usuario?.id_usuario;
+  const { usuario, isLoading: isUserLoading } = useUser();
+  // CAMBIO: Usar .id en lugar de .id_usuario
+  const userId = usuario?.id; 
+
+  // ... (resto del código actualizando referencias de id_usuario a id si las hay)
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,54 +1,86 @@
-// index.ts
+// backend/src/index.ts
 
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import session from "express-session";
-import passport from "passport";
+import session from "express-session"; // <--- Necesario para Passport
+import passport from "passport";       // <--- Necesario para Passport
+import path from "path";
+import { fileURLToPath } from 'url';
 
-dotenv.config();
-import "./config/db.js";
-import "./auth/google.js"; // <-- IMPORTANTE
+// Inicializar DB e importar configuración
+import { db } from "./config/db.js";
+import "./config/db.js"; 
+
+// 1. Configuración de Estrategias de Passport (IMPORTANTE)
+import "./auth/google.js"; 
 import "./auth/github.js";
 
+// 2. Importar rutas
 import authRoutes from "./routes/auth.routes.js";
-import proyectosRoutes from "./routes/proyectos.routes.js"; // <-- La ruta que necesitamos
+import proyectosRoutes from "./routes/proyectos.routes.js";
 import tareasRoutes from "./routes/tareas.routes.js";
+import documentosRoutes from "./routes/documentos.routes.js";
+import notificacionesRoutes from "./routes/notificaciones.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 import userRoutes from "./routes/usuarios.routes.js";
 import roleRoutes from "./routes/roles.routes.js";
-import authGoogleRoutes from "./routes/googleauth.routes.js";
-import githubAuthRoutes from "./routes/githubaunth.js";
+// Rutas de Autenticación Social
+import authGoogleRoutes from "./routes/googleauth.routes.js"; // <--- RESTAURADO
+import githubAuthRoutes from "./routes/githubaunth.js";       // <--- RESTAURADO
+// Rutas IA
+import proyectosiaRoutes from "./routes/proyectosia.routes.js";
+
+dotenv.config();
 
 const app = express();
 
-// 1️⃣ Sesión
+// ==========================================
+// MIDDLEWARES
+// ==========================================
+app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+
+// Configuración de Sesión (Requerida por Passport)
 app.use(
   session({
-    secret: "mi_super_secreto_123",
+    secret: "mi_super_secreto_123", // Cambia esto en producción
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false },
+    cookie: { secure: false }, // true si usas HTTPS
   })
 );
 
-// 2️⃣ Passport
+// Inicializar Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// 3️⃣ Middlewares normales
-app.use(cors());
-app.use(express.json());
 
-// 4️⃣ Rutas
+// ==========================================
+// DEFINICIÓN DE RUTAS
+// ==========================================
+
+// 1. Rutas de Autenticación
 app.use("/api/auth", authRoutes);
-// AÑADIR ESTA LÍNEA PARA MONTAR TODAS las rutas de proyectos:
-app.use("/api", proyectosRoutes); // 🔥 CORRECCIÓN: Esto mapea /proyectos y /mis-proyectos a /api/...
-app.use("/api/tareas", tareasRoutes);
+app.use("/auth", authGoogleRoutes); // <--- Habilita /auth/google
+app.use("/auth", githubAuthRoutes); // <--- Habilita /auth/github
+
+// 2. Rutas del Sistema
 app.use("/api/usuarios", userRoutes);
 app.use("/api/roles", roleRoutes);
-app.use("/auth", authGoogleRoutes);
-app.use("/auth", githubAuthRoutes);
 
+// Rutas funcionales (Montadas en /api)
+app.use("/api", proyectosRoutes); 
+app.use("/api", tareasRoutes);    
+app.use("/api", notificacionesRoutes);
+app.use("/api", chatRoutes);
+app.use("/api", documentosRoutes);
+
+// 3. Rutas de IA
+app.use("/api/proyectos", proyectosiaRoutes); 
+
+// Ruta de prueba
 app.get("/", (req, res) => {
   res.send("🚀 Backend funcionando y DB conectada");
 });
