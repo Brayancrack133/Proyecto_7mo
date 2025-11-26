@@ -8,19 +8,16 @@ import passport from "passport";
 
 dotenv.config();
 import "./config/db.js";
-import "./auth/google.js";  // <-- IMPORTANTE
+import "./auth/google.js"; // <-- IMPORTANTE
 import "./auth/github.js";
 
-
 import authRoutes from "./routes/auth.routes.js";
-import proyectosRoutes from "./routes/proyectos.routes.js";
+import proyectosRoutes from "./routes/proyectos.routes.js"; // <-- La ruta que necesitamos
 import tareasRoutes from "./routes/tareas.routes.js";
 import userRoutes from "./routes/usuarios.routes.js";
 import roleRoutes from "./routes/roles.routes.js";
 import authGoogleRoutes from "./routes/googleauth.routes.js";
 import githubAuthRoutes from "./routes/githubaunth.js";
-
-
 
 const app = express();
 
@@ -44,7 +41,8 @@ app.use(express.json());
 
 // 4️⃣ Rutas
 app.use("/api/auth", authRoutes);
-//app.use("/api/proyectos", proyectosRoutes);
+// AÑADIR ESTA LÍNEA PARA MONTAR TODAS las rutas de proyectos:
+app.use("/api", proyectosRoutes); // 🔥 CORRECCIÓN: Esto mapea /proyectos y /mis-proyectos a /api/...
 app.use("/api/tareas", tareasRoutes);
 app.use("/api/usuarios", userRoutes);
 app.use("/api/roles", roleRoutes);
