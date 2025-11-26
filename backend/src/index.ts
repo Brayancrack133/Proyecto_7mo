@@ -3,104 +3,59 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-// Solución al TypeError: Importa la exportación por defecto
-import {db} from "./config/db.js"; 
+import session from "express-session";
+import passport from "passport";
 
-
-import path from "path"; // <--- Agrega esto arriba si no está
-import { fileURLToPath } from 'url'; // <--- Necesario para __dirname en módulos ES
-
-// Importamos las rutas
-import proyectosRoutes from "./routes/proyectos.routes";
-import tareasRoutes from "./routes/tareas.routes";
-import documentosRoutes from "./routes/documentos.routes";
-import notificacionesRoutes from "./routes/notificaciones.routes";
-import chatRoutes from "./routes/chat.routes";
-import authRoutes from "./routes/auth.routes";
-//con ia
-import proyectosiaRoutes from "./routes/proyectosia.routes";
-//metodologias
-import metodologiasRoutes from "./routes/metodologias.routes";
-
-
-// Cargar variables de entorno (Solo aquí)
 dotenv.config();
-
-// Inicializar DB (solo importarla para conectarse)
 import "./config/db.js";
+import "./auth/google.js";  // <-- IMPORTANTE
+import "./auth/github.js";
 
-// Importamos rutas
-import userRoutes from "./routes/usuarios.routes";
-import roleRoutes from "./routes/roles.routes";
+
+import authRoutes from "./routes/auth.routes.js";
+import proyectosRoutes from "./routes/proyectos.routes.js";
+import tareasRoutes from "./routes/tareas.routes.js";
+import userRoutes from "./routes/usuarios.routes.js";
+import roleRoutes from "./routes/roles.routes.js";
+import authGoogleRoutes from "./routes/googleauth.routes.js";
+import githubAuthRoutes from "./routes/githubaunth.js";
+
+
 
 const app = express();
 
-// 🔥 Middlewares SIEMPRE primero
+// 1️⃣ Sesión
+app.use(
+  session({
+    secret: "mi_super_secreto_123",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false },
+  })
+);
+
+// 2️⃣ Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// 3️⃣ Middlewares normales
 app.use(cors());
 app.use(express.json());
 
-// 🔥 Ahora sí, rutas
+// 4️⃣ Rutas
 app.use("/api/auth", authRoutes);
 //app.use("/api/proyectos", proyectosRoutes);
 app.use("/api/tareas", tareasRoutes);
 app.use("/api/usuarios", userRoutes);
 app.use("/api/roles", roleRoutes);
-// --- DEFINICIÓN DE RUTAS ---
-app.use("/api", proyectosRoutes); // Para /mis-proyectos
-app.use("/api", tareasRoutes);    // Para /tareas
-app.use("/api", notificacionesRoutes);
-app.use("/api", chatRoutes);
+app.use("/auth", authGoogleRoutes);
+app.use("/auth", githubAuthRoutes);
 
-app.use('/uploads', express.static('uploads'));
-app.use("/api", documentosRoutes);
-
-//con ia
-app.use("/api/proyectos", proyectosiaRoutes);
-
-//Metodologias
-
-app.use("/api/metodologias", metodologiasRoutes);
-
-// Ruta simple de prueba
 app.get("/", (req, res) => {
   res.send("🚀 Backend funcionando y DB conectada");
 });
 
 const PORT = process.env.PORT || 3000;
-
-
-// --- Obtener proyectos de un usuario ---
-app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
-    // ... (Tu lógica de ruta usando db.query se mantiene igual)
-});
-
-
-
-// Obtener proyectos de un usuario
-app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
-  const { idUsuario } = req.params;
-
-  try {
-    const [rows]: any = await db.query(
-      `
-            SELECT DISTINCT 
-                p.id_proyecto,
-                p.nombre,
-                IF(p.id_jefe = ?, 'Líder', 'Integrante') AS rol
-            FROM proyectos p
-            JOIN miembros_equipo me ON p.id_equipo = me.id_equipo
-            WHERE me.id_usuario = ?
-            `,
-      [idUsuario, idUsuario]
-    );
-
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error obteniendo proyectos" });
-  }
-});
-// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🔥 Servidor escuchando en puerto ${PORT}`);
 });

@@ -1,7 +1,7 @@
-import React from 'react'
+
 import Sidebar from '../organisms/Sidebar'
 import ContInicio from '../organisms/ContInicio'
-import Header from '../organisms/Header'
+import Header from '../organisms/Head'
 const Inicio = () => {
     return (
         <div className="inicio-page">

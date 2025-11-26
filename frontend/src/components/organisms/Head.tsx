@@ -1,5 +1,4 @@
-import React from 'react'
-import './Header.css'
+import './Head.css'
 // 1. Importamos el hook para acceder a los datos globales
 import { useUser } from '../../context/UserContext';
 
