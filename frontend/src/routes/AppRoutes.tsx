@@ -21,7 +21,6 @@ export const AppRoutes = () => {
         <Route path="/panel" element={<h1>Módulo: Panel Analítico</h1>} />
         <Route path="/configuracion" element={<h1>Módulo: Configuración</h1>} />
       </Route>
-
       {/* Página 404 */}
       <Route path="*" element={<h1>404 | Página No Encontrada</h1>} />
     </Routes>
