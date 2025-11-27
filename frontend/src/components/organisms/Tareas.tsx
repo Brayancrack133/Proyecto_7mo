@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import TarjetaTarea, { TareaData } from './TarjetaTarea'
-import './Tareas.css' // <--- Asegúrate de crear este archivo CSS (ver paso 3)
+import './Tareas.css'
 import { useUser } from '../../context/UserContext';
-import ModalAvance from './ModalAvance'; // <--- 1. IMPORTAR EL NUEVO MODAL
+import ModalAvance from './ModalAvance';
 
 interface Props {
     idProyecto?: string;
     esLider: boolean;
-    // 1. NUEVAS PROPS
     idTareaInicial: number | null;
     limpiarSeleccion: () => void;
 }
@@ -16,101 +15,29 @@ interface Miembro {
     id_usuario: number;
     nombre: string;
     apellido: string;
+    rol_en_equipo?: string;
 }
 
 const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarSeleccion }) => {
     const { usuario } = useUser();
-
     const [listaTareas, setListaTareas] = useState<TareaData[]>([]);
 
-    // ESTADOS PARA EL MODAL Y FORMULARIO
-    const [mostrarModal, setMostrarModal] = useState(false);
+    // --- ESTADOS EXISTENTES ---
+    const [mostrarModal, setMostrarModal] = useState(false); // Modal Crear Tarea
     const [miembros, setMiembros] = useState<Miembro[]>([]);
+    const [idTareaSeleccionada, setIdTareaSeleccionada] = useState<number | null>(null); // Modal Avance
 
+    // --- 🆕 ESTADOS NUEVOS PARA ASIGNACIÓN ---
+    const [modalAsignar, setModalAsignar] = useState(false);
+    const [idTareaAsignar, setIdTareaAsignar] = useState<number | null>(null);
+    const [idMiembroAsignar, setIdMiembroAsignar] = useState("");
 
-    const [tareaSeleccionada, setTareaSeleccionada] = useState<TareaData | null>(null);
-    const [archivo, setArchivo] = useState<File | null>(null);
-    const [comentario, setComentario] = useState("");
-    const [idTareaSeleccionada, setIdTareaSeleccionada] = useState<number | null>(null);
-
-    const handleClickTarjeta = (tarea: TareaData) => {
-        setTareaSeleccionada(tarea);
-        setArchivo(null);
-        setComentario("");
-        setDocumentosAdjuntos([]); // <--- Limpiamos
-    };
-
-    useEffect(() => {
-        if (idTareaInicial) {
-            setIdTareaSeleccionada(idTareaInicial); // Abrimos modal
-            limpiarSeleccion();
-        }
-    }, [idTareaInicial]);
-
-
-
-    const [documentosAdjuntos, setDocumentosAdjuntos] = useState<any[]>([]);
-
-    // Efecto para cargar documentos cuando se abre una tarea
-    useEffect(() => {
-        if (tareaSeleccionada) {
-            fetch(`http://localhost:3000/api/tareas/${tareaSeleccionada.id_tarea}/documentos`)
-                .then(res => res.json())
-                .then(data => setDocumentosAdjuntos(data))
-                .catch(err => console.error("Error cargando docs:", err));
-        }
-    }, [tareaSeleccionada]);
-
-    useEffect(() => {
-        if (idTareaInicial && listaTareas.length > 0) {
-            // Buscamos la tarea en la lista que acabamos de descargar
-            const tareaEncontrada = listaTareas.find(t => t.id_tarea === idTareaInicial);
-
-            if (tareaEncontrada) {
-                console.log("🚀 Abriendo automáticamente:", tareaEncontrada.titulo);
-                setTareaSeleccionada(tareaEncontrada); // Esto abre el Modal de Avance
-                // OJO: Si quieres abrir el de EDICIÓN (si eres líder), la lógica sería distinta,
-                // pero por ahora asumimos que es para ver/subir avance.
-
-                limpiarSeleccion(); // Limpiamos para que no se vuelva a abrir sola si recargamos
-            }
-        }
-    }, [listaTareas, idTareaInicial]);
-
-    const handleSubirAvance = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!archivo || !tareaSeleccionada || !usuario) return;
-
-        const formData = new FormData();
-        formData.append("archivo", archivo);
-        formData.append("id_tarea", tareaSeleccionada.id_tarea.toString());
-        formData.append("id_usuario", usuario.id.toString());
-        formData.append("comentario", comentario);
-
-        fetch('http://localhost:3000/api/tareas/subir-avance', {
-            method: 'POST',
-            body: formData // <--- No lleva Content-Type manual, fetch lo pone solo
-        })
-            .then(res => {
-                if (res.ok) {
-                    alert("✅ Avance subido correctamente");
-                    setTareaSeleccionada(null); // Cierra el modal
-                } else {
-                    alert("❌ Error al subir avance");
-                }
-            })
-            .catch(err => console.error(err));
-    };
-
+    // Estado para nueva tarea manual
     const [nuevaTarea, setNuevaTarea] = useState({
-        titulo: '',
-        descripcion: '',
-        fecha_inicio: '',
-        fecha_fin: '',
-        id_responsable: ''
+        titulo: '', descripcion: '', fecha_inicio: '', fecha_fin: '', id_responsable: ''
     });
 
-    // 1. Cargar Tareas (Tu lógica original)
+    // 1. CARGAR TAREAS
     const cargarTareas = () => {
         if (idProyecto) {
             fetch(`http://localhost:3000/api/tareas/${idProyecto}`)
@@ -120,13 +47,8 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
         }
     };
 
-    useEffect(() => {
-        cargarTareas();
-    }, [idProyecto]);
-
-    // 2. Función para abrir modal y cargar miembros del equipo
-    const handleAbrirModal = () => {
-        setMostrarModal(true);
+    // 2. CARGAR MIEMBROS (Reutilizable)
+    const cargarMiembros = () => {
         if (idProyecto) {
             fetch(`http://localhost:3000/api/proyecto/${idProyecto}/miembros`)
                 .then(res => res.json())
@@ -135,42 +57,83 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
         }
     };
 
-    // 3. Manejar cambios en los inputs
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setNuevaTarea({
-            ...nuevaTarea,
-            [e.target.name]: e.target.value
-        });
+    useEffect(() => {
+        cargarTareas();
+    }, [idProyecto]);
+
+    // Efecto para abrir modal inicial si viene por URL
+    useEffect(() => {
+        if (idTareaInicial) {
+            setIdTareaSeleccionada(idTareaInicial);
+            limpiarSeleccion();
+        }
+    }, [idTareaInicial]);
+
+    // --- HANDLERS EXISTENTES ---
+    const handleAbrirModalCrear = () => {
+        setMostrarModal(true);
+        cargarMiembros();
     };
 
-    // 4. Enviar formulario al Backend
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        setNuevaTarea({ ...nuevaTarea, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmitCrear = (e: React.FormEvent) => {
         e.preventDefault();
         if (!idProyecto) return;
-
-        // Preparamos el objeto a enviar
-        const tareaParaEnviar = {
-            ...nuevaTarea,
-            id_proyecto: idProyecto
-        };
+        const tareaParaEnviar = { ...nuevaTarea, id_proyecto: idProyecto };
 
         fetch('http://localhost:3000/api/tareas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(tareaParaEnviar)
         })
-            .then(res => {
-                if (res.ok) {
-                    alert("✅ Tarea creada con éxito");
-                    setMostrarModal(false); // Cerramos modal
-                    cargarTareas(); // Recargamos la lista para ver la nueva tarea
-                    // Limpiamos formulario
-                    setNuevaTarea({ titulo: '', descripcion: '', fecha_inicio: '', fecha_fin: '', id_responsable: '' });
-                } else {
-                    alert("❌ Error al crear tarea");
-                }
-            })
-            .catch(err => console.error(err));
+        .then(res => {
+            if (res.ok) {
+                alert("✅ Tarea creada con éxito");
+                setMostrarModal(false);
+                cargarTareas();
+                setNuevaTarea({ titulo: '', descripcion: '', fecha_inicio: '', fecha_fin: '', id_responsable: '' });
+            } else {
+                alert("❌ Error al crear tarea");
+            }
+        })
+        .catch(err => console.error(err));
+    };
+
+    // --- 🆕 HANDLERS PARA ASIGNAR (Lógica nueva) ---
+    
+    // 1. Abrir el modal cuando clickean "Asignar" en la tarjeta
+    const handleAbrirAsignar = (idTarea: number) => {
+        setIdTareaAsignar(idTarea); // Guardamos qué tarea estamos editando
+        setModalAsignar(true);      // Abrimos modal visual
+        cargarMiembros();           // Aseguramos tener la lista de gente
+        setIdMiembroAsignar("");    // Limpiamos selección previa
+    };
+
+    // 2. Guardar la asignación en el Backend
+    const handleGuardarAsignacion = () => {
+        if (!idTareaAsignar || !idMiembroAsignar) {
+            alert("Selecciona un miembro por favor");
+            return;
+        }
+
+        fetch(`http://localhost:3000/api/tareas/${idTareaAsignar}/asignar`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_usuario: idMiembroAsignar })
+        })
+        .then(res => {
+            if (res.ok) {
+                alert("✅ Tarea asignada correctamente");
+                setModalAsignar(false); // Cerrar modal
+                cargarTareas();         // Recargar lista para ver el cambio (foto del usuario)
+            } else {
+                alert("❌ Error al asignar");
+            }
+        })
+        .catch(err => console.error(err));
     };
 
     return (
@@ -183,81 +146,86 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
             <div className='apartoptn'>
                 <p className='txtapartoptn'>Gestión de tareas</p>
                 {esLider && (
-                    <button className='agrebuttnoptn' onClick={handleAbrirModal}>
+                    <button className='agrebuttnoptn' onClick={handleAbrirModalCrear}>
                         <img className='plustarbutoptn' src="/agregar.png" alt="Agregar" />
                         <p className='agretxtbutoptn'>Nueva Tarea</p>
                     </button>
                 )}
             </div>
 
-            {/* Al mapear las tarjetas: */}
+            {/* LISTA DE TARJETAS */}
             <div className='containerproy'>
-                {/* ... */}
                 {listaTareas.map(tarea => (
                     <TarjetaTarea
                         key={tarea.id_tarea}
                         tarea={tarea}
-                        puedeEditar={esLider || tarea.id_responsable === usuario?.id}
-                        // Al hacer click, solo guardamos el ID
+                        puedeEditar={esLider || tarea.id_responsable === (usuario as any)?.id}
+                        // Click en la tarjeta -> Ver detalle/avance
                         onSeleccionar={(t) => setIdTareaSeleccionada(t.id_tarea)}
+                        // 🆕 Click en botón azul -> Asignar miembro (Solo líderes deberían ver esto o todos, depende tu regla)
+                        onAsignar={handleAbrirAsignar} 
                     />
                 ))}
             </div>
 
-            {/* ================= MODAL 1: CREAR NUEVA TAREA ================= */}
+            {/* ================= MODAL 1: CREAR NUEVA TAREA (Manual) ================= */}
             {mostrarModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h3>Nueva Tarea</h3>
-                        <form onSubmit={handleSubmit}>
-                            <input
-                                type="text" name="titulo" placeholder="Título de la tarea" required
-                                value={nuevaTarea.titulo} onChange={handleChange}
-                            />
-                            <textarea
-                                name="descripcion" placeholder="Descripción" required
-                                value={nuevaTarea.descripcion} onChange={handleChange}
-                            />
+                        <form onSubmit={handleSubmitCrear}>
+                            <input type="text" name="titulo" placeholder="Título" required value={nuevaTarea.titulo} onChange={handleChange} />
+                            <textarea name="descripcion" placeholder="Descripción" required value={nuevaTarea.descripcion} onChange={handleChange} />
                             <div className="fechas-row">
-                                <div>
-                                    <label>Inicio:</label>
-                                    <input type="date" name="fecha_inicio" required value={nuevaTarea.fecha_inicio} onChange={handleChange} />
-                                </div>
-                                <div>
-                                    <label>Fin:</label>
-                                    <input type="date" name="fecha_fin" required value={nuevaTarea.fecha_fin} onChange={handleChange} />
-                                </div>
+                                <div><label>Inicio:</label><input type="date" name="fecha_inicio" required value={nuevaTarea.fecha_inicio} onChange={handleChange} /></div>
+                                <div><label>Fin:</label><input type="date" name="fecha_fin" required value={nuevaTarea.fecha_fin} onChange={handleChange} /></div>
                             </div>
-
                             <label>Asignar a:</label>
                             <select name="id_responsable" required value={nuevaTarea.id_responsable} onChange={handleChange}>
-                                <option value="">-- Seleccionar Miembro --</option>
-                                {miembros.map(m => (
-                                    <option key={m.id_usuario} value={m.id_usuario}>
-                                        {m.nombre} {m.apellido}
-                                    </option>
-                                ))}
+                                <option value="">-- Seleccionar --</option>
+                                {miembros.map(m => <option key={m.id_usuario} value={m.id_usuario}>{m.nombre} {m.apellido}</option>)}
                             </select>
-
                             <div className="modal-actions">
                                 <button type="button" onClick={() => setMostrarModal(false)} className="btn-cancelar">Cancelar</button>
-                                <button type="submit" className="btn-guardar">Guardar Tarea</button>
+                                <button type="submit" className="btn-guardar">Guardar</button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
 
-            {/* ================= MODAL 2: VER/SUBIR AVANCE (COMPONENTE NUEVO) ================= */}
-            {idTareaSeleccionada && (
-                <ModalAvance
-                    idTarea={idTareaSeleccionada}
-                    esLider={esLider}
-                    onClose={() => setIdTareaSeleccionada(null)}
-                />
+            {/* ================= 🆕 MODAL 2: ASIGNAR TAREA (IA) ================= */}
+            {modalAsignar && (
+                <div className="modal-overlay">
+                    <div className="modal-content" style={{ maxWidth: '400px' }}>
+                        <h3>👤 Asignar Responsable</h3>
+                        <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                            Selecciona quién se encargará de esta tarea.
+                        </p>
+                        
+                        <label>Miembro del equipo:</label>
+                        <select 
+                            style={{ width: '100%', padding: '10px', marginBottom: '20px', borderRadius: '5px', border: '1px solid #ccc' }}
+                            value={idMiembroAsignar}
+                            onChange={(e) => setIdMiembroAsignar(e.target.value)}
+                        >
+                            <option value="">-- Seleccionar --</option>
+                            {miembros.map(m => (
+                                <option key={m.id_usuario} value={m.id_usuario}>
+                                    {m.nombre} {m.apellido} {m.rol_en_equipo ? `(${m.rol_en_equipo})` : ''}
+                                </option>
+                            ))}
+                        </select>
+
+                        <div className="modal-actions">
+                            <button type="button" onClick={() => setModalAsignar(false)} className="btn-cancelar">Cancelar</button>
+                            <button type="button" onClick={handleGuardarAsignacion} className="btn-guardar">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
             )}
 
-            {/* 3. === AQUÍ USAMOS EL NUEVO COMPONENTE === */}
+            {/* ================= MODAL 3: VER/SUBIR AVANCE ================= */}
             {idTareaSeleccionada && (
                 <ModalAvance
                     idTarea={idTareaSeleccionada}

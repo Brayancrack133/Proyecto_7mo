@@ -1,5 +1,3 @@
-// backend/src/index.ts
-
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -8,15 +6,18 @@ import passport from "passport";       // <--- Necesario para Passport
 import path from "path";
 import { fileURLToPath } from 'url';
 
-// Inicializar DB e importar configuración
-import { db } from "./config/db.js";
-import "./config/db.js"; 
+// Cargar variables de entorno
+dotenv.config();
 
-// 1. Configuración de Estrategias de Passport (IMPORTANTE)
+// Inicializar DB (Importar el pool configurado)
+// NOTA: Asegúrate de que en db.ts hayas aceptado TU versión (con SSL/TiDB)
+import { db } from "./config/db.js";
+
+// 1. Configuración de Estrategias de Passport (Del MAIN)
 import "./auth/google.js"; 
 import "./auth/github.js";
 
-// 2. Importar rutas
+// 2. Importar rutas (Combinación de ambas ramas)
 import authRoutes from "./routes/auth.routes.js";
 import proyectosRoutes from "./routes/proyectos.routes.js";
 import tareasRoutes from "./routes/tareas.routes.js";
@@ -25,34 +26,39 @@ import notificacionesRoutes from "./routes/notificaciones.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import userRoutes from "./routes/usuarios.routes.js";
 import roleRoutes from "./routes/roles.routes.js";
-// Rutas de Autenticación Social
-import authGoogleRoutes from "./routes/googleauth.routes.js"; // <--- RESTAURADO
-import githubAuthRoutes from "./routes/githubaunth.js";       // <--- RESTAURADO
-// Rutas IA
-import proyectosiaRoutes from "./routes/proyectosia.routes.js";
 
-dotenv.config();
+// Rutas de Autenticación Social (Del MAIN)
+import authGoogleRoutes from "./routes/googleauth.routes.js"; 
+import githubAuthRoutes from "./routes/githubaunth.js";       
+
+// Rutas de IA (TUYAS)
+import proyectosiaRoutes from "./routes/proyectosia.routes.js";
 
 const app = express();
 
 // ==========================================
 // MIDDLEWARES
 // ==========================================
-app.use(cors());
+// CORS: Es vital dejarlo al principio para que el Frontend no falle
+app.use(cors({
+    origin: 'http://localhost:5173', // Ajusta si es necesario
+    credentials: true
+}));
+
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-// Configuración de Sesión (Requerida por Passport)
+// Configuración de Sesión (Requerida por Passport - Del MAIN)
 app.use(
   session({
-    secret: "mi_super_secreto_123", // Cambia esto en producción
+    secret: process.env.SESSION_SECRET || "mi_super_secreto_123", // Mejor usar .env
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // true si usas HTTPS
+    cookie: { secure: false }, // Poner true si usas HTTPS en producción
   })
 );
 
-// Inicializar Passport
+// Inicializar Passport (Del MAIN)
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -66,19 +72,20 @@ app.use("/api/auth", authRoutes);
 app.use("/auth", authGoogleRoutes); // <--- Habilita /auth/google
 app.use("/auth", githubAuthRoutes); // <--- Habilita /auth/github
 
-// 2. Rutas del Sistema
+// 2. Rutas del Sistema Base
 app.use("/api/usuarios", userRoutes);
 app.use("/api/roles", roleRoutes);
 
-// Rutas funcionales (Montadas en /api)
+// 3. Rutas funcionales (Montadas en /api)
 app.use("/api", proyectosRoutes); 
 app.use("/api", tareasRoutes);    
 app.use("/api", notificacionesRoutes);
 app.use("/api", chatRoutes);
 app.use("/api", documentosRoutes);
 
-// 3. Rutas de IA
-app.use("/api/proyectos", proyectosiaRoutes); 
+// 4. Rutas de IA (TUYAS - Con el prefijo correcto que definimos hoy)
+app.use("/api/proyectos-ia", proyectosiaRoutes);
+
 
 // Ruta de prueba
 app.get("/", (req, res) => {

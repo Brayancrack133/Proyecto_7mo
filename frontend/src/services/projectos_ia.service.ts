@@ -1,12 +1,32 @@
-// src/services/proyectos.service.ts
-import api from "./api"; // tu instancia axios (baseURL: /api)
+// Usamos la instancia 'api' configurada por tus compañeros
+// (Esto es mejor porque ya trae la URL base y seguramente los headers de auth)
+import api from "./api"; 
 
-export const crearProyecto = async (data: any) => {
-  const res = await api.post("/proyectos", data);
-  return res.data;
+// 1. TU FUNCIÓN DE IA (Adaptada a la instancia api)
+export const generarProyectoConIA = async (idea: string) => {
+    try {
+        // Nota: Como 'api' ya tiene la base (ej: /api), solo ponemos el resto
+        const response = await api.post("/proyectos-ia/generar", { idea });
+        return response.data;
+    } catch (error) {
+        console.error("Error llamando a la IA:", error);
+        throw error;
+    }
 };
 
+// 2. FUNCIÓN DE CREAR PROYECTO (Unificada)
+// Renombramos 'crearProyectoEnBD' a 'crearProyecto' para seguir el estándar del equipo
+export const crearProyecto = async (projectData: any) => {
+    // Usamos api.post en lugar de axios.post directo
+    const response = await api.post("/proyectos", projectData);
+    return response.data;
+};
+
+// Mantenemos el alias por compatibilidad si algún archivo tuyo viejo lo busca
+export const crearProyectoEnBD = crearProyecto;
+
+// 3. FUNCIÓN DE TUS COMPAÑEROS (Metodologías)
 export const listarMetodologias = async () => {
-  const res = await api.get("/metodologias");
-  return res.data;
+    const res = await api.get("/metodologias"); // Asumiendo que esta ruta existe
+    return res.data;
 };

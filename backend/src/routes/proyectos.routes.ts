@@ -90,42 +90,85 @@ router.get("/proyecto/:idProyecto/miembros", async (req, res) => {
 });
 
 // ==============================================================
-// RUTA 4: CREAR NUEVO PROYECTO (Con transacciones manuales)
+// RUTA 4: CREAR NUEVO PROYECTO + TAREAS IA (FINAL)
 // ==============================================================
 router.post("/proyectos", async (req, res) => {
-    const { nombre, descripcion, fecha_inicio, fecha_fin, id_usuario } = req.body;
-    const connection = await db.getConnection(); // Obtenemos una conexión para la transacción
+    // 1. Recibimos 'tareas' (array de strings) además de lo demás
+    const { 
+        nombre, descripcion, fecha_inicio, fecha_fin, 
+        id_jefe, tipo, tamano, complejidad, metodologia_id,
+        tareas // <--- Lista de tareas sugeridas por la IA
+    } = req.body;
+    
+    const idLider = id_jefe || 1; 
+    const connection = await db.getConnection(); 
 
     try {
         await connection.beginTransaction();
 
-        // 1. Crear Equipo
+        // --- PASO A: CREAR EQUIPO ---
         const [resultEq] = await connection.query<ResultSetHeader>(
-            "INSERT INTO equipos (nombre_equipo) VALUES (?)", 
+            "INSERT INTO Equipos (nombre_equipo) VALUES (?)", 
             [nombre]
         );
         const idEquipo = resultEq.insertId;
 
-        // 2. Crear Proyecto
+        // --- PASO B: CREAR PROYECTO ---
+        const [resultProj] = await connection.query<ResultSetHeader>(
+            `INSERT INTO Proyectos (
+                nombre, descripcion, fecha_inicio, fecha_fin, 
+                id_jefe, id_equipo, 
+                tipo, tamano, complejidad, metodologia_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                nombre, descripcion, fecha_inicio, fecha_fin, 
+                idLider, idEquipo, 
+                tipo || "Otro", tamano || "Mediano", complejidad || "Media", metodologia_id || null
+            ]
+        );
+        const idNuevoProyecto = resultProj.insertId;
+
+        // --- PASO C: ASIGNAR LÍDER ---
         await connection.query(
-            `INSERT INTO proyectos (nombre, descripcion, fecha_inicio, fecha_fin, id_jefe, id_equipo)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [nombre, descripcion, fecha_inicio, fecha_fin, id_usuario, idEquipo]
+            `INSERT INTO Miembros_Equipo (id_equipo, id_usuario, rol_en_equipo)
+             VALUES (?, ?, 'Líder de Proyecto')`,
+            [idEquipo, idLider]
         );
 
-        // 3. Asignar Líder
-        await connection.query(
-            `INSERT INTO miembros_equipo (id_equipo, id_usuario, rol_en_equipo)
-             VALUES (?, ?, 'Líder de Proyecto')`,
-            [idEquipo, id_usuario]
-        );
+        // --- PASO D: INSERTAR TAREAS DE LA IA (SIN ASIGNAR) ---
+        if (tareas && Array.isArray(tareas) && tareas.length > 0) {
+            // Calculamos fechas por defecto para las tareas (ej: inician hoy, terminan en 7 días)
+            // Esto permite que aparezcan en el calendario, luego el usuario las ajusta.
+            const fechaTareaInicio = fecha_inicio; 
+            // Truco: Sumamos 7 días a la fecha de inicio para tener una fecha fin por defecto
+            const fechaObj = new Date(fecha_inicio);
+            fechaObj.setDate(fechaObj.getDate() + 7);
+            const fechaTareaFin = fechaObj.toISOString().split('T')[0];
+
+            for (const tituloTarea of tareas) {
+                await connection.query(
+                    `INSERT INTO Tareas (
+                        id_proyecto, titulo, descripcion, 
+                        fecha_inicio, fecha_fin, 
+                        id_responsable
+                    ) VALUES (?, ?, ?, ?, ?, NULL)`, // NULL = Sin asignar (Botón "Asignar a" aparecerá)
+                    [
+                        idNuevoProyecto, 
+                        tituloTarea, 
+                        "Tarea sugerida por IA", // Descripción genérica
+                        fechaTareaInicio, 
+                        fechaTareaFin
+                    ]
+                );
+            }
+        }
 
         await connection.commit();
-        res.json({ message: "Proyecto creado exitosamente" });
+        res.json({ message: "Proyecto y tareas creados exitosamente" });
 
     } catch (error) {
         await connection.rollback();
-        console.error(error);
+        console.error("❌ Error creando proyecto:", error);
         res.status(500).json({ error: "Error creando proyecto" });
     } finally {
         connection.release();
@@ -208,5 +251,22 @@ router.post("/proyectos/aceptar-union", async (req, res) => {
         return res.status(500).json({ error: "Error aceptando miembro" });
     }
 });
+
+// RUTA: Asignar un miembro a una tarea
+router.put("/tareas/:idTarea/asignar", async (req, res) => {
+    const { idTarea } = req.params;
+    const { id_usuario } = req.body; // El ID del miembro que seleccionaste en el dropdown
+
+    try {
+        await db.query(
+            "UPDATE Tareas SET id_responsable = ? WHERE id_tarea = ?",
+            [id_usuario, idTarea]
+        );
+        res.json({ message: "Tarea asignada correctamente" });
+    } catch (error) {
+        res.status(500).json({ error: "Error al asignar tarea" });
+    }
+});
+
 
 export default router;
