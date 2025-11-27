@@ -73,7 +73,7 @@ const Sidebar: React.FC = () => {
         })}
       </nav>
 
-      {/* Footer con perfil de usuario */}
+      {/*
       <div className="sidebar-footer">
         <div className="user-profile">
           <div className="user-avatar">U</div>
@@ -83,6 +83,7 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </div>
+      */}
     </aside>
   );
 };

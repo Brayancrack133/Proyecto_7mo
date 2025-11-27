@@ -214,7 +214,7 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
                         </div>
 
                         <form className="chat-input-area" onSubmit={handleEnviar}>
-                            <input 
+                            <input
                                 type="text"
                                 name="mensaje"
                                 id="input-mensaje"
