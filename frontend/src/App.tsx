@@ -13,6 +13,11 @@ import Proyecto_Principal from "./pages/gestion_proyectos/ProjectCreationForm";
 import Planificacion from "./components/organisms/Planificacion";
 import ContInicio from "./components/organisms/ContInicio";
 import Contenido from "./components/templates/Contenido";
+import Cascada from "./pages/Metodologias/metCascada";
+import Kanvan from "./pages/Metodologias/metKanvan";
+import Scrum from "./pages/Metodologias/metScrum";
+import XP from "./pages/Metodologias/metXP";
+import Proyecto_vacio from "./components/templates/Proyecto_vacio/Proyecto_vacio";
 
 // =======================================================
 // COMPONENTE AUXILIAR (DEBE IR ANTES DE USARLO)
@@ -122,6 +127,14 @@ function App() {
             />
 
             <Route
+              path="/proyecto-vacio"
+              element={
+                <Contenido>
+                  <Proyecto_vacio />
+                </Contenido>
+              }
+            />
+            <Route
               path="/proyecto-principal"
               element={
                 <Contenido>
@@ -135,6 +148,38 @@ function App() {
               element={
                 <Contenido>
                   <ContInicio />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/cascada"
+              element={
+                <Contenido>
+                  <Cascada />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/kanvan"
+              element={
+                <Contenido>
+                  <Kanvan />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/scrum"
+              element={
+                <Contenido>
+                  <Scrum />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/xp"
+              element={
+                <Contenido>
+                  <XP />
                 </Contenido>
               }
             />
