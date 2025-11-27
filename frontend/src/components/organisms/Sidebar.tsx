@@ -16,8 +16,12 @@ const Sidebar: React.FC = () => {
 
   const opciones: OpcionMenu[] = [
     { nombre: 'Inicio', ruta: '/inicio', icon: Home },
-    { nombre: 'Proyectos', ruta: '/mis-proyectos', icon: FolderKanban },
-    { nombre: 'Gestión de Usuarios', ruta: '/proyecto-principal', icon: Users },
+    { nombre: 'Proyectos', ruta: '/proyecto-vacio', icon: FolderKanban },
+    //{ nombre: 'Gestión de Usuarios', ruta: '/proyecto-vacio', icon: Users },
+    //{ nombre: 'Cascada', ruta: '/cascada', icon: FolderKanban },
+    //{ nombre: 'Kanvan', ruta: '/kanvan', icon: FolderKanban },
+    //{ nombre: 'Scrum', ruta: '/scrum', icon: FolderKanban },
+    //{ nombre: 'XP', ruta: '/xp', icon: FolderKanban },
   ];
 
   const isActive = (opcion: OpcionMenu): boolean => {

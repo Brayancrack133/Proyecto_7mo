@@ -33,6 +33,10 @@ import githubAuthRoutes from "./routes/githubaunth.js";
 // Rutas de IA (TUYAS)
 import proyectosiaRoutes from "./routes/proyectosia.routes.js";
 
+
+//para proyecto con ia
+import proyecto_principal_routes from "./routes/proyectoPrincipal.routes.js";
+
 const app = express();
 
 // ==========================================
@@ -81,6 +85,10 @@ app.use("/api", tareasRoutes);
 app.use("/api", notificacionesRoutes);
 app.use("/api", chatRoutes);
 app.use("/api", documentosRoutes);
+
+//para proyecto con ia
+app.use("/api/proyecto-principal", proyecto_principal_routes);
+
 
 // 4. Rutas de IA (TUYAS - Con el prefijo correcto que definimos hoy)
 app.use("/api/proyectos-ia", proyectosiaRoutes);

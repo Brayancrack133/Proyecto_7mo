@@ -1,0 +1,82 @@
+.empty-state-container {
+    /* OCUPAR TODO EL ESPACIO */
+    width: 100%;             /* Fuerza a ocupar todo el ancho disponible */
+    height: 100%;            /* Intenta ocupar toda la altura */
+    min-height: 70vh;        /* Altura mínima para que se vea centrado verticalmente */
+    
+    /* CENTRADO PERFECTO */
+    display: flex;
+    flex-direction: column;  /* Alinea contenido en columna */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center;     /* Centra horizontalmente */
+    
+    /* ESTÉTICA */
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 40px;
+    box-sizing: border-box;  /* Asegura que el padding no rompa el ancho */
+    
+    /* Opcional: Sombra suave para que resalte del fondo */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.empty-content {
+    text-align: center;      /* Centra el texto internamente */
+    max-width: 600px;        /* Evita que el texto sea demasiado ancho y difícil de leer */
+    width: 100%;
+    
+    /* Flex para centrar elementos internos como la imagen si es necesario */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.image-wrapper {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center; /* Asegura que la imagen esté centrada */
+    width: 100%;
+}
+
+.empty-image {
+    max-width: 100%;
+    height: auto;
+    max-height: 280px;
+    object-fit: contain;
+}
+
+.empty-title {
+    font-size: 1.8rem;
+    color: #1f2937;
+    margin-bottom: 16px;
+    font-weight: 700;
+}
+
+.empty-description {
+    font-size: 1.1rem;
+    color: #6b7280;
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.btn-create-first {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    
+    /* Asegurar que el botón no se estire */
+    width: auto; 
+    min-width: 200px;
+}
+
+.btn-create-first:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}

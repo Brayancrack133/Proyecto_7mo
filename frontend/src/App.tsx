@@ -13,6 +13,12 @@ import Proyecto_Principal from "./pages/gestion_proyectos/ProjectCreationForm";
 import Planificacion from "./components/organisms/Planificacion";
 import ContInicio from "./components/organisms/ContInicio";
 import Contenido from "./components/templates/Contenido";
+import Cascada from "./pages/Metodologias/metCascada";
+import Kanvan from "./pages/Metodologias/metKanvan";
+import Scrum from "./pages/Metodologias/metScrum";
+import XP from "./pages/Metodologias/metXP";
+import Proyecto_vacio from "./components/templates/Proyecto_vacio/Proyecto_vacio";
+import ContPlanificacion from "./components/templates/ContPlanificacion";
 
 // =======================================================
 // COMPONENTE AUXILIAR (DEBE IR ANTES DE USARLO)
@@ -122,6 +128,14 @@ function App() {
             />
 
             <Route
+              path="/proyecto-vacio"
+              element={
+                <Contenido>
+                  <Proyecto_vacio />
+                </Contenido>
+              }
+            />
+            <Route
               path="/proyecto-principal"
               element={
                 <Contenido>
@@ -138,6 +152,41 @@ function App() {
                 </Contenido>
               }
             />
+            <Route
+              path="/cascada"
+              element={
+                <Contenido>
+                  <Cascada />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/kanvan"
+              element={
+                <Contenido>
+                  <Kanvan />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/scrum"
+              element={
+                <Contenido>
+                  <Scrum />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/xp"
+              element={
+                <Contenido>
+                  <XP />
+                </Contenido>
+              }
+            />
+            {/* 🔥 NUEVA RUTA: Área de Trabajo (Planificación) */}
+                {/* Esta es la ruta a la que irán las fases. El :id es el del proyecto */}
+                <Route path="/proyecto/:id/planificacion" element={<Contenido><ContPlanificacion /></Contenido>} />
 
             <Route
               path="/proyecto/:id"
