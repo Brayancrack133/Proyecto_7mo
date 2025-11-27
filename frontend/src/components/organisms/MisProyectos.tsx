@@ -143,19 +143,19 @@ const MisProyectos = () => {
                         <h3>🚀 Crear Nuevo Proyecto</h3>
                         <form onSubmit={handleCrear}>
                             <label>Nombre del Proyecto</label>
-                            <input type="text" required value={nuevoProyecto.nombre} onChange={e => setNuevoProyecto({...nuevoProyecto, nombre: e.target.value})} />
+                            <input className='shet' type="text" required value={nuevoProyecto.nombre} onChange={e => setNuevoProyecto({...nuevoProyecto, nombre: e.target.value})} />
                             
                             <label>Descripción</label>
-                            <textarea required value={nuevoProyecto.descripcion} onChange={e => setNuevoProyecto({...nuevoProyecto, descripcion: e.target.value})} />
+                            <textarea className='shet' required value={nuevoProyecto.descripcion} onChange={e => setNuevoProyecto({...nuevoProyecto, descripcion: e.target.value})} />
                             
                             <div style={{display:'flex', gap:'10px'}}>
                                 <div style={{flex:1}}>
                                     <label>Inicio</label>
-                                    <input type="date" required value={nuevoProyecto.fecha_inicio} onChange={e => setNuevoProyecto({...nuevoProyecto, fecha_inicio: e.target.value})} />
+                                    <input className='shet' type="date" required value={nuevoProyecto.fecha_inicio} onChange={e => setNuevoProyecto({...nuevoProyecto, fecha_inicio: e.target.value})} />
                                 </div>
                                 <div style={{flex:1}}>
                                     <label>Fin (Estimado)</label>
-                                    <input type="date" required value={nuevoProyecto.fecha_fin} onChange={e => setNuevoProyecto({...nuevoProyecto, fecha_fin: e.target.value})} />
+                                    <input className='shet' type="date" required value={nuevoProyecto.fecha_fin} onChange={e => setNuevoProyecto({...nuevoProyecto, fecha_fin: e.target.value})} />
                                 </div>
                             </div>
                             <div className="modal-actions">
@@ -180,7 +180,7 @@ const MisProyectos = () => {
                                 proyectosDisponibles.map(p => (
                                     <li key={p.id_proyecto} className="item-join">
                                         <div>
-                                            <strong>{p.nombre}</strong>
+                                            <strong className='shet'>{p.nombre}</strong>
                                             <br/><span style={{fontSize:'12px', color:'#888'}}>Líder: {p.nombre_jefe}</span>
                                         </div>
                                         <button type="button" className="btn-solicitar" onClick={() => solicitarUnion(p.id_proyecto)}>Solicitar</button>

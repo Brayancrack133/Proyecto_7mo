@@ -174,14 +174,14 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
                     <div className="modal-content">
                         <h3>Nueva Tarea</h3>
                         <form onSubmit={handleSubmitCrear}>
-                            <input type="text" name="titulo" placeholder="Título" required value={nuevaTarea.titulo} onChange={handleChange} />
-                            <textarea name="descripcion" placeholder="Descripción" required value={nuevaTarea.descripcion} onChange={handleChange} />
+                            <input className='shet' type="text" name="titulo" placeholder="Título" required value={nuevaTarea.titulo} onChange={handleChange} />
+                            <textarea className='shet' name="descripcion" placeholder="Descripción" required value={nuevaTarea.descripcion} onChange={handleChange} />
                             <div className="fechas-row">
-                                <div><label>Inicio:</label><input type="date" name="fecha_inicio" required value={nuevaTarea.fecha_inicio} onChange={handleChange} /></div>
-                                <div><label>Fin:</label><input type="date" name="fecha_fin" required value={nuevaTarea.fecha_fin} onChange={handleChange} /></div>
+                                <div><label>Inicio:</label><input className='shet' type="date" name="fecha_inicio" required value={nuevaTarea.fecha_inicio} onChange={handleChange} /></div>
+                                <div><label>Fin:</label><input className='shet' type="date" name="fecha_fin" required value={nuevaTarea.fecha_fin} onChange={handleChange} /></div>
                             </div>
                             <label>Asignar a:</label>
-                            <select name="id_responsable" required value={nuevaTarea.id_responsable} onChange={handleChange}>
+                            <select className='shet' name="id_responsable" required value={nuevaTarea.id_responsable} onChange={handleChange}>
                                 <option value="">-- Seleccionar --</option>
                                 {miembros.map(m => <option key={m.id_usuario} value={m.id_usuario}>{m.nombre} {m.apellido}</option>)}
                             </select>
