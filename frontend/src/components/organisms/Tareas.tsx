@@ -84,7 +84,7 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
         const formData = new FormData();
         formData.append("archivo", archivo);
         formData.append("id_tarea", tareaSeleccionada.id_tarea.toString());
-        formData.append("id_usuario", usuario.id_usuario.toString());
+        formData.append("id_usuario", usuario.id.toString());
         formData.append("comentario", comentario);
 
         fetch('http://localhost:3000/api/tareas/subir-avance', {
@@ -197,7 +197,7 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
                     <TarjetaTarea
                         key={tarea.id_tarea}
                         tarea={tarea}
-                        puedeEditar={esLider || tarea.id_responsable === usuario?.id_usuario}
+                        puedeEditar={esLider || tarea.id_responsable === usuario?.id}
                         // Al hacer click, solo guardamos el ID
                         onSeleccionar={(t) => setIdTareaSeleccionada(t.id_tarea)}
                     />
