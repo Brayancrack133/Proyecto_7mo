@@ -25,21 +25,26 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
     const [chatActivo, setChatActivo] = useState<'GENERAL' | number>('GENERAL');
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+
+    // Creamos esta variable auxiliar
+    const miId = (usuario as any)?.id || usuario?.id_usuario;
+
     // NUEVO: Ref para saber si acabamos de cambiar de chat
     const isChatChanged = useRef(false);
 
     // 1. Cargar Datos Iniciales
     useEffect(() => {
-        if (idProyecto && usuario) {
+        if (idProyecto && miId) {
             fetch(`http://localhost:3000/api/proyecto/${idProyecto}/miembros`)
                 .then(res => res.json())
                 .then(data => setMiembros(data));
 
-            fetch(`http://localhost:3000/api/proyecto/${idProyecto}/usuario/${usuario.id_usuario}`)
+            // CORRECCIÓN AQUÍ: Cambiamos ${usuario.id_usuario} por ${miId}
+            fetch(`http://localhost:3000/api/proyecto/${idProyecto}/usuario/${miId}`)
                 .then(res => res.json())
                 .then(data => setInfoProyecto(data));
         }
-    }, [idProyecto, usuario]);
+    }, [idProyecto, miId]);
 
     // NUEVO: Detectar cuando cambiamos de chat para forzar el scroll abajo
     useEffect(() => {
@@ -49,12 +54,15 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
 
     const cargarMensajes = () => {
         if (!usuario || !idProyecto) return;
+
         let url = "";
         if (chatActivo === 'GENERAL') {
             url = `http://localhost:3000/api/chat/${idProyecto}/general`;
         } else {
-            url = `http://localhost:3000/api/chat/${idProyecto}/privado/${usuario.id_usuario}/${chatActivo}`;
+            // CORRECCIÓN AQUÍ: Cambiamos usuario.id_usuario por miId
+            url = `http://localhost:3000/api/chat/${idProyecto}/privado/${miId}/${chatActivo}`;
         }
+
         fetch(url)
             .then(res => res.json())
             .then(data => setMensajes(data))
@@ -96,11 +104,15 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
         e.preventDefault();
         if (!nuevoMensaje.trim() || !usuario || !idProyecto) return;
 
+        // CORRECCIÓN: Usamos el ID real
+        const miId = (usuario as any)?.id || usuario?.id_usuario;
+
         const payload: any = {
             id_proyecto: idProyecto,
-            id_usuario: usuario.id_usuario,
+            id_usuario: miId, // <--- CORREGIDO
             mensaje: nuevoMensaje
         };
+
         if (chatActivo !== 'GENERAL') payload.id_destinatario = chatActivo;
 
         fetch('http://localhost:3000/api/chat', {
@@ -115,7 +127,7 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
         });
     };
 
-   
+
 
     const getHeaderInfo = () => {
         if (chatActivo === 'GENERAL') {
@@ -160,7 +172,8 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
 
                         <div className="members-list">
                             {miembros
-                                .filter(m => m.id_usuario !== usuario?.id_usuario)
+                                // CORRECCIÓN: Usamos miId (que definimos al principio del componente)
+                                .filter(m => String(m.id_usuario) !== String(miId))
                                 .map(m => (
                                     <div
                                         key={m.id_usuario}
@@ -199,10 +212,10 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
                             )}
 
                             {mensajes.map(msg => {
-                                const esMio = msg.id_usuario === usuario?.id_usuario;
+                                const miIdReal = (usuario as any)?.id || usuario?.id_usuario;
+                                const esMio = String(msg.id_usuario) === String(miIdReal);
                                 return (
-                                    <div key={msg.id_mensaje} className={`message-bubble ${esMio ? 'msg-mine' : 'msg-other'}`}>
-                                        {!esMio && <span className="msg-sender">{msg.nombre} {msg.apellido}</span>}
+                                    <div key={msg.id_mensaje} className={`message-bubble ${esMio ? 'msg-mine' : 'msg-other'}`}>                                        {!esMio && <span className="msg-sender">{msg.nombre} {msg.apellido}</span>}
                                         {msg.mensaje}
                                         <span style={{ fontSize: '10px', color: '#999', float: 'right', marginLeft: '10px', marginTop: '5px' }}>
                                             {new Date(msg.fecha_envio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

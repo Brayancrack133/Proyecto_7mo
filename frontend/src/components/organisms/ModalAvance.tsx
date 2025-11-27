@@ -10,7 +10,7 @@ interface Props {
 
 const ModalAvance: React.FC<Props> = ({ idTarea, esLider, onClose }) => {
     const { usuario } = useUser();
-    
+
     // Estados internos
     const [tareaInfo, setTareaInfo] = useState<any>(null);
     const [documentosAdjuntos, setDocumentosAdjuntos] = useState<any[]>([]);
@@ -19,7 +19,7 @@ const ModalAvance: React.FC<Props> = ({ idTarea, esLider, onClose }) => {
 
     // 1. Cargar Info de la Tarea y Documentos al abrir
     useEffect(() => {
-        if(idTarea){
+        if (idTarea) {
             // Cargar detalles (Título, descripción)
             fetch(`http://localhost:3000/api/tarea/${idTarea}`)
                 .then(res => res.json())
@@ -40,8 +40,8 @@ const ModalAvance: React.FC<Props> = ({ idTarea, esLider, onClose }) => {
         const formData = new FormData();
         formData.append("archivo", archivo);
         formData.append("id_tarea", idTarea.toString());
-        formData.append("id_usuario", usuario.id_usuario.toString());
-        formData.append("comentario", comentario);
+        formData.append("id_usuario", String(miId));
+         formData.append("comentario", comentario);
 
         fetch('http://localhost:3000/api/tareas/subir-avance', { method: 'POST', body: formData })
             .then(res => {
@@ -59,7 +59,12 @@ const ModalAvance: React.FC<Props> = ({ idTarea, esLider, onClose }) => {
 
     if (!tareaInfo) return null; // Cargando...
 
-    const soyResponsable = usuario?.id_usuario === tareaInfo.id_responsable;
+    // 1. Obtenemos el ID real del usuario logueado
+    const miId = (usuario as any)?.id || usuario?.id_usuario;
+
+    // 2. Comparamos con seguridad (String vs String)
+    const soyResponsable = String(miId) === String(tareaInfo.id_responsable);
+
     const hayArchivos = documentosAdjuntos.length > 0;
 
     return (
@@ -92,7 +97,7 @@ const ModalAvance: React.FC<Props> = ({ idTarea, esLider, onClose }) => {
 
                 {soyResponsable ? (
                     <form onSubmit={handleSubirAvance}>
-                         <h4 style={{ fontSize: '14px', marginBottom: '10px', color: '#333' }}>📤 Subir Nuevo Avance:</h4>
+                        <h4 style={{ fontSize: '14px', marginBottom: '10px', color: '#333' }}>📤 Subir Nuevo Avance:</h4>
                         <input type="file" onChange={(e) => e.target.files && setArchivo(e.target.files[0])} />
                         <textarea placeholder="Comentario..." value={comentario} onChange={(e) => setComentario(e.target.value)} style={{ width: '100%', marginTop: '10px', padding: '8px', border: '1px solid #ccc' }} />
                         <div className="modal-actions" style={{ marginTop: '15px' }}>

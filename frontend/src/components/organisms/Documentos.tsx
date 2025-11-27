@@ -37,10 +37,16 @@ const Documentos: React.FC<Props> = ({ idProyecto, esLider }) => {
         e.preventDefault();
         if (!archivo || !usuario) return;
 
+        // CORRECCIÓN: Usamos el ID real
+        const miId = (usuario as any).id || usuario.id_usuario;
+
         const formData = new FormData();
         formData.append("archivo", archivo);
         formData.append("id_proyecto", idProyecto!);
-        formData.append("id_usuario", usuario.id_usuario.toString());
+
+        // CORRECCIÓN: Usamos miId
+        formData.append("id_usuario", String(miId));
+
         formData.append("comentario", descripcion);
 
         fetch('http://localhost:3000/api/documentos/general', { method: 'POST', body: formData })

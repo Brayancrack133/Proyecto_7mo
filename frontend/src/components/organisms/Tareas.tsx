@@ -197,8 +197,13 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
                     <TarjetaTarea
                         key={tarea.id_tarea}
                         tarea={tarea}
-                        puedeEditar={esLider || tarea.id_responsable === usuario?.id_usuario}
-                        // Al hacer click, solo guardamos el ID
+                        // CORRECCIÓN: Usamos (usuario as any) para apagar la alerta roja
+                        // Y usamos String() para comparar texto con texto y evitar errores de tipos
+                        puedeEditar={
+                            esLider ||
+                            String(tarea.id_responsable) === String((usuario as any)?.id) ||
+                            String(tarea.id_responsable) === String((usuario as any)?.id_usuario)
+                        }
                         onSeleccionar={(t) => setIdTareaSeleccionada(t.id_tarea)}
                     />
                 ))}
@@ -210,27 +215,27 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
                     <div className="modal-content">
                         <h3>Nueva Tarea</h3>
                         <form onSubmit={handleSubmit}>
-                            <input
+                            <input className='shet'
                                 type="text" name="titulo" placeholder="Título de la tarea" required
                                 value={nuevaTarea.titulo} onChange={handleChange}
                             />
-                            <textarea
+                            <textarea className='shet'
                                 name="descripcion" placeholder="Descripción" required
                                 value={nuevaTarea.descripcion} onChange={handleChange}
                             />
                             <div className="fechas-row">
                                 <div>
                                     <label>Inicio:</label>
-                                    <input type="date" name="fecha_inicio" required value={nuevaTarea.fecha_inicio} onChange={handleChange} />
+                                    <input className='shet' type="date" name="fecha_inicio" required value={nuevaTarea.fecha_inicio} onChange={handleChange} />
                                 </div>
                                 <div>
                                     <label>Fin:</label>
-                                    <input type="date" name="fecha_fin" required value={nuevaTarea.fecha_fin} onChange={handleChange} />
+                                    <input className='shet' type="date" name="fecha_fin" required value={nuevaTarea.fecha_fin} onChange={handleChange} />
                                 </div>
                             </div>
 
                             <label>Asignar a:</label>
-                            <select name="id_responsable" required value={nuevaTarea.id_responsable} onChange={handleChange}>
+                            <select className='shet' name="id_responsable" required value={nuevaTarea.id_responsable} onChange={handleChange}>
                                 <option value="">-- Seleccionar Miembro --</option>
                                 {miembros.map(m => (
                                     <option key={m.id_usuario} value={m.id_usuario}>
@@ -248,14 +253,7 @@ const Tareas: React.FC<Props> = ({ idProyecto, esLider, idTareaInicial, limpiarS
                 </div>
             )}
 
-            {/* ================= MODAL 2: VER/SUBIR AVANCE (COMPONENTE NUEVO) ================= */}
-            {idTareaSeleccionada && (
-                <ModalAvance
-                    idTarea={idTareaSeleccionada}
-                    esLider={esLider}
-                    onClose={() => setIdTareaSeleccionada(null)}
-                />
-            )}
+
 
             {/* 3. === AQUÍ USAMOS EL NUEVO COMPONENTE === */}
             {idTareaSeleccionada && (

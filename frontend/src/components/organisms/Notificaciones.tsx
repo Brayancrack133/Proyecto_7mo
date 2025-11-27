@@ -33,14 +33,18 @@ const Notificaciones: React.FC<Props> = ({ alClickEnTarea, idProyecto }) => {
 
     useEffect(() => {
         if (usuario && idProyecto) {
-            // 3. USAMOS LA NUEVA URL CON DOBLE FILTRO
-            fetch(`http://localhost:3000/api/notificaciones/usuario/${usuario.id_usuario}/proyecto/${idProyecto}`)
+            // CORRECCIÓN: Detectamos el ID real (sea 'id' o 'id_usuario')
+            const idReal = (usuario as any).id || usuario.id_usuario;
+
+            fetch(`http://localhost:3000/api/notificaciones/usuario/${idReal}/proyecto/${idProyecto}`)
                 .then(res => res.json())
-                .then(data => setNotificaciones(data))
+                .then(data => {
+                    console.log("Notificaciones cargadas:", data); // Para depurar
+                    setNotificaciones(data);
+                })
                 .catch(err => console.error(err));
         }
-    }, [usuario, idProyecto]); // 4. Agregamos idProyecto a las dependencias
-
+    }, [usuario, idProyecto]);
 
     return (
         <>

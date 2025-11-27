@@ -29,9 +29,18 @@ const MisProyectos = () => {
     // --- CARGAR MIS PROYECTOS ---
     const cargarMisProyectos = () => {
         if (usuario) {
-            fetch(`http://localhost:3000/api/mis-proyectos/${usuario.id_usuario}`)
-                .then(res => res.ok ? res.json() : [])
-                .then(data => setProyectos(Array.isArray(data) ? data : []))
+            // TRUCO: Usamos el ID real (sea 'id' o 'id_usuario')
+            const idReal = (usuario as any).id || usuario.id_usuario;
+
+            fetch(`http://localhost:3000/api/mis-proyectos/${idReal}`)
+                .then(res => {
+                    if (res.ok) return res.json();
+                    throw new Error("Error al cargar proyectos");
+                })
+                .then(data => {
+                    console.log("Proyectos cargados:", data); // Para depurar si hace falta
+                    setProyectos(Array.isArray(data) ? data : []);
+                })
                 .catch(err => console.error(err));
         }
     };
@@ -43,16 +52,24 @@ const MisProyectos = () => {
         e.preventDefault();
         if (!usuario) return;
 
+        // CORRECCIÓN: Detectamos el ID real, ya sea que venga como 'id' o 'id_usuario'
+        // Usamos 'as any' temporalmente para que TypeScript no se queje
+        const idReal = (usuario as any).id || usuario.id_usuario;
+
         fetch('http://localhost:3000/api/proyectos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...nuevoProyecto, id_usuario: usuario.id_usuario })
+            // Usamos la variable idReal aquí
+            body: JSON.stringify({ ...nuevoProyecto, id_usuario: idReal })
         }).then(res => {
             if (res.ok) {
                 alert("✅ Proyecto creado exitosamente");
                 setModalCrear(false);
-                cargarMisProyectos(); // Recargar la lista
+                cargarMisProyectos();
                 setNuevoProyecto({ nombre: '', descripcion: '', fecha_inicio: '', fecha_fin: '' });
+            } else {
+                // Agregamos esto para ver errores en pantalla si fallara de nuevo
+                alert("❌ Error al crear proyecto");
             }
         });
     };
@@ -70,14 +87,21 @@ const MisProyectos = () => {
     // --- LÓGICA SOLICITAR UNIÓN ---
     const solicitarUnion = (idProyecto: number) => {
         if (!usuario) return;
+
+        // TRUCO: Usamos el ID real
+        const idReal = (usuario as any).id || usuario.id_usuario;
+
         fetch('http://localhost:3000/api/proyectos/solicitar-union', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_proyecto: idProyecto, id_usuario_solicitante: usuario.id_usuario })
+            // CORRECCIÓN: Enviamos idReal
+            body: JSON.stringify({ id_proyecto: idProyecto, id_usuario_solicitante: idReal })
         }).then(res => {
             if (res.ok) {
                 alert("📩 Solicitud enviada al líder del proyecto");
                 setModalUnirse(false);
+            } else {
+                alert("❌ Error al enviar solicitud. Revisa si el tipo de notificación existe.");
             }
         });
     };
@@ -116,19 +140,19 @@ const MisProyectos = () => {
                         <h3>🚀 Crear Nuevo Proyecto</h3>
                         <form onSubmit={handleCrear}>
                             <label>Nombre del Proyecto</label>
-                            <input type="text" required value={nuevoProyecto.nombre} onChange={e => setNuevoProyecto({...nuevoProyecto, nombre: e.target.value})} />
-                            
+                            <input className='shet' type="text" required value={nuevoProyecto.nombre} onChange={e => setNuevoProyecto({ ...nuevoProyecto, nombre: e.target.value })} />
+
                             <label>Descripción</label>
-                            <textarea required value={nuevoProyecto.descripcion} onChange={e => setNuevoProyecto({...nuevoProyecto, descripcion: e.target.value})} />
-                            
-                            <div style={{display:'flex', gap:'10px'}}>
-                                <div style={{flex:1}}>
+                            <textarea className='shet' required value={nuevoProyecto.descripcion} onChange={e => setNuevoProyecto({ ...nuevoProyecto, descripcion: e.target.value })} />
+
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <div style={{ flex: 1 }}>
                                     <label>Inicio</label>
-                                    <input type="date" required value={nuevoProyecto.fecha_inicio} onChange={e => setNuevoProyecto({...nuevoProyecto, fecha_inicio: e.target.value})} />
+                                    <input className='shet' type="date" required value={nuevoProyecto.fecha_inicio} onChange={e => setNuevoProyecto({ ...nuevoProyecto, fecha_inicio: e.target.value })} />
                                 </div>
-                                <div style={{flex:1}}>
+                                <div style={{ flex: 1 }}>
                                     <label>Fin (Estimado)</label>
-                                    <input type="date" required value={nuevoProyecto.fecha_fin} onChange={e => setNuevoProyecto({...nuevoProyecto, fecha_fin: e.target.value})} />
+                                    <input className='shet' type="date" required value={nuevoProyecto.fecha_fin} onChange={e => setNuevoProyecto({ ...nuevoProyecto, fecha_fin: e.target.value })} />
                                 </div>
                             </div>
 
@@ -146,17 +170,17 @@ const MisProyectos = () => {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h3>🤝 Unirse a un Proyecto</h3>
-                        <p style={{fontSize:'14px', color:'#666'}}>Selecciona un proyecto para enviar solicitud:</p>
-                        
+                        <p style={{ fontSize: '14px', color: '#000' }}>Selecciona un proyecto para enviar solicitud:</p>
+
                         <ul className="lista-join">
                             {proyectosDisponibles.length === 0 ? (
-                                <p style={{textAlign:'center', color:'#999'}}>No hay proyectos disponibles.</p>
+                                <p style={{ textAlign: 'center', color: '#000' }}>No hay proyectos disponibles.</p>
                             ) : (
                                 proyectosDisponibles.map(p => (
                                     <li key={p.id_proyecto} className="item-join">
                                         <div>
-                                            <strong>{p.nombre}</strong>
-                                            <br/><span style={{fontSize:'12px', color:'#888'}}>Líder: {p.nombre_jefe}</span>
+                                            <strong className='shet'>{p.nombre}</strong>
+                                            <br /><span style={{ fontSize: '12px', color: '#000' }}>Líder: {p.nombre_jefe}</span>
                                         </div>
                                         <button className="btn-solicitar" onClick={() => solicitarUnion(p.id_proyecto)}>
                                             Solicitar
