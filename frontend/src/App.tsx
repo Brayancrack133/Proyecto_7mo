@@ -18,6 +18,7 @@ import Kanvan from "./pages/Metodologias/metKanvan";
 import Scrum from "./pages/Metodologias/metScrum";
 import XP from "./pages/Metodologias/metXP";
 import Proyecto_vacio from "./components/templates/Proyecto_vacio/Proyecto_vacio";
+import ContPlanificacion from "./components/templates/ContPlanificacion";
 
 // =======================================================
 // COMPONENTE AUXILIAR (DEBE IR ANTES DE USARLO)
@@ -183,6 +184,9 @@ function App() {
                 </Contenido>
               }
             />
+            {/* 🔥 NUEVA RUTA: Área de Trabajo (Planificación) */}
+                {/* Esta es la ruta a la que irán las fases. El :id es el del proyecto */}
+                <Route path="/proyecto/:id/planificacion" element={<Contenido><ContPlanificacion /></Contenido>} />
 
             <Route
               path="/proyecto/:id"

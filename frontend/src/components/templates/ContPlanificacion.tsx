@@ -1,28 +1,18 @@
-// src/components/templates/ContPlanificacion.tsx
-import React from 'react'
-import { useParams } from 'react-router-dom' 
-import Header from '../organisms/Head'
-import Sidebar from '../organisms/Sidebar'
-import Planificacion from '../organisms/Planificacion'
-import './Contenido.css' 
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import Planificacion from '../organisms/Planificacion';
+import './Contenido.css'; // Asumiendo que usas estilos globales o similares
 
 const ContPlanificacion = () => {
-    // 1. Aquí ya tienes el ID (ej: "2")
-    const { id } = useParams(); 
+    // Obtenemos el ID del proyecto desde la URL (definido en AppRoutes como :id)
+    const { id } = useParams<{ id: string }>();
 
     return (
-        <div className="inicio-page">
-            <Header />
-            <div className="contnt">
-                <Sidebar />
-                
-                {/* --- CAMBIO AQUÍ --- */}
-                {/* Le pasamos el ID al componente Planificación */}
-                <Planificacion idProyecto={id} /> 
-                
-            </div>
+        <div className='cont-planificacion-page' style={{ width: '100%', height: '100%' }}>
+            {/* Pasamos el ID al componente que tiene toda la lógica de Tareas/Chat/etc */}
+            <Planificacion idProyecto={id} />
         </div>
-    )
-}
+    );
+};
 
-export default ContPlanificacion
+export default ContPlanificacion;
