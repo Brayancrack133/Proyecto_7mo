@@ -1,112 +1,137 @@
 import React, { useState, FormEvent, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ Importar useNavigate
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
+import './ProjectManagementPage.css'; 
 
-// --- 1. DEFINICIÓN DE TIPOS Y DATOS ---
-
-// Definición de la estructura de un proyecto
-interface Project {
+// --- TIPOS ---
+interface ProjectUI {
   id: string;
   nombre: string;
+  descripcion: string;
   fechas: string;
-  rol: 'Colaborador' | 'Líder';
+  fechaInicioRaw: string;
+  fechaFinRaw: string;
+  rol: string; // Cambiado a string general para evitar conflictos
   jefe: string;
   estado: 'Activo' | 'Finalizado';
   progreso: number;
   equipo: number;
 }
 
-// Definición de la estructura de los datos del formulario de nuevo proyecto
-interface NewProjectData {
+interface ProjectDB {
+  id_proyecto: number;
+  nombre: string;
+  descripcion: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  rol: string;
+  nombre_jefe: string;
+  estado_calculado: 'Activo' | 'Finalizado';
+  cantidad_miembros: number;
+}
+
+interface ProjectFormData {
+  id?: string;
   nombre: string;
   fechaInicio: string;
   fechaFin: string;
-  jefe: string;
   descripcion: string;
 }
 
+// --- COMPONENTES UI ---
 
-// --- 2. SUBCOMPONENTES DE UI ESPECÍFICAS ---
-
-/**
- * Componente que representa una fila de proyecto en la tabla.
- */
-const ProjectRow: React.FC<{ project: Project }> = ({ project }) => {
-  // Uso de clases de Tailwind para los estilos visuales
-  const rolClass = project.rol === 'Colaborador' 
-    ? 'text-purple-700 bg-purple-100 px-2 py-1 rounded-full text-xs font-medium' 
-    : 'text-blue-700 bg-blue-100 px-2 py-1 rounded-full text-xs font-medium';
-
-  const estadoClass = project.estado === 'Activo' 
-    ? 'text-green-700 bg-green-100 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1' 
-    : 'text-blue-700 bg-blue-100 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1';
-
-  // Usamos progreso 100 si está finalizado para el color de la barra
+const ProjectRow: React.FC<{ 
+    project: ProjectUI; 
+    onView: (id: string) => void;
+    onEdit: (project: ProjectUI) => void;
+    onToggleStatus: (id: string, currentStatus: string) => void;
+}> = ({ project, onView, onEdit, onToggleStatus }) => {
+  
+  // Clases dinámicas
+  const badgeClass = project.rol === 'Colaborador' ? 'badge colaborador' : 'badge lider';
+  const statusClass = project.estado === 'Activo' ? 'badge activo' : 'badge finalizado';
+  
   const progressValue = project.estado === 'Finalizado' ? 100 : project.progreso;
-  const progressColor = progressValue === 100 ? 'bg-blue-500 text-blue-500' : 'bg-orange-500 text-orange-500';
+  const progressColor = progressValue === 100 ? '#2563eb' : '#f97316';
 
   return (
-    <tr className="border-b border-gray-200 hover:bg-gray-50 transition duration-150">
-      <td className="p-4">
-        <p className="font-semibold text-gray-800">{project.nombre}</p>
-        <p className="text-xs text-gray-500">{project.fechas}</p>
+    <tr>
+      <td>
+        <p className="cell-title">{project.nombre}</p>
+        <p className="cell-subtitle">{project.fechas}</p>
       </td>
-      <td className="p-4">
-        <span className={rolClass}>{project.rol}</span>
+      <td><span className={badgeClass}>{project.rol}</span></td>
+      <td className="cell-title" style={{ fontSize: '0.9rem' }}>
+        {project.jefe || 'Sin asignar'}
       </td>
-      <td className="p-4 text-gray-600">{project.jefe}</td>
-      <td className="p-4">
-        <span className={estadoClass}>
-          {/* Icono de check (lucide-react check-circle) */}
-          <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-          <span>{project.estado}</span>
+      <td>
+        <span className={statusClass}>
+           {project.estado}
         </span>
       </td>
-      <td className="p-4">
-        <div className="flex items-center gap-2">
-          <div className="w-20 h-2 bg-gray-200 rounded-full">
-            <div 
-              className={`h-full rounded-full ${progressColor.split(' ')[0]}`}
-              style={{ width: `${progressValue}%`, transition: 'width 1s' }}
-            ></div>
+      <td>
+        <div className="progress-container">
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width: `${progressValue}%`, backgroundColor: progressColor }}></div>
           </div>
-          <span className={`text-sm font-medium ${progressColor.split(' ')[1]}`}>{progressValue}%</span>
+          <span className="progress-text">{progressValue}%</span>
         </div>
       </td>
-      <td className="p-4 text-gray-600">{project.equipo} miembros</td>
-      <td className="p-4">
-        <button title="Ver Detalles" className="text-blue-600 hover:text-blue-800 transition duration-150">
-          {/* Icono de ojo (lucide-react eye) */}
-          <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
+      <td style={{ fontWeight: '600' }}>{project.equipo} miembros</td>
+      
+      {/* ACCIONES */}
+      <td>
+        <div className="actions-cell">
+            <button onClick={() => onView(project.id)} title="Ver Detalles" className="action-btn view">
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            </button>
+            
+            {/* MODIFICADO: Mostramos botones siempre para que puedas probar.
+               En producción, descomenta la condición del rol.
+            */}
+            {/* {project.rol === 'Líder' && ( */}
+            <>
+                <button onClick={() => onEdit(project)} title="Editar Proyecto" className="action-btn edit">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                </button>
+
+                <button 
+                    onClick={() => onToggleStatus(project.id, project.estado)} 
+                    title={project.estado === 'Activo' ? "Finalizar Proyecto" : "Reactivar Proyecto"} 
+                    className={`action-btn ${project.estado === 'Activo' ? 'delete' : 'activate'}`}
+                >
+                    {project.estado === 'Activo' ? (
+                        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    ) : (
+                        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    )}
+                </button>
+            </>
+            {/* )} */}
+        </div>
       </td>
     </tr>
   );
 };
 
-/**
- * Componente que muestra una tarjeta de resumen de estadísticas.
- */
-const StatCard: React.FC<{ title: string; count: number; color: string; bgColor: string; icon: React.ReactNode; onClick: () => void }> = ({ title, count, color, bgColor, icon, onClick }) => (
-  <div 
-    onClick={onClick} 
-    className={`flex justify-between items-center p-6 min-w-48 bg-white rounded-xl shadow-lg border border-gray-200 cursor-pointer hover:shadow-xl transition duration-300 transform hover:-translate-y-0.5`}
-  >
-    <div>
-      <p className="text-xs font-medium text-gray-500 uppercase">{title}</p>
-      <p className={`text-3xl font-extrabold ${color}`}>{count}</p>
-    </div>
-    <div className={`p-3 rounded-full ${bgColor}`}>
-      {icon}
-    </div>
-  </div>
-);
+// ... [El Modal y StatCard se mantienen igual que la versión anterior, el CSS nuevo se encargará de estilizarlos] ...
+// Para ahorrar espacio aquí, asumo que usas los mismos componentes StatCard, FilterPill y ProjectModal del código anterior.
+// Si necesitas el código del Modal nuevamente, avísame.
 
-/**
- * Modal para crear un nuevo proyecto.
- */
-const ProjectModal: React.FC<{ isOpen: boolean; onClose: () => void; onSave: (data: NewProjectData) => Promise<void> }> = ({ isOpen, onClose, onSave }) => {
-  const [formData, setFormData] = useState<NewProjectData>({ nombre: '', fechaInicio: '', fechaFin: '', jefe: '', descripcion: '' });
+// Reutilizamos el Modal del código anterior, el CSS nuevo lo arreglará visualmente.
+const ProjectModal: React.FC<{ 
+    isOpen: boolean; 
+    onClose: () => void; 
+    onSave: (data: ProjectFormData) => Promise<void>;
+    initialData?: ProjectFormData | null;
+}> = ({ isOpen, onClose, onSave, initialData }) => {
+  const [formData, setFormData] = useState<ProjectFormData>({ nombre: '', fechaInicio: '', fechaFin: '', descripcion: '' });
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && initialData) setFormData(initialData);
+    else setFormData({ nombre: '', fechaInicio: '', fechaFin: '', descripcion: '' });
+  }, [isOpen, initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -115,75 +140,42 @@ const ProjectModal: React.FC<{ isOpen: boolean; onClose: () => void; onSave: (da
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    try {
-      await onSave(formData);
-      // Reset form on success
-      setFormData({ nombre: '', fechaInicio: '', fechaFin: '', jefe: '', descripcion: '' });
-    } catch (error) {
-      // Handle error display if necessary
-      console.error("Error saving project in modal:", error);
-    } finally {
-      setIsSaving(false);
-    }
+    await onSave(formData);
+    setIsSaving(false);
   };
-
-  useEffect(() => {
-    // Reset form when opening/closing
-    if (!isOpen) {
-      setFormData({ nombre: '', fechaInicio: '', fechaFin: '', jefe: '', descripcion: '' });
-    }
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
-        <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-800">Crear Nuevo Proyecto</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
-            {/* Icono X */}
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          </button>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3 className="modal-title">{initialData ? 'Editar Proyecto' : 'Nuevo Proyecto'}</h3>
+          <button onClick={onClose} className="close-btn">×</button>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
-          <div>
-            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre del Proyecto</label>
-            <input id="nombre" value={formData.nombre} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" />
+        <form onSubmit={handleSubmit} className="modal-body">
+          <div className="form-group">
+            <label htmlFor="nombre">Nombre del Proyecto</label>
+            <input id="nombre" className="form-control" value={formData.nombre} onChange={handleChange} required placeholder="Ej: Rediseño Web" />
           </div>
-          <div className="flex gap-4">
-            <div className="w-1/2">
-              <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
-              <input type="date" id="fechaInicio" value={formData.fechaInicio} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" />
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="fechaInicio">Fecha Inicio</label>
+              <input type="date" id="fechaInicio" className="form-control" value={formData.fechaInicio} onChange={handleChange} required />
             </div>
-            <div className="w-1/2">
-              <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
-              <input type="date" id="fechaFin" value={formData.fechaFin} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" />
+            <div className="form-group">
+              <label htmlFor="fechaFin">Fecha Fin</label>
+              <input type="date" id="fechaFin" className="form-control" value={formData.fechaFin} onChange={handleChange} />
             </div>
           </div>
-          <div>
-            <label htmlFor="jefe" className="block text-sm font-medium text-gray-700 mb-1">Jefe de Proyecto</label>
-            <select id="jefe" value={formData.jefe} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-              <option value="" disabled>Selecciona un jefe</option>
-              <option value="Ana López">Ana López</option>
-              <option value="Juan Pérez">Juan Pérez</option>
-              <option value="Carlos Ruiz">Carlos Ruiz</option>
-              {/* Añadir más opciones si es necesario */}
-            </select>
+          <div className="form-group">
+            <label htmlFor="descripcion">Descripción</label>
+            <textarea id="descripcion" className="form-control" value={formData.descripcion} onChange={handleChange} rows={3} placeholder="Detalles del proyecto..."></textarea>
           </div>
-          <div>
-            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-            <textarea id="descripcion" value={formData.descripcion} onChange={handleChange} rows={3} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-          </div>
-          <div className="flex justify-end gap-3 mt-4">
-            <button type="button" onClick={onClose} disabled={isSaving} className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition duration-150 disabled:opacity-50">Cancelar</button>
-            <button type="submit" disabled={isSaving} className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150 flex items-center gap-2 disabled:opacity-50">
-              {isSaving ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                  Guardando...
-                </>
-              ) : 'Guardar Proyecto'}
+          <div className="modal-footer">
+            <button type="button" onClick={onClose} className="btn btn-secondary">Cancelar</button>
+            <button type="submit" disabled={isSaving} className="btn btn-primary">
+              {isSaving ? 'Guardando...' : 'Guardar'}
             </button>
           </div>
         </form>
@@ -192,104 +184,84 @@ const ProjectModal: React.FC<{ isOpen: boolean; onClose: () => void; onSave: (da
   );
 };
 
-/**
- * Componente para las píldoras de filtro
- */
+const StatCard: React.FC<{ title: string; count: number; theme: 'orange'|'purple'|'green'|'gray'; icon: React.ReactNode; onClick: () => void }> = ({ title, count, theme, icon, onClick }) => (
+  <div onClick={onClick} className={`stat-card stat-${theme}`}>
+    <div>
+      <p className="stat-title">{title}</p>
+      <p className="stat-count">{count}</p>
+    </div>
+    <div className="stat-icon">{icon}</div>
+  </div>
+);
+
 const FilterPill: React.FC<{ label: string; isActive: boolean; onClick: () => void }> = ({ label, isActive, onClick }) => (
-    <button
-        onClick={onClick}
-        className={`px-3 py-1 text-sm font-medium rounded-full transition duration-150 ${
-            isActive 
-                ? 'bg-blue-600 text-white shadow-md' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        }`}
-    >
-        {label}
+    <button onClick={onClick} className={`filter-pill ${isActive ? 'active' : 'inactive'}`}>
+      {label}
     </button>
 );
 
-// --- 3. EL MÓDULO (PÁGINA) PRINCIPAL ---
+// --- COMPONENTE PRINCIPAL ---
 
 const ProjectManagementPage: React.FC = () => {
-    const API_URL = "http://localhost:3000/api/proyectos";
-    const navigate = useNavigate(); // ✅ Hook para navegación
+    const { usuario } = useUser(); 
+    const navigate = useNavigate();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [editingProject, setEditingProject] = useState<ProjectFormData | null>(null);
+    const [projects, setProjects] = useState<ProjectUI[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+    
+    // Filtros
     const [filter, setFilter] = useState<'Todos' | 'Líder' | 'Colaborador' | 'Activo' | 'Finalizado'>('Todos');
     const [searchTerm, setSearchTerm] = useState('');
 
-    const handleOpenModal = useCallback(() => setIsModalOpen(true), []);
+    const handleOpenCreateModal = useCallback(() => {
+        setEditingProject(null);
+        setIsModalOpen(true);
+    }, []);
+
     const handleCloseModal = useCallback(() => setIsModalOpen(false), []);
 
-    /**
-     * Función para cargar los proyectos desde la API (GET).
-     */
     const fetchProjects = useCallback(async () => {
+        if (!usuario?.id) return;
+
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(`http://localhost:3000/api/mis-proyectos/${usuario.id}`);
+            if (!response.ok) throw new Error("Error al conectar con el servidor");
             
-            if (!response.ok) {
-                throw new Error(`Error HTTP ${response.status}: No se pudo acceder al API.`);
-            }
-            
-            const data: Project[] = await response.json();
-            setProjects(data);
+            const dataDB: ProjectDB[] = await response.json();
+
+            const projectsFormatted: ProjectUI[] = dataDB.map(p => ({
+                id: p.id_proyecto.toString(),
+                nombre: p.nombre,
+                descripcion: p.descripcion || "",
+                fechaInicioRaw: p.fecha_inicio ? p.fecha_inicio.split('T')[0] : '', 
+                fechaFinRaw: p.fecha_fin ? p.fecha_fin.split('T')[0] : '',
+                fechas: `${new Date(p.fecha_inicio).toLocaleDateString()} - ${new Date(p.fecha_fin).toLocaleDateString()}`,
+                rol: p.rol,
+                jefe: p.nombre_jefe,
+                estado: p.estado_calculado,
+                progreso: 0, 
+                equipo: p.cantidad_miembros
+            }));
+
+            setProjects(projectsFormatted);
         } catch (err) {
-            console.error("Error al cargar proyectos:", err);
-            setError("No se pudieron cargar los proyectos. Asegúrate de que tu servidor de Node/Express esté corriendo en `http://localhost:3000`.");
-            setProjects([]);
+            console.error(err);
+            setError("Error cargando proyectos. Verifica que el backend esté corriendo.");
         } finally {
             setIsLoading(false);
         }
-    }, [API_URL]);
+    }, [usuario?.id]);
 
     useEffect(() => {
         fetchProjects();
     }, [fetchProjects]);
 
-    /**
-     * Función para guardar un nuevo proyecto a través de la API (POST).
-     */
-    const handleSaveProject = async (data: NewProjectData) => {
-        setError(null);
-
-        const projectPayload = {
-            nombre: data.nombre,
-            fecha_inicio: data.fechaInicio,
-            fecha_fin: data.fechaFin,
-            jefe: data.jefe,
-            descripcion: data.descripcion,
-        };
-        
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(projectPayload),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error al guardar: ${response.status}`);
-            }
-
-            handleCloseModal();
-            await fetchProjects(); 
-        } catch (err) {
-            console.error("Error al crear proyecto:", err);
-            setError("Error al crear el proyecto. Revisa la consola para más detalles.");
-            throw err;
-        }
-    };
-
-    // Lógica de filtrado y búsqueda
+    // --- LÓGICA DE FILTRADO (CORREGIDA) ---
     const filteredProjects = projects.filter(p => {
         let passesFilter = true;
         if (filter === 'Líder') passesFilter = p.rol === 'Líder';
@@ -298,17 +270,86 @@ const ProjectManagementPage: React.FC = () => {
         else if (filter === 'Finalizado') passesFilter = p.estado === 'Finalizado';
 
         if (!passesFilter) return false;
-
+        
         if (searchTerm === '') return true;
 
-        const lowerSearch = searchTerm.toLowerCase();
+        // BÚSQUEDA SEGURA: Usamos || "" para evitar error si p.jefe es null
+        const term = searchTerm.toLowerCase();
         return (
-            p.nombre.toLowerCase().includes(lowerSearch) ||
-            p.jefe.toLowerCase().includes(lowerSearch)
+            (p.nombre || "").toLowerCase().includes(term) ||
+            (p.jefe || "").toLowerCase().includes(term)
         );
     });
 
-    // Cálculos dinámicos para las tarjetas de estadísticas
+    // --- ACCIONES ---
+    const handleViewProject = (id: string) => navigate(`/proyecto/${id}`);
+
+    const handleEditProject = (project: ProjectUI) => {
+        setEditingProject({
+            id: project.id,
+            nombre: project.nombre,
+            descripcion: project.descripcion,
+            fechaInicio: project.fechaInicioRaw,
+            fechaFin: project.fechaFinRaw
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleToggleStatus = async (id: string, currentStatus: string) => {
+        const nuevoEstado = currentStatus === 'Activo' ? 'finalizar' : 'activar';
+        if (!window.confirm(`¿Seguro que deseas ${nuevoEstado} este proyecto?`)) return;
+
+        try {
+            await fetch(`http://localhost:3000/api/proyectos/${id}/estado`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accion: nuevoEstado }) 
+            });
+            await fetchProjects(); 
+        } catch (error) {
+            alert("Error al actualizar estado");
+        }
+    };
+
+    const handleSaveProject = async (data: ProjectFormData) => {
+        if (!usuario?.id) return;
+        try {
+            const isEdit = !!data.id;
+            const url = isEdit 
+                ? `http://localhost:3000/api/proyectos/${data.id}` 
+                : "http://localhost:3000/api/proyectos";
+            
+            const method = isEdit ? 'PUT' : 'POST';
+            const payload: any = {
+                nombre: data.nombre,
+                descripcion: data.descripcion,
+                fecha_inicio: data.fechaInicio,
+                fecha_fin: data.fechaFin,
+            };
+
+            if (!isEdit) {
+                payload.id_jefe = usuario.id;
+                payload.tipo = "Desarrollo Web"; 
+                payload.tamano = "Mediano";
+                payload.complejidad = "Media";
+            }
+
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) throw new Error("Error al guardar");
+
+            handleCloseModal();
+            fetchProjects(); 
+        } catch (err) {
+            console.error(err);
+            alert("Error al guardar el proyecto.");
+        }
+    };
+
     const stats = {
         myProjects: projects.filter(p => p.rol === 'Líder').length,
         collaboratorProjects: projects.filter(p => p.rol === 'Colaborador').length,
@@ -317,136 +358,90 @@ const ProjectManagementPage: React.FC = () => {
     };
 
     return (
-        <div className="p-0">
-            <header className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-extrabold text-gray-900">Gestión de Proyectos</h1>
-                
-                {/* ✅ BOTONES: Modal y Formulario con IA */}
-                <div className="flex gap-3">
-                    <button 
-                        onClick={handleOpenModal} 
-                        className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150 flex items-center gap-1"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
-                        Nuevo Proyecto
+        <div className="project-page-container">
+            <header className="page-header">
+                <h1 className="page-title">Gestión de Proyectos</h1>
+                <div className="header-actions">
+                    <button onClick={handleOpenCreateModal} className="btn btn-primary">
+                        <span>+</span> Nuevo
                     </button>
-                    
-                    {/* ✅ NUEVO BOTÓN: Ir al formulario con IA (DOUE) */}
-                    <button 
-                        onClick={() => navigate('/proyectos/crear')}
-                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-md hover:from-purple-700 hover:to-pink-700 transition duration-150 flex items-center gap-2"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                        Crear con IA
+                    <button onClick={() => navigate('/proyecto-principal')} className="btn btn-gradient">
+                        <span>✨</span> Crear con IA
                     </button>
                 </div>
             </header>
 
-            {/* Tarjetas de Estadísticas */}
-            <div className="flex flex-wrap gap-4 mb-8">
-                <StatCard 
-                    title="Mis Proyectos" count={stats.myProjects} 
-                    color="text-orange-600" bgColor="bg-orange-100" 
-                    icon={<span className="text-xl">📁</span>} 
-                    onClick={() => setFilter('Líder')} 
-                />
-                <StatCard 
-                    title="Como Colaborador" count={stats.collaboratorProjects} 
-                    color="text-purple-600" bgColor="bg-purple-100" 
-                    icon={<span className="text-xl">👥</span>} 
-                    onClick={() => setFilter('Colaborador')} 
-                />
-                <StatCard 
-                    title="Activos" count={stats.activeProjects} 
-                    color="text-green-600" bgColor="bg-green-100" 
-                    icon={<span className="text-xl">✅</span>} 
-                    onClick={() => setFilter('Activo')} 
-                />
-                <StatCard 
-                    title="Finalizados" count={stats.finishedProjects} 
-                    color="text-gray-600" bgColor="bg-gray-100" 
-                    icon={<span className="text-xl">🏁</span>} 
-                    onClick={() => setFilter('Finalizado')} 
-                />
+            <div className="stats-grid">
+                <StatCard title="Mis Proyectos" count={stats.myProjects} theme="orange" icon={<span>📁</span>} onClick={() => setFilter('Líder')} />
+                <StatCard title="Colaborador" count={stats.collaboratorProjects} theme="purple" icon={<span>👥</span>} onClick={() => setFilter('Colaborador')} />
+                <StatCard title="Activos" count={stats.activeProjects} theme="green" icon={<span>✅</span>} onClick={() => setFilter('Activo')} />
+                <StatCard title="Finalizados" count={stats.finishedProjects} theme="gray" icon={<span>🏁</span>} onClick={() => setFilter('Finalizado')} />
             </div>
 
-            {/* Tabla de Proyectos */}
-            <div className="bg-white p-6 rounded-xl shadow-lg">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">Proyectos {filter !== 'Todos' ? `(${filter})` : ''}</h2>
-                
-                {/* Filtros y Búsqueda */}
-                <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
-                    <div className="flex items-center space-x-2">
-                        <FilterPill label="Todos" isActive={filter === 'Todos'} onClick={() => setFilter('Todos')} />
-                        <FilterPill label="Líder" isActive={filter === 'Líder'} onClick={() => setFilter('Líder')} />
-                        <FilterPill label="Colaborador" isActive={filter === 'Colaborador'} onClick={() => setFilter('Colaborador')} />
-                        <FilterPill label="Activo" isActive={filter === 'Activo'} onClick={() => setFilter('Activo')} />
-                        <FilterPill label="Finalizado" isActive={filter === 'Finalizado'} onClick={() => setFilter('Finalizado')} />
+            <div className="main-card">
+                <div className="controls-bar">
+                    <h2 className="section-title">Lista de Proyectos</h2>
+                    <div className="filter-group">
+                        {['Todos', 'Líder', 'Colaborador', 'Activo', 'Finalizado'].map(f => (
+                            <FilterPill key={f} label={f} isActive={filter === f} onClick={() => setFilter(f as any)} />
+                        ))}
                     </div>
-                    <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="Buscar proyecto o jefe..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="p-2 pl-10 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full md:w-64"
-                        />
-                        <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
+                    <input 
+                        type="text" 
+                        placeholder="Buscar proyecto o jefe..." 
+                        value={searchTerm} 
+                        onChange={(e) => setSearchTerm(e.target.value)} 
+                        className="search-input" 
+                    />
                 </div>
 
-                {/* Mensajes de Estado */}
-                {isLoading && !error && (
-                    <p className="text-center py-8 text-blue-600 font-semibold flex items-center justify-center gap-2">
-                         <svg className="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        Cargando proyectos desde el API de MySQL...
-                    </p>
-                )}
-
-                {error && (
-                    <div className="text-center py-6 bg-red-100 text-red-700 border border-red-300 rounded-lg p-3">
-                        <p className="font-semibold">¡Error de Conexión o Datos!</p>
-                        <p className="text-sm">{error}</p>
-                        <button onClick={fetchProjects} className="mt-3 px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm">
-                            Reintentar Carga
-                        </button>
-                    </div>
-                )}
+                {isLoading && <p className="loading-msg">Cargando...</p>}
+                {error && <p className="error-msg">{error}</p>}
                 
-                {/* Tabla de Resultados */}
-                {!isLoading && !error && filteredProjects.length > 0 && (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                {!isLoading && !error && (
+                    <div className="table-responsive">
+                        <table className="project-table">
+                            <thead>
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PROYECTO</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROL</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">JEFE</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ESTADO</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PROGRESO</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EQUIPO</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ACCIONES</th>
+                                    <th>Proyecto</th>
+                                    <th>Rol</th>
+                                    <th>Jefe</th>
+                                    <th>Estado</th>
+                                    <th>Progreso</th>
+                                    <th>Equipo</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredProjects.map((p) => <ProjectRow key={p.id} project={p} />)}
+                            <tbody>
+                                {filteredProjects.length > 0 ? (
+                                    filteredProjects.map((p) => (
+                                        <ProjectRow 
+                                            key={p.id} 
+                                            project={p} 
+                                            onView={handleViewProject}
+                                            onEdit={handleEditProject}
+                                            onToggleStatus={handleToggleStatus}
+                                        />
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={7} className="empty-msg">No se encontraron proyectos con ese filtro.</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
                 )}
-                
-                {/* Mensaje de No Resultados */}
-                {!isLoading && !error && filteredProjects.length === 0 && (
-                    <p className="text-center py-6 text-gray-500">No se encontraron proyectos para el filtro actual.</p>
-                )}
             </div>
 
-            {/* Modal de creación de proyecto */}
-            <ProjectModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveProject} />
+            <ProjectModal 
+                isOpen={isModalOpen} 
+                onClose={handleCloseModal} 
+                onSave={handleSaveProject} 
+                initialData={editingProject} 
+            />
         </div>
     );
 }
 
 export default ProjectManagementPage;
-
-export { ProjectManagementPage as App };

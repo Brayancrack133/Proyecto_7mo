@@ -19,7 +19,7 @@ import Scrum from "./pages/Metodologias/metScrum";
 import XP from "./pages/Metodologias/metXP";
 import Proyecto_vacio from "./components/templates/Proyecto_vacio/Proyecto_vacio";
 import ContPlanificacion from "./components/templates/ContPlanificacion";
-
+import Dashboard_Proyecto from "./pages/gestion_proyectos/ProjectManagementPage";
 // =======================================================
 // COMPONENTE AUXILIAR (DEBE IR ANTES DE USARLO)
 // =======================================================
@@ -181,6 +181,14 @@ function App() {
               element={
                 <Contenido>
                   <XP />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/dashboard-proyecto"
+              element={
+                <Contenido>
+                  <Dashboard_Proyecto />
                 </Contenido>
               }
             />

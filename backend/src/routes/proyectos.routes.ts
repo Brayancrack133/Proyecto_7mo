@@ -10,6 +10,12 @@ const router = Router();
 router.get("/mis-proyectos/:idUsuario", async (req, res) => {
     const { idUsuario } = req.params;
 
+    // Esta consulta hace lo siguiente:
+    // 1. Obtiene los proyectos donde el usuario es miembro.
+    // 2. Hace JOIN con usuarios para obtener el nombre del Jefe.
+    // 3. Calcula si el usuario es "Líder" o "Colaborador".
+    // 4. Calcula el estado (Activo/Finalizado) según la fecha de fin.
+    // 5. Cuenta cuántos miembros tiene el equipo (subconsulta).
     const query = `
         SELECT 
             p.id_proyecto,
@@ -17,16 +23,20 @@ router.get("/mis-proyectos/:idUsuario", async (req, res) => {
             p.descripcion,
             p.fecha_inicio,
             p.fecha_fin,
-            IF(p.id_jefe = me.id_usuario, 'Líder de proyecto', 'Integrante') AS rol,
-            e.nombre_equipo
+            IF(p.id_jefe = ?, 'Líder', 'Colaborador') AS rol,
+            CONCAT(u.nombre, ' ', u.apellido) AS nombre_jefe,
+            IF(p.fecha_fin < CURDATE(), 'Finalizado', 'Activo') AS estado_calculado,
+            (SELECT COUNT(*) FROM miembros_equipo me WHERE me.id_equipo = p.id_equipo) as cantidad_miembros
         FROM proyectos p
         JOIN equipos e ON p.id_equipo = e.id_equipo
-        JOIN miembros_equipo me ON me.id_equipo = e.id_equipo
-        WHERE me.id_usuario = ?
+        JOIN miembros_equipo me_propio ON me_propio.id_equipo = e.id_equipo
+        JOIN usuarios u ON p.id_jefe = u.id_usuario
+        WHERE me_propio.id_usuario = ?
     `;
 
     try {
-        const [results] = await db.query(query, [idUsuario]);
+        // Pasamos idUsuario dos veces (una para verificar rol, otra para filtrar)
+        const [results] = await db.query(query, [idUsuario, idUsuario]);
         res.json(results);
     } catch (err) {
         console.error("Error DB:", err);
@@ -268,5 +278,49 @@ router.put("/tareas/:idTarea/asignar", async (req, res) => {
     }
 });
 
+//==============================================================
+// RUTA 8: EDITAR PROYECTO (PUT)
+// ==============================================================
+router.put("/proyectos/:id", async (req, res) => {
+    const { id } = req.params;
+    const { nombre, descripcion, fecha_inicio, fecha_fin } = req.body;
+
+    try {
+        await db.query(
+            "UPDATE proyectos SET nombre=?, descripcion=?, fecha_inicio=?, fecha_fin=? WHERE id_proyecto=?",
+            [nombre, descripcion, fecha_inicio, fecha_fin, id]
+        );
+        res.json({ message: "Proyecto actualizado correctamente" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error al actualizar proyecto" });
+    }
+});
+
+// ==============================================================
+// RUTA 9: CAMBIAR ESTADO (Finalizar/Activar)
+// ==============================================================
+router.put("/proyectos/:id/estado", async (req, res) => {
+    const { id } = req.params;
+    const { accion } = req.body; // 'finalizar' o 'activar'
+
+    try {
+        let query = "";
+        
+        if (accion === 'finalizar') {
+            // Para finalizar, ponemos la fecha fin a AYER
+            query = "UPDATE proyectos SET fecha_fin = DATE_SUB(CURDATE(), INTERVAL 1 DAY) WHERE id_proyecto = ?";
+        } else {
+            // Para activar, ponemos la fecha fin a 3 meses en el futuro (o null si prefieres indefinido)
+            query = "UPDATE proyectos SET fecha_fin = DATE_ADD(CURDATE(), INTERVAL 3 MONTH) WHERE id_proyecto = ?";
+        }
+
+        await db.query(query, [id]);
+        res.json({ message: `Proyecto ${accion === 'finalizar' ? 'finalizado' : 'activado'} correctamente` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error al cambiar estado" });
+    }
+});
 
 export default router;
