@@ -1,13 +1,12 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import session from "express-session"; // <--- Necesario para Passport
 import passport from "passport";       // <--- Necesario para Passport
 import path from "path";
 import { fileURLToPath } from 'url';
 
 // Cargar variables de entorno
-dotenv.config();
 
 // Inicializar DB (Importar el pool configurado)
 // NOTA: Asegúrate de que en db.ts hayas aceptado TU versión (con SSL/TiDB)

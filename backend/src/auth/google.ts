@@ -1,7 +1,9 @@
 // backend/src/auth/google.ts
 import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import pkg from "passport-google-oauth20"; // 👈 Importar todo el paquete
+const { Strategy: GoogleStrategy } = pkg;  // 👈 Desestructurar la estrategia
 import { db } from "../config/db.js";
+// ... resto del código
 
 // ====================================================
 // 🔹 SERIALIZAR → Guarda solo el ID del usuario en la sesión

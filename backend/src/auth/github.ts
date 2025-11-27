@@ -1,7 +1,8 @@
 import passport from "passport";
-// @ts-ignore: no type declarations for 'passport-github2'
-import { Strategy as GitHubStrategy } from "passport-github2";
+import pkg from "passport-github2"; // 👈 Importar todo el paquete
+const { Strategy: GitHubStrategy } = pkg; // 👈 Desestructurar
 import { db } from "../config/db.js";
+// ... resto del código
 
 passport.use(
   new GitHubStrategy(
