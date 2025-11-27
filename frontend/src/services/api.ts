@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import type { AxiosInstance, AxiosResponse } from 'axios'; // Eliminé AxiosError si no se usa explícitamente como tipo, pero puedes dejarlo.
 
 // Permitir acceso a variables de entorno de Vite
 declare global {
@@ -21,7 +21,9 @@ export const api: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  // ✅ CAMBIO REALIZADO: Aumentado a 60 segundos (60000ms)
+  // Esto evita el error "timeout of 10000ms exceeded"
+  timeout: 60000, 
 });
 
 // Interceptor de respuesta con manejo seguro
@@ -30,15 +32,15 @@ api.interceptors.response.use(
   (error: unknown) => {
     if (axios.isAxiosError(error)) {
       if (error.response) {
-        console.error('❌ Error del servidor:', error.response.data);
+        console.error('Error del servidor:', error.response.data);
         return Promise.reject(error.response.data);
       } else if (error.request) {
-        console.error('⚠️ Error de red:', error.message);
+        console.error('Error de red (o Timeout):', error.message);
       } else {
-        console.error('🚫 Error de configuración:', error.message);
+        console.error('Error de configuración:', error.message);
       }
     } else {
-      console.error('🧩 Error desconocido:', error);
+      console.error('Error desconocido:', error);
     }
 
     return Promise.reject(error);
@@ -46,4 +48,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
