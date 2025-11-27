@@ -4,7 +4,7 @@ import {
   crearRol,
   editarRol,
   eliminarRol
-} from "../controllers/roles.controller";
+} from "../controllers/roles.controller.js";
 
 const router = Router();
 

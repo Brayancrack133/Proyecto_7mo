@@ -37,7 +37,7 @@ const Planificacion: React.FC<Props> = ({ idProyecto }) => {
 
     useEffect(() => {
         if (idProyecto && usuario) {
-            fetch(`http://localhost:3000/api/proyecto/${idProyecto}/usuario/${usuario.id_usuario}`)
+            fetch(`http://localhost:3000/api/proyecto/${idProyecto}/usuario/${usuario.id}`)
                 .then(res => res.json())
                 .then(data => {
                     // Si el rol calculado es 'Líder', ponemos true

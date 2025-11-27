@@ -1,0 +1,158 @@
+.methopage{
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+.methodology-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: flex-start; /* Alineación inicial vertical */
+  margin: 20px 0;
+  padding-top: 20px; /* Añadido para evitar que el contenedor se pegue al header */
+  text-align: center;
+}
+
+.phase-card {
+  background-color: #f3f4f6;
+  padding: 20px;
+  margin: 15px;
+  border-radius: 10px;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.phase-card:hover {
+  transform: scale(1.05);
+}
+
+.phase-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+h3 {
+  font-size: 18px;
+  color: #333;
+}
+
+p {
+  font-size: 14px;
+  color: #ffffff;
+}
+/* Metodologías en general */
+.methodology-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin: 20px 0;
+}
+
+/* Cada fase */
+.phase-card {
+  background-color: #f3f4f6;
+  padding: 25px;
+  margin: 15px;
+  border-radius: 10px;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Hover animado */
+.phase-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Color de fondo de cada metodología */
+.azul {
+  background-color: #74c0fc; /* Azul */
+}
+
+.amarillo {
+  background-color: #f7b731; /* Amarillo */
+}
+
+.naranja {
+  background-color: #ff6b6b; /* Rojo */
+}
+
+.verde {
+  background-color: #1e8e3e; /* Verde */
+}
+.rosa {
+  background-color: #ff9ff3; /* Rosa */
+}
+
+.morado {
+  background-color: #9b59b6; /* Morado */
+}
+
+/* Iconos */
+.phase-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+  color: #fff; /* Blanco */
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 50%;
+}
+
+/* Títulos */
+h3 {
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Descripción de las fases */
+p {
+  font-size: 14px;
+  color: #ffffff;
+  margin-top: 10px;
+}
+/* Si quieres que el contenedor ocupe toda la altura disponible pero con el header en la parte superior */
+@media (min-height: 768px) {
+  .methodology-container {
+    height: calc(100vh - 60px); /* Ajusta la altura dejando espacio para el header (por ejemplo, de 60px) */
+  }
+}
+
+/* Asegurarnos de que el diseño sea más amigable en pantallas más pequeñas */
+@media (max-width: 768px) {
+  .methodology-container {
+    flex-direction: column; /* Apilar las fases de forma vertical */
+    align-items: center; /* Centrar elementos de forma vertical */
+    height: auto; /* Eliminar la altura fija para pantallas pequeñas */
+  }
+
+  .phase-card {
+    width: 100%; /* Que los cuadros ocupen todo el ancho disponible */
+    margin: 10px 0; /* Ajustar márgenes en pantallas pequeñas */
+  }
+}
+
+/* Para tamaños de pantalla pequeños, como móviles */
+@media (max-width: 480px) {
+  .phase-card {
+    width: 90%; /* Los cuadros ocupan el 90% del ancho disponible */
+    margin: 10px auto; /* Alineación centrada con márgenes automáticos */
+  }
+
+  .phase-icon {
+    font-size: 35px; /* Reducir tamaño de los íconos */
+  }
+
+  h3 {
+    font-size: 16px; /* Reducir el tamaño de los títulos */
+  }
+
+  p {
+    font-size: 12px; /* Reducir el tamaño del texto */
+  }
+}

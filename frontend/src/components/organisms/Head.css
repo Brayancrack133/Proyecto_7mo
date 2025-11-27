@@ -1,0 +1,54 @@
+.headcontent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100px;
+    padding: 0 40px;
+    background: #071739;
+    border-bottom: 1px solid #0e2a5a;
+    width: 100%;
+}
+
+/* LOGO */
+.futurep {
+    width: 75px;
+    height: 75px;
+}
+
+/* CONTENEDOR DE DATOS DEL USUARIO */
+.datcont {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* NOMBRE + PERFIL */
+.ussrname {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.usnm {
+    color: #CDD5DB;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.profile {
+    color: #9aa5b1;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* AVATAR / FOTO */
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

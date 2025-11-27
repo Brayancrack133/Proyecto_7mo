@@ -1,44 +1,89 @@
 // src/components/organisms/Sidebar.tsx
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './sidebar.css';
+import { Home, FolderKanban, Users, ChevronRight } from 'lucide-react';
+import './sidebar.css'; // Importa el nuevo CSS
 
-const Sidebar = () => {
+interface OpcionMenu {
+  nombre: string;
+  ruta: string;
+  icon: React.ComponentType<{ size?: string | number; className?: string }>;  // Permite string o number, pero no null
+}
+
+const Sidebar: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
-  const opciones = [
-    { nombre: 'Inicio', ruta: '/' },
-    { nombre: 'Proyectos', ruta: '/proyectos' },
-    // BORRAMOS LA LÍNEA DE PLANIFICACIÓN PORQUE YA NO ES UN MENÚ DIRECTO
+  const opciones: OpcionMenu[] = [
+    { nombre: 'Inicio', ruta: '/inicio', icon: Home },
+    { nombre: 'Proyectos', ruta: '/mis-proyectos', icon: FolderKanban },
+    { nombre: 'Gestión de Usuarios', ruta: '/proyecto-principal', icon: Users },
   ];
 
-  // Ajustamos la lógica para que "Proyectos" se quede encendido 
-  // cuando estás dentro de un proyecto (opcional, pero se ve mejor)
-  const isActive = (opcion: { nombre: string; ruta: string }) => {
+  const isActive = (opcion: OpcionMenu): boolean => {
     if (location.pathname === opcion.ruta) return true;
     
-    // Si estamos viendo el detalle de un proyecto (/proyecto/1), 
-    // mantenemos iluminado el botón "Proyectos" para que sepa de dónde viene.
+    // Mantener iluminado "Proyectos" cuando estás en el detalle
     if (opcion.nombre === 'Proyectos' && location.pathname.includes('/proyecto/')) {
-        return true;
+      return true;
     }
+    
     return false;
   };
 
   return (
-    <div className="optioncont">
-      {opciones.map((opcion) => (
-        <button
-          key={opcion.nombre}
-          className={`option ${isActive(opcion) ? 'active' : ''}`}
-          onClick={() => navigate(opcion.ruta)}
-        >
-          {/* Iconos (Puedes agregar lógica para iconos aquí si quieres) */}
-          <p className="opttxt">{opcion.nombre}</p>
-        </button>
-      ))}
-    </div>
+    <aside className="sidebar">
+      {/* Header del Sidebar */}
+      <div className="sidebar-header">
+        <div className="sidebar-logo">
+          <div className="logo-icon">P</div>
+          <div className="logo-text">
+            <h2>ProjectHub</h2>
+            <span>Gestión de Proyectos</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Navegación */}
+      <nav className="sidebar-nav">
+        {opciones.map((opcion) => {
+          const Icon = opcion.icon;
+          const active = isActive(opcion);
+          
+          return (
+            <button
+              key={opcion.nombre}
+              className={`nav-item ${active ? 'active' : ''}`}
+              onClick={() => navigate(opcion.ruta)}
+              aria-current={active ? 'page' : undefined}
+            >
+              {/* Indicador lateral para el item activo */}
+              <div className="nav-indicator"></div>
+              
+              {/* Icono */}
+              <Icon size={18} className="nav-icon" />
+              
+              {/* Texto */}
+              <span className="nav-text">{opcion.nombre}</span>
+              
+              {/* Flecha indicadora */}
+              <ChevronRight size={14} className="nav-arrow" />
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Footer con perfil de usuario */}
+      <div className="sidebar-footer">
+        <div className="user-profile">
+          <div className="user-avatar">U</div>
+          <div className="user-info">
+            <p className="user-name">Usuario</p>
+            <p className="user-email">usuario@email.com</p>
+          </div>
+        </div>
+      </div>
+    </aside>
   );
 };
 

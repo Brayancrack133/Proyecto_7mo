@@ -1,51 +1,300 @@
-.optioncont {
+/* ===============================================
+   SIDEBAR MODERNO Y PROFESIONAL
+   =============================================== */
+
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a1929 0%, #071739 100%);
+  color: #fff;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 267px;
-  min-width: 267px; /* 👈 evita que cambie */
-  height: 100%; /* 👈 ocupa toda la altura visible */
-  background: #071739;
-  border-right: 1px solid #000;
-  padding: 20px 0;
-  gap: 10px;
-  flex-shrink: 0; /* 👈 evita que se achique si el contenedor usa flex */
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ===============================================
+   HEADER DEL SIDEBAR
+   =============================================== */
 
-.option {
+.sidebar-header {
+  padding: 20px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.sidebar-logo {
   display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.logo-icon:hover {
+  transform: scale(1.05);
+}
+
+.logo-text h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: -0.3px;
+}
+
+.logo-text span {
+  font-size: 10px;
+  color: #94a3b8;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ===============================================
+   NAVEGACIÓN
+   =============================================== */
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: left;
   width: 100%;
-  height: 62px;
-  padding: 10px 20px;
+  overflow: hidden;
+}
+
+/* Indicador lateral activo */
+.nav-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
+  border-radius: 0 4px 4px 0;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-icon {
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.nav-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 1;
+}
+
+.nav-arrow {
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+/* Estados Hover */
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  transform: translateX(2px);
+}
+
+.nav-item:hover .nav-icon {
+  transform: scale(1.1);
+}
+
+.nav-item:hover .nav-arrow {
+  opacity: 0.5;
+  transform: translateX(0);
+}
+
+/* Estado Activo */
+.nav-item.active {
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0.15) 0%,
+    rgba(139, 92, 246, 0.15) 100%
+  );
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.nav-item.active .nav-indicator {
+  height: 24px;
+}
+
+.nav-item.active .nav-icon {
+  transform: scale(1.15);
+  color: #60a5fa;
+}
+
+.nav-item.active .nav-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: #60a5fa;
+}
+
+/* Efecto de presionado */
+.nav-item:active {
+  transform: translateX(1px) scale(0.98);
+}
+
+/* ===============================================
+   FOOTER DEL SIDEBAR
+   =============================================== */
+
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.user-profile {
+  display: flex;
   align-items: center;
   gap: 10px;
-  border: none;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 10px;
-  background: transparent;
+  transition: all 0.2s ease;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
 }
 
-.option:hover {
-  background: rgba(255, 255, 255, 0.1);
+.user-profile:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.option.active {
-  background: #DD9D52;
-  color: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.opttxt {
-  flex: 1 0 0;
-  color: #CDD5DB;
-  font-size: 20px;
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
-  letter-spacing: -0.48px;
-  text-align: left;
+  font-size: 13px;
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  flex-shrink: 0;
 }
 
-.option.active .opttxt {
-  color: #fff;
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  margin: 0;
+  font-size: 10px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===============================================
+   ANIMACIONES Y EFECTOS ADICIONALES
+   =============================================== */
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.nav-item {
+  animation: slideIn 0.3s ease forwards;
+}
+
+.nav-item:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.nav-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.nav-item:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+/* ===============================================
+   RESPONSIVE (OPCIONAL)
+   =============================================== */
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+  }
+  
+  .nav-item {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
 }

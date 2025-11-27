@@ -1,34 +1,46 @@
-import React from 'react';
-import styles from './Header.module.css';
-import { Icon } from '../../atoms/Icon/Icon'; // Asumimos que Icon ya existe
-// Aquí se importarían NavItem, Button, etc., si fueran necesarios
+import { Link } from "react-router-dom";
+import "./Header.css";
 
-export const Header: React.FC = () => {
+interface UserData {
+  nombre: string;
+  apellido: string;
+  foto?: string | null;
+}
+
+interface HeaderProps {
+  u: UserData | null;
+}
+
+export default function Header({ u }: HeaderProps) {
+  const userPhoto =
+    u?.foto && u.foto !== ""
+      ? u.foto
+      : "/Images/User.png";
+
   return (
-    <header className={styles.header}>
-      <div className={styles.logoContainer}>
-        {/* Usando el icono de la 'F' de Future Plan */}
-        <Icon name="logo" size={30} className={styles.logoIcon} /> 
+    <header className="header">
+      <div className="header-left">
+        <div className="loguito"><img  className="logoF" src="/Images/LogoF.png" alt="" /></div>
+        
+
+        <nav className="nav-links">
+          <Link to="/">Inicio</Link>
+          <Link to="/proyectos">Mis Proyectos</Link>
+          <Link to="/repositorio">Repositorio</Link>
+        </nav>
       </div>
 
-      {/* Navegación Principal: Inicio, Mis Proyectos, Administración, etc. */}
-      <nav className={styles.navMenu}>
-        <a href="/inicio" className={styles.navItem}>Inicio</a>
-        <a href="/nosotros" className={styles.navItem}>Nosotros</a>
-        <a href="/misproyectos" className={styles.navItem}>Mis Proyectos</a>
-        <a href="/administracion" className={styles.navItem}>Administración</a>
-      </nav>
+      <div className="header-right">
+        <span className="user-name">
+          {u ? `${u.nombre} ${u.apellido}` : "Mi cuenta"}
+        </span>
 
-      {/* Perfil de Usuario */}
-      <div className={styles.userSection}>
-        <Icon name="search" size={20} className={styles.searchIcon} />
-        <span className={styles.adminText}>ADMIN</span>
-        <div className={styles.profileInfo}>
-          <span className={styles.profileName}>Hi Perfil</span>
-          {/*  */}
-          <Icon name="user" size={24} className={styles.profileAvatar} />
-        </div>
+        <img
+          src={userPhoto}
+          alt="Foto usuario"
+          className="user-photo"
+        />
       </div>
     </header>
   );
-};
+}

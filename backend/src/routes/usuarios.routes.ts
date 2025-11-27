@@ -5,7 +5,7 @@ import {
   editarUsuario,
   cambiarEstadoUsuario,
   buscarUsuarios
-} from "../controllers/usuarios.controller";
+} from "../controllers/usuarios.controller.js";
 
 const router = Router();
 

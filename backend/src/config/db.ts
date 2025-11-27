@@ -6,37 +6,43 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cargamos las variables. Asegúrate que la ruta "../../.env" sea la correcta
-// según donde esté este archivo guardado.
+// Cargamos las variables de entorno
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
-export const db = mysql
-  .createPool({
+// 1. CONFIGURACIÓN DEL POOL (Usamos TUS datos de TiDB)
+const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: Number(process.env.DB_PORT) || 4000, // TiDB usa el 4000, no el 3306
+    port: Number(process.env.DB_PORT) || 4000, // TiDB usa 4000
     
-    // 🔥 ESTO ES LO QUE FALTABA Y ES OBLIGATORIO PARA TIDB:
+    // 🔥 SSL OBLIGATORIO PARA TIDB (Esto viene de tu rama)
     ssl: {
       rejectUnauthorized: true,
       minVersion: 'TLSv1.2'
     },
     
-    // Configuraciones para que la conexión no se caiga
+    // Configuraciones de estabilidad
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
-  })
-  .promise();
+});
 
-// Probar conexión
+// 2. EXPORTACIONES (Estructura del MAIN para compatibilidad)
+
+// Exportación principal (Promesas) - La que usas tú
+export const db = pool.promise();
+
+// Exportación secundaria (Callbacks) - La que usan ellos (Probablemente para Passport)
+export const dbRaw: any = pool; 
+
+// 3. TEST DE CONEXIÓN
 db.getConnection()
   .then((conn) => {
     console.log("✅ Conexión a TiDB Cloud exitosa 🎉");
-    conn.release(); // Liberamos la conexión de prueba
+    conn.release(); // Liberamos la conexión
   })
-  .catch((err) =>
-    console.error("❌ Error al conectar a la Base de Datos:", err.message)
-  );
+  .catch((err) => {
+    console.error("❌ Error al conectar a la Base de Datos:", err.message);
+  });

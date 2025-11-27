@@ -24,7 +24,7 @@ export const register = async (req: Request, res: Response) => {
 
     // 3. Registrar usuario
     const [result]: any = await db.query(
-"INSERT INTO usuarios (nombre, apellido, correo, contraseña, estado) VALUES (?, ?, ?, ?, 1)",
+      "INSERT INTO usuarios (nombre, apellido, correo, contraseña, estado) VALUES (?, ?, ?, ?, 1)",
       [nombre, apellido, correo, hashedPassword]
     );
 
@@ -33,7 +33,7 @@ export const register = async (req: Request, res: Response) => {
     // 4. Asignar rol por defecto → Cliente (4)
     await db.query(
       "INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)",
-      [userId, 4]
+      [userId, 2] // <--- CAMBIADO: De 4 a 2
     );
 
     res.json({

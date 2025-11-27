@@ -1,111 +1,157 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
+import "./App.css";
+
+// --- COMPONENTES DEL LÍDER (Auth y Landing) ---
 import Login from "./pages/Login/Login";
 import Register from "./pages/Registro/Register";
 import GestUser from "./pages/Gest_user/Gest_user";
-import { AppRoutes } from "./routes/AppRoutes";
-import "./App.css";
+
+// --- TUS COMPONENTES (Gestión de Proyectos) ---
+import { UserProvider } from './context/UserContext';
+import MisProyectos from "./components/organisms/MisProyectos";
+import Proyecto_Principal from "./pages/gestion_proyectos/ProjectCreationForm";
+import Planificacion from "./components/organisms/Planificacion";
+import ContInicio from "./components/organisms/ContInicio";
+import Contenido from "./components/templates/Contenido";
+
+// =======================================================
+// COMPONENTE AUXILIAR (DEBE IR ANTES DE USARLO)
+// =======================================================
+
+const RutaPlanificacion = () => {
+  const { id } = useParams();
+  return id ? (
+    <Planificacion idProyecto={id} />
+  ) : (
+    <div>Error: ID de proyecto no válido</div>
+  );
+};
+
+// =======================================================
+// APP PRINCIPAL
+// =======================================================
 
 function App() {
   return (
-    <div className="principal">
-      <Router>
-        <Routes>
-          {/* 🔹 Landing principal */}
-          <Route
-            path="/"
-            element={
+    <UserProvider>
+      <div className="principal">
+        <Router>
+          <Routes>
+
+            {/* ===================================================== */}
+            {/* LANDING PAGE */}
+            {/* ===================================================== */}
+
+            <Route path="/" element={
               <div className="landing-container">
-                {/* 🔹 NAVBAR SUPERIOR */}
+
                 <nav className="navbar">
                   <ul>
                     <li><Link to="/">Inicio</Link></li>
                     <li><Link to="/nosotros">Nosotros</Link></li>
-                    <li><Link to="/mis_proyectos">Mis Proyectos</Link></li>
-                    <li><Link to="/Login">Administración</Link></li>
+                    <li><Link to="/mis-proyectos">Mis Proyectos</Link></li>
+                    <li><Link to="/login">Administración</Link></li>
                     <li><Link to="/contacto">Contacto</Link></li>
                   </ul>
                 </nav>
 
-                {/* 🔹 SECCIÓN HERO */}
+                {/* HERO */}
                 <section className="hero">
                   <div className="hero-text">
                     <h1 className="logo">FUTURE PLAN</h1>
                     <p className="slogan">“La forma inteligente de organizar tus proyectos”</p>
                     <Link to="/login" className="btn-main">Empezar</Link>
                     <p className="descripcion">
-                      Future Plan es una plataforma de planificación y gestión de proyectos 
-                      que integra Inteligencia Artificial para recomendar metodologías, estimar 
-                      tiempos y mejorar la productividad de los equipos.
+                      Future Plan es una plataforma de planificación y gestión de proyectos.
                     </p>
                   </div>
 
-                  <div className="main-image"> <div className="parent"> <div className="card"> <img className="imgmain" src="/Images/prinimg.png" alt="Imagen principal" /> </div> </div> </div>
+                  <div className="main-image">
+                    <div className="parent">
+                      <div className="card">
+                        <img className="imgmain" src="/Images/prinimg.png" alt="Imagen" />
+                      </div>
+                    </div>
+                  </div>
                 </section>
 
-                {/* 🔹 SECCIÓN DE FEATURES */}
+                {/* FEATURES */}
                 <section className="features">
                   <div className="feature">
                     <img src="/Images/IAimagen.jpeg" alt="IA" />
                     <h3>Planificación inteligente</h3>
-                    <p>La IA sugiere metodologías y etapas según tu proyecto.</p>
                   </div>
+
                   <div className="feature">
                     <img src="/Images/Produc.jpeg" alt="Productividad" />
                     <h3>Productividad optimizada</h3>
-                    <p>Panel de control con KPIs, alertas tempranas y reportes automáticos.</p>
                   </div>
+
                   <div className="feature">
                     <img src="/Images/teams.jpg" alt="Colaboración" />
                     <h3>Colaboración en equipo</h3>
-                    <p>Chat, videollamadas y notificaciones en un solo lugar.</p>
                   </div>
+
                   <div className="feature">
-                    <img src="/Images/central.jpg" alt="Gestión centralizada" />
+                    <img src="/Images/central.jpg" alt="Gestión" />
                     <h3>Gestión centralizada</h3>
-                    <p>Documentos, repositorios y tareas organizadas en una plataforma.</p>
                   </div>
                 </section>
 
-                {/* 🔹 SECCIÓN “CÓMO FUNCIONA” */}
-                <section className="how-it-works">
-                  <h2>¿Cómo Funciona?</h2>
-                  <div className="steps">
-                    <div className="step">
-                      <div className="circle-num">1</div>
-                      <h3>Crea tu Proyecto</h3>
-                      <p>Define objetivos, plazos y recursos. La IA sugerirá la mejor metodología.</p>
-                    </div>
-                    <div className="step">
-                      <div className="circle-num">2</div>
-                      <h3>Organiza tu Equipo</h3>
-                      <p>Invita colaboradores, asigna roles y tareas, todo de forma inteligente.</p>
-                    </div>
-                    <div className="step">
-                      <div className="circle-num">3</div>
-                      <h3>Supervisa con IA</h3>
-                      <p>Monitorea avances en tiempo real y recibe alertas predictivas.</p>
-                    </div>
-                  </div>
-                </section>
-
-                {/* 🔹 CALL TO ACTION FINAL */}
-                <section className="cta">
-                  <h3>¿Listo Para Transformar tu Proyecto?</h3>
-                  <p>Únete a miles de equipos que están planificando su futuro con inteligencia.</p>
-                  <Link to="/register" className="btn-gradient">Empezar</Link>
-                </section>
               </div>
-            }
-          />
+            } />
 
-          {/* 🔹 RUTAS INTERNAS */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/gest_user" element={<GestUser />} />
-          <Route path="/*" element={<AppRoutes />} />
-        </Routes>
-      </Router>
-    </div>
+            {/* ===================================================== */}
+            {/* RUTAS DE AUTENTICACIÓN */}
+            {/* ===================================================== */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/gest_user" element={<GestUser />} />
+
+            {/* ===================================================== */}
+            {/* RUTAS CON LAYOUT (HEADER + SIDEBAR) */}
+            {/* ===================================================== */}
+
+            <Route
+              path="/mis-proyectos"
+              element={
+                <Contenido>
+                  <MisProyectos />
+                </Contenido>
+              }
+            />
+
+            <Route
+              path="/proyecto-principal"
+              element={
+                <Contenido>
+                  <Proyecto_Principal />
+                </Contenido>
+              }
+            />
+
+            <Route
+              path="/inicio"
+              element={
+                <Contenido>
+                  <ContInicio />
+                </Contenido>
+              }
+            />
+
+            <Route
+              path="/proyecto/:id"
+              element={
+                <Contenido>
+                  <RutaPlanificacion />
+                </Contenido>
+              }
+            />
+
+          </Routes>
+        </Router>
+      </div>
+    </UserProvider>
   );
 }
 

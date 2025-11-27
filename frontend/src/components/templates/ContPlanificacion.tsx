@@ -1,7 +1,7 @@
 // src/components/templates/ContPlanificacion.tsx
 import React from 'react'
 import { useParams } from 'react-router-dom' 
-import Header from '../organisms/Header'
+import Header from '../organisms/Head'
 import Sidebar from '../organisms/Sidebar'
 import Planificacion from '../organisms/Planificacion'
 import './Contenido.css' 

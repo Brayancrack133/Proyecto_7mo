@@ -1,6 +1,5 @@
-// src/routes/proyectos.routes.ts
 import { Router } from "express";
-import { generarDetallesProyecto } from "../controllers/proyectosIA.controller.js"; // <--- Importamos el controlador
+import { generarDetallesProyecto } from "../controllers/proyectosIA.controller.js"; 
 
 const router = Router();
 

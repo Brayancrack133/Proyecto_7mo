@@ -1,99 +1,98 @@
-// index.ts
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-// Solución al TypeError: Importa la exportación por defecto
-import {db} from "./config/db.js"; 
+import session from "express-session"; // <--- Necesario para Passport
+import passport from "passport";       // <--- Necesario para Passport
+import path from "path";
+import { fileURLToPath } from 'url';
 
-import path from "path"; // <--- Agrega esto arriba si no está
-import { fileURLToPath } from 'url'; // <--- Necesario para __dirname en módulos ES
+// Cargar variables de entorno
+dotenv.config();
 
-// Importamos las rutas
+// Inicializar DB (Importar el pool configurado)
+// NOTA: Asegúrate de que en db.ts hayas aceptado TU versión (con SSL/TiDB)
+import { db } from "./config/db.js";
+
+// 1. Configuración de Estrategias de Passport (Del MAIN)
+import "./auth/google.js"; 
+import "./auth/github.js";
+
+// 2. Importar rutas (Combinación de ambas ramas)
+import authRoutes from "./routes/auth.routes.js";
 import proyectosRoutes from "./routes/proyectos.routes.js";
 import tareasRoutes from "./routes/tareas.routes.js";
 import documentosRoutes from "./routes/documentos.routes.js";
 import notificacionesRoutes from "./routes/notificaciones.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
-import authRoutes from "./routes/auth.routes.js";
-//con ia
-import proyectosiaRoutes from "./routes/proyectosia.routes.js";
-
-// Cargar variables de entorno (Solo aquí)
-dotenv.config();
-
-// Inicializar DB (solo importarla para conectarse)
-import "./config/db.js";
-
-// Importamos rutas
 import userRoutes from "./routes/usuarios.routes.js";
 import roleRoutes from "./routes/roles.routes.js";
 
+// Rutas de Autenticación Social (Del MAIN)
+import authGoogleRoutes from "./routes/googleauth.routes.js"; 
+import githubAuthRoutes from "./routes/githubaunth.js";       
+
+// Rutas de IA (TUYAS)
+import proyectosiaRoutes from "./routes/proyectosia.routes.js";
+
 const app = express();
 
-// 🔥 Middlewares SIEMPRE primero
-app.use(cors());
-app.use(express.json());
+// ==========================================
+// MIDDLEWARES
+// ==========================================
+// CORS: Es vital dejarlo al principio para que el Frontend no falle
+app.use(cors({
+    origin: 'http://localhost:5173', // Ajusta si es necesario
+    credentials: true
+}));
 
-// 🔥 Ahora sí, rutas
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+
+// Configuración de Sesión (Requerida por Passport - Del MAIN)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "mi_super_secreto_123", // Mejor usar .env
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }, // Poner true si usas HTTPS en producción
+  })
+);
+
+// Inicializar Passport (Del MAIN)
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// ==========================================
+// DEFINICIÓN DE RUTAS
+// ==========================================
+
+// 1. Rutas de Autenticación
 app.use("/api/auth", authRoutes);
-app.use("/api/proyectos", proyectosRoutes);
-app.use("/api/tareas", tareasRoutes);
+app.use("/auth", authGoogleRoutes); // <--- Habilita /auth/google
+app.use("/auth", githubAuthRoutes); // <--- Habilita /auth/github
+
+// 2. Rutas del Sistema Base
 app.use("/api/usuarios", userRoutes);
 app.use("/api/roles", roleRoutes);
-// --- DEFINICIÓN DE RUTAS ---
-app.use("/api", proyectosRoutes); // Para /mis-proyectos
-app.use("/api", tareasRoutes);    // Para /tareas
+
+// 3. Rutas funcionales (Montadas en /api)
+app.use("/api", proyectosRoutes); 
+app.use("/api", tareasRoutes);    
 app.use("/api", notificacionesRoutes);
 app.use("/api", chatRoutes);
-
-app.use('/uploads', express.static('uploads'));
 app.use("/api", documentosRoutes);
 
-//con ia
+// 4. Rutas de IA (TUYAS - Con el prefijo correcto que definimos hoy)
 app.use("/api/proyectos-ia", proyectosiaRoutes);
 
 
-
-// Ruta simple de prueba
+// Ruta de prueba
 app.get("/", (req, res) => {
   res.send("🚀 Backend funcionando y DB conectada");
 });
 
 const PORT = process.env.PORT || 3000;
-
-
-// --- Obtener proyectos de un usuario ---
-app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
-    // ... (Tu lógica de ruta usando db.query se mantiene igual)
-});
-
-
-
-// Obtener proyectos de un usuario
-app.get("/api/mis-proyectos/:idUsuario", async (req, res) => {
-  const { idUsuario } = req.params;
-
-  try {
-    const [rows]: any = await db.query(
-      `
-            SELECT DISTINCT 
-                p.id_proyecto,
-                p.nombre,
-                IF(p.id_jefe = ?, 'Líder', 'Integrante') AS rol
-            FROM proyectos p
-            JOIN miembros_equipo me ON p.id_equipo = me.id_equipo
-            WHERE me.id_usuario = ?
-            `,
-      [idUsuario, idUsuario]
-    );
-
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error obteniendo proyectos" });
-  }
-});
-// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🔥 Servidor escuchando en puerto ${PORT}`);
 });

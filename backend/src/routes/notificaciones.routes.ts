@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { db } from "../config/db.js";
-
-const router = Router();
+// Importamos dbRaw (la que acepta callbacks) y la renombramos a 'db'
+import { dbRaw } from "../config/db.js";
+const db: any = dbRaw; const router = Router();
 
 // Obtener notificaciones de un usuario (Ordenadas por la más nueva primero)
 router.get("/notificaciones/:idUsuario", (req, res) => {
@@ -23,7 +23,7 @@ router.get("/notificaciones/:idUsuario", (req, res) => {
         ORDER BY n.fecha_creacion DESC
     `;
 
-    db.query(query, [idUsuario], (err, results) => {
+    db.query(query, [idUsuario], (err: any, results: any) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: "Error server" });
@@ -61,7 +61,7 @@ router.get("/notificaciones/usuario/:idUsuario/proyecto/:idProyecto", (req, res)
         ORDER BY n.fecha_creacion DESC
     `;
 
-    db.query(query, [idUsuario, idProyecto, idProyecto], (err, results) => {
+    db.query(query, [idUsuario, idProyecto, idProyecto], (err: any, results: any) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: "Error server" });
