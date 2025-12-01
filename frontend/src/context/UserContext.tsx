@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // 1. INTERFAZ CORREGIDA (Coincide con tu LocalStorage real)
 export interface User {

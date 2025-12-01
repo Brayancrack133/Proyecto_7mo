@@ -1,23 +1,27 @@
 // src/components/organisms/Sidebar.tsx
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, FolderKanban, Users, ChevronRight } from 'lucide-react';
-import './sidebar.css'; // Importa el nuevo CSS
+// 1. Importamos el icono FileText para documentos
+import { Home, FolderKanban, Users, ChevronRight, FileText, LayoutDashboard } from 'lucide-react';
+import './sidebar.css'; 
 
 interface OpcionMenu {
   nombre: string;
   ruta: string;
-  icon: React.ComponentType<{ size?: string | number; className?: string }>;  // Permite string o number, pero no null
+  icon: React.ComponentType<{ size?: string | number; className?: string }>;
 }
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 2. Agregamos "Mis Documentos" al array de opciones
   const opciones: OpcionMenu[] = [
     { nombre: 'Inicio', ruta: '/inicio', icon: Home },
     { nombre: 'Proyectos', ruta: '/mis-proyectos', icon: FolderKanban },
+    { nombre: 'Mis Documentos', ruta: '/mis-documentos', icon: FileText }, // <-- NUEVA OPCIÓN
     { nombre: 'Gestión de Usuarios', ruta: '/proyecto-principal', icon: Users },
+    { nombre: 'Dashboard', ruta: '/dashboard', icon: LayoutDashboard }
   ];
 
   const isActive = (opcion: OpcionMenu): boolean => {

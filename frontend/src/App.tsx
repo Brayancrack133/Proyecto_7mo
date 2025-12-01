@@ -13,6 +13,8 @@ import Proyecto_Principal from "./pages/gestion_proyectos/ProjectCreationForm";
 import Planificacion from "./components/organisms/Planificacion";
 import ContInicio from "./components/organisms/ContInicio";
 import Contenido from "./components/templates/Contenido";
+import MisDocumentos from './components/organisms/MisDocumentos';
+import Dashboard from "./components/organisms/Dashboard";
 
 // =======================================================
 // COMPONENTE AUXILIAR (DEBE IR ANTES DE USARLO)
@@ -147,6 +149,24 @@ function App() {
                 </Contenido>
               }
             />
+            {/* ---> ESTA ES LA RUTA NUEVA QUE FALTABA <--- */}
+            <Route
+              path="/mis-documentos"
+              element={
+                <Contenido>
+                  <MisDocumentos />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <Contenido>
+                  <Dashboard />
+                </Contenido>
+              }
+            />
+           
 
           </Routes>
         </Router>

@@ -1,0 +1,434 @@
+/* --- LAYOUT PRINCIPAL --- */
+.dashboard-container {
+    padding: 2rem;
+    background-color: #f3f4f6; /* Fondo gris suave */
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1f2937;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.center-msg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.2rem;
+    color: #6b7280;
+}
+
+/* --- HEADER --- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.dashboard-title h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #111827;
+    margin: 0;
+    letter-spacing: -0.025em;
+}
+
+.dashboard-title p {
+    color: #6b7280;
+    margin: 0.5rem 0 0;
+    font-size: 0.95rem;
+}
+
+/* Botones */
+.btn-dash {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    color: #374151;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-dash:hover {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+}
+
+/* --- TARJETAS KPIs (SUPERIORES) --- */
+.kpi-grid {
+    display: grid;
+    /* Reducimos el mínimo a 220px para que quepan mejor en pantallas medianas */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-icon {
+    padding: 0.8rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    height: 50px;
+}
+
+/* Colores específicos para iconos */
+.kpi-icon.blue { background: #EFF6FF; color: #2563EB; }
+.kpi-icon.green { background: #ECFDF5; color: #059669; }
+.kpi-icon.orange { background: #FFF7ED; color: #EA580C; }
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.kpi-label {
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* --- GRID PRINCIPAL (GRÁFICAS) --- */
+.main-grid {
+    display: grid;
+    /* Reducimos el mínimo a 350px para permitir 2 columnas en laptops estándar */
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0; /* Evita desbordamiento de flex items */
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- ESTILOS DE GRÁFICAS (NUEVO) --- */
+.chart-container {
+    width: 100%;
+    overflow-x: auto; /* Permite scroll horizontal si hay muchas barras */
+    padding-bottom: 10px;
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    height: 180px; /* Altura fija para la gráfica */
+    gap: 12px;
+    width: 100%;
+}
+
+.bar-column {
+    flex: 1;
+    min-width: 40px; /* Ancho mínimo de barra */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar-fill {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 4px; /* Siempre muestra al menos una línea */
+    opacity: 0.9;
+    position: relative;
+}
+
+.bar-fill:hover {
+    opacity: 1;
+    filter: brightness(1.1);
+}
+
+/* Tooltip simple al hacer hover */
+.bar-fill:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    white-space: nowrap;
+    z-index: 10;
+    margin-bottom: 5px;
+}
+
+.bar-label {
+    font-size: 10px;
+    color: #6b7280;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+.bar-value {
+    font-size: 11px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+/* Colores alternados para las barras */
+.bar-column:nth-child(odd) .bar-fill { background-color: #3b82f6; }
+.bar-column:nth-child(even) .bar-fill { background-color: #60a5fa; }
+
+
+/* --- LISTAS DE ACTIVIDAD Y ALERTAS --- */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Scrollbar fino para listas */
+.activity-list::-webkit-scrollbar { width: 4px; }
+.activity-list::-webkit-scrollbar-track { background: #f1f1f1; }
+.activity-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+.activity-item {
+    display: flex;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.activity-item.warning {
+    background-color: #FEF2F2; /* Fondo rojo suave */
+    border-left: 3px solid #DC2626;
+}
+
+.no-data {
+    text-align: center;
+    color: #9ca3af;
+    padding: 2rem;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* --- SECCIÓN PROYECTOS DETALLADOS --- */
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 2rem 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.projects-grid {
+    display: grid;
+    /* Usamos auto-fit y reducimos minmax a 300px para llenar mejor el ancho */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.project-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #e5e7eb;
+    border-left-width: 4px; /* Borde izquierdo grueso colorido */
+    transition: all 0.2s ease;
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.project-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.team-badge {
+    background: #f3f4f6;
+    color: #4b5563;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Mini Estadísticas (Cajas grises dentro de tarjeta) */
+.project-stats {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-pill {
+    flex: 1;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #475569;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Mini Estadísticas V2 (Verticales) */
+.mini-stat {
+    flex: 1;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    padding: 10px;
+    borderRadius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background-color 0.2s;
+}
+
+.mini-stat:hover {
+    background-color: #f1f5f9;
+}
+
+.mini-stat-val {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1E293B;
+}
+
+.mini-stat-label {
+    font-size: 10px;
+    color: #64748B;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.project-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* --- MEDIA QUERIES (RESPONSIVE) --- */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-dash {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .main-grid {
+        grid-template-columns: 1fr; /* Una sola columna en móvil */
+    }
+    
+    .kpi-grid {
+        grid-template-columns: 1fr; /* KPIs uno debajo de otro en móvil muy pequeño */
+    }
+}
+
+/* --- IMPRESIÓN --- */
+@media print {
+    .dashboard-container { background: white; padding: 0; }
+    .btn-dash { display: none; }
+    .chart-card, .project-card, .kpi-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        break-inside: avoid;
+    }
+}
