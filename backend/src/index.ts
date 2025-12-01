@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import session from "express-session"; // <--- Necesario para Passport
-import passport from "passport";       // <--- Necesario para Passport
+import passport from "passport";       // <--- Necesario para Passport
 import path from "path";
 import { fileURLToPath } from 'url';
 
@@ -28,14 +28,16 @@ import roleRoutes from "./routes/roles.routes.js";
 
 // Rutas de Autenticación Social (Del MAIN)
 import authGoogleRoutes from "./routes/googleauth.routes.js"; 
-import githubAuthRoutes from "./routes/githubaunth.js";       
+import githubAuthRoutes from "./routes/githubaunth.js";       
 
 // Rutas de IA (TUYAS)
 import proyectosiaRoutes from "./routes/proyectosia.routes.js";
 
-
-//para proyecto con ia
+// para proyecto con ia
 import proyecto_principal_routes from "./routes/proyectoPrincipal.routes.js";
+
+// ---> [NUEVO] Importar rutas del Dashboard <---
+import dashboardRoutes from "./routes/dashboard.routes.js"; 
 
 const app = express();
 
@@ -44,8 +46,8 @@ const app = express();
 // ==========================================
 // CORS: Es vital dejarlo al principio para que el Frontend no falle
 app.use(cors({
-    origin: 'http://localhost:5173', // Ajusta si es necesario
-    credentials: true
+    origin: 'http://localhost:5173', // Ajusta si es necesario
+    credentials: true
 }));
 
 app.use(express.json());
@@ -53,12 +55,12 @@ app.use('/uploads', express.static('uploads'));
 
 // Configuración de Sesión (Requerida por Passport - Del MAIN)
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "mi_super_secreto_123", // Mejor usar .env
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false }, // Poner true si usas HTTPS en producción
-  })
+  session({
+    secret: process.env.SESSION_SECRET || "mi_super_secreto_123", // Mejor usar .env
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }, // Poner true si usas HTTPS en producción
+  })
 );
 
 // Inicializar Passport (Del MAIN)
@@ -80,13 +82,21 @@ app.use("/api/usuarios", userRoutes);
 app.use("/api/roles", roleRoutes);
 
 // 3. Rutas funcionales (Montadas en /api)
+// NOTA: 'proyectosRoutes' ya incluye '/proyectos' o '/mis-proyectos' internamente, así que se monta en /api
 app.use("/api", proyectosRoutes); 
-app.use("/api", tareasRoutes);    
+app.use("/api", tareasRoutes);    
 app.use("/api", notificacionesRoutes);
 app.use("/api", chatRoutes);
-app.use("/api", documentosRoutes);
 
-//para proyecto con ia
+// CORRECCIÓN IMPORTANTE: Montar documentos en /api/documentos explícitamente
+// Antes lo tenías en /api, lo que causaba conflicto con /api/usuario/:id de proyectos o usuarios
+app.use("/api/documentos", documentosRoutes);
+
+// ---> [NUEVO] Conectar la ruta del Dashboard <---
+// Esto habilita http://localhost:3000/api/dashboard/stats/:id
+app.use("/api/dashboard", dashboardRoutes);
+
+// para proyecto con ia
 app.use("/api/proyecto-principal", proyecto_principal_routes);
 
 
@@ -96,10 +106,10 @@ app.use("/api/proyectos-ia", proyectosiaRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
-  res.send("🚀 Backend funcionando y DB conectada");
+  res.send("🚀 Backend funcionando y DB conectada");
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🔥 Servidor escuchando en puerto ${PORT}`);
+  console.log(`🔥 Servidor escuchando en puerto ${PORT}`);
 });
