@@ -18,14 +18,8 @@ const Sidebar: React.FC = () => {
   // 2. Agregamos "Mis Documentos" al array de opciones
   const opciones: OpcionMenu[] = [
     { nombre: 'Inicio', ruta: '/inicio', icon: Home },
-    { nombre: 'Dashboard Proyectos', ruta: '/dashboard-proyecto', icon: Users },
-    //{ nombre: 'Cascada', ruta: '/cascada', icon: FolderKanban },
-    //{ nombre: 'Kanvan', ruta: '/kanvan', icon: FolderKanban },
-    //{ nombre: 'Scrum', ruta: '/scrum', icon: FolderKanban },
-    //{ nombre: 'XP', ruta: '/xp', icon: FolderKanban },
-    { nombre: 'Proyectos', ruta: '/mis-proyectos', icon: FolderKanban },
+    { nombre: 'Proyectos', ruta: '/dashboard-proyecto', icon: LayoutDashboard},
     { nombre: 'Mis Documentos', ruta: '/mis-documentos', icon: FileText }, // <-- NUEVA OPCIÓN
-    { nombre: 'Gestión de Usuarios', ruta: '/proyecto-principal', icon: Users },
     { nombre: 'Dashboard', ruta: '/dashboard', icon: LayoutDashboard }
   ];
 
