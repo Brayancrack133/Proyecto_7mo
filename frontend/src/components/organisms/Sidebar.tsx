@@ -16,7 +16,6 @@ const Sidebar: React.FC = () => {
 
   const opciones: OpcionMenu[] = [
     { nombre: 'Inicio', ruta: '/inicio', icon: Home },
-    { nombre: 'Proyectos', ruta: '/proyecto-vacio', icon: FolderKanban },
     { nombre: 'Dashboard Proyectos', ruta: '/dashboard-proyecto', icon: Users },
     //{ nombre: 'Cascada', ruta: '/cascada', icon: FolderKanban },
     //{ nombre: 'Kanvan', ruta: '/kanvan', icon: FolderKanban },
