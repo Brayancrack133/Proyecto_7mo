@@ -20,6 +20,9 @@ import XP from "./pages/Metodologias/metXP";
 import Proyecto_vacio from "./components/templates/Proyecto_vacio/Proyecto_vacio";
 import ContPlanificacion from "./components/templates/ContPlanificacion";
 import Dashboard_Proyecto from "./pages/gestion_proyectos/ProjectManagementPage";
+import MisDocumentos from './components/organisms/MisDocumentos';
+import Dashboard from "./components/organisms/Dashboard";
+
 // =======================================================
 // COMPONENTE AUXILIAR (DEBE IR ANTES DE USARLO)
 // =======================================================
@@ -204,6 +207,24 @@ function App() {
                 </Contenido>
               }
             />
+            {/* ---> ESTA ES LA RUTA NUEVA QUE FALTABA <--- */}
+            <Route
+              path="/mis-documentos"
+              element={
+                <Contenido>
+                  <MisDocumentos />
+                </Contenido>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <Contenido>
+                  <Dashboard />
+                </Contenido>
+              }
+            />
+           
 
           </Routes>
         </Router>

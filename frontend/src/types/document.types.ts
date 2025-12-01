@@ -11,6 +11,7 @@ export interface Document {
   uploadedBy: string; // Nombre del responsable
   uploadedAt: string; // Fecha y hora de subida
   downloadCount: number;
+  
 }
 
 // Define la estructura para un Repositorio Externo (GIT)

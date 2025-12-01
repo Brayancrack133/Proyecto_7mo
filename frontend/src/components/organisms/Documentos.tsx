@@ -35,25 +35,43 @@ const Documentos: React.FC<Props> = ({ idProyecto, esLider }) => {
     // Función para subir
     const handleSubir = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!archivo || !usuario) return;
+
+        if (!archivo) {
+            alert("Selecciona un archivo");
+            return;
+        }
+
+        if (!usuario?.id) {
+            alert("Usuario no válido");
+            return;
+        }
+
+        if (!idProyecto) {
+            alert("Proyecto no válido");
+            return;
+        }
 
         const formData = new FormData();
         formData.append("archivo", archivo);
-        formData.append("id_proyecto", idProyecto!);
+        formData.append("id_proyecto", idProyecto); // ← YA NO lleva !
         formData.append("id_usuario", usuario.id.toString());
         formData.append("comentario", descripcion);
 
-        fetch('http://localhost:3000/api/documentos/general', { method: 'POST', body: formData })
+        fetch('http://localhost:3000/api/documentos/general', {
+            method: 'POST',
+            body: formData
+        })
             .then(res => {
                 if (res.ok) {
                     alert("✅ Documento compartido");
                     setMostrarModal(false);
                     setArchivo(null);
                     setDescripcion("");
-                    cargarDocs(); // Recargar la lista
+                    cargarDocs();
                 }
             });
     };
+
 
     // Función para borrar
     const handleBorrar = (idDoc: number) => {
