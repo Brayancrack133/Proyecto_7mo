@@ -34,7 +34,7 @@ const Notificaciones: React.FC<Props> = ({ alClickEnTarea, idProyecto }) => {
     useEffect(() => {
         if (usuario && idProyecto) {
             // 3. USAMOS LA NUEVA URL CON DOBLE FILTRO
-            fetch(`http://localhost:3000/api/notificaciones/usuario/${usuario.id_usuario}/proyecto/${idProyecto}`)
+            fetch(`http://localhost:3000/api/notificaciones/usuario/${usuario.id}/proyecto/${idProyecto}`)
                 .then(res => res.json())
                 .then(data => setNotificaciones(data))
                 .catch(err => console.error(err));

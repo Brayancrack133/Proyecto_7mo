@@ -40,7 +40,7 @@ const ModalAvance: React.FC<Props> = ({ idTarea, esLider, onClose }) => {
         const formData = new FormData();
         formData.append("archivo", archivo);
         formData.append("id_tarea", idTarea.toString());
-        formData.append("id_usuario", usuario.id_usuario.toString());
+        formData.append("id_usuario", usuario.id.toString());
         formData.append("comentario", comentario);
 
         fetch('http://localhost:3000/api/tareas/subir-avance', { method: 'POST', body: formData })
@@ -59,7 +59,7 @@ const ModalAvance: React.FC<Props> = ({ idTarea, esLider, onClose }) => {
 
     if (!tareaInfo) return null; // Cargando...
 
-    const soyResponsable = usuario?.id_usuario === tareaInfo.id_responsable;
+    const soyResponsable = usuario?.id === tareaInfo.id_responsable;
     const hayArchivos = documentosAdjuntos.length > 0;
 
     return (
@@ -93,8 +93,8 @@ const ModalAvance: React.FC<Props> = ({ idTarea, esLider, onClose }) => {
                 {soyResponsable ? (
                     <form onSubmit={handleSubirAvance}>
                          <h4 style={{ fontSize: '14px', marginBottom: '10px', color: '#333' }}>📤 Subir Nuevo Avance:</h4>
-                        <input type="file" onChange={(e) => e.target.files && setArchivo(e.target.files[0])} />
-                        <textarea placeholder="Comentario..." value={comentario} onChange={(e) => setComentario(e.target.value)} style={{ width: '100%', marginTop: '10px', padding: '8px', border: '1px solid #ccc' }} />
+                        <input className='shet' type="file" onChange={(e) => e.target.files && setArchivo(e.target.files[0])} />
+                        <textarea className='shet' placeholder="Comentario..." value={comentario} onChange={(e) => setComentario(e.target.value)} style={{ width: '100%', marginTop: '10px', padding: '8px', border: '1px solid #ccc' }} />
                         <div className="modal-actions" style={{ marginTop: '15px' }}>
                             <button type="button" className="btn-cancelar" onClick={onClose}>Cerrar</button>
                             {archivo && <button type="submit" className="btn-guardar">Enviar</button>}

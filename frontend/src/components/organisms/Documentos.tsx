@@ -40,7 +40,7 @@ const Documentos: React.FC<Props> = ({ idProyecto, esLider }) => {
         const formData = new FormData();
         formData.append("archivo", archivo);
         formData.append("id_proyecto", idProyecto!);
-        formData.append("id_usuario", usuario.id_usuario.toString());
+        formData.append("id_usuario", usuario.id.toString());
         formData.append("comentario", descripcion);
 
         fetch('http://localhost:3000/api/documentos/general', { method: 'POST', body: formData })
@@ -108,10 +108,10 @@ const Documentos: React.FC<Props> = ({ idProyecto, esLider }) => {
                         <h3>Subir Recurso Oficial</h3>
                         <form onSubmit={handleSubir}>
                             <label>Archivo:</label>
-                            <input type="file" required onChange={e => e.target.files && setArchivo(e.target.files[0])} />
+                            <input className='shet' type="file" required onChange={e => e.target.files && setArchivo(e.target.files[0])} />
 
                             <label>Descripción:</label>
-                            <textarea
+                            <textarea className='shet'
                                 placeholder="Ej: Manual de Usuario v1.0"
                                 value={descripcion}
                                 onChange={e => setDescripcion(e.target.value)}

@@ -24,7 +24,7 @@ export default function Header({ u }: HeaderProps) {
         
 
         <nav className="nav-links">
-          <Link to="/">Inicio</Link>
+          
           <Link to="/proyectos">Mis Proyectos</Link>
           <Link to="/repositorio">Repositorio</Link>
         </nav>

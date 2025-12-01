@@ -35,7 +35,7 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
                 .then(res => res.json())
                 .then(data => setMiembros(data));
 
-            fetch(`http://localhost:3000/api/proyecto/${idProyecto}/usuario/${usuario.id_usuario}`)
+            fetch(`http://localhost:3000/api/proyecto/${idProyecto}/usuario/${usuario.id}`)
                 .then(res => res.json())
                 .then(data => setInfoProyecto(data));
         }
@@ -53,7 +53,7 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
         if (chatActivo === 'GENERAL') {
             url = `http://localhost:3000/api/chat/${idProyecto}/general`;
         } else {
-            url = `http://localhost:3000/api/chat/${idProyecto}/privado/${usuario.id_usuario}/${chatActivo}`;
+            url = `http://localhost:3000/api/chat/${idProyecto}/privado/${usuario.id}/${chatActivo}`;
         }
         fetch(url)
             .then(res => res.json())
@@ -98,7 +98,7 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
 
         const payload: any = {
             id_proyecto: idProyecto,
-            id_usuario: usuario.id_usuario,
+            id_usuario: usuario.id,
             mensaje: nuevoMensaje
         };
         if (chatActivo !== 'GENERAL') payload.id_destinatario = chatActivo;
@@ -160,7 +160,7 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
 
                         <div className="members-list">
                             {miembros
-                                .filter(m => m.id_usuario !== usuario?.id_usuario)
+                                .filter(m => m.id_usuario !== usuario?.id)
                                 .map(m => (
                                     <div
                                         key={m.id_usuario}
@@ -199,7 +199,7 @@ const ChatInterno: React.FC<Props> = ({ idProyecto }) => {
                             )}
 
                             {mensajes.map(msg => {
-                                const esMio = msg.id_usuario === usuario?.id_usuario;
+                                const esMio = msg.id_usuario === usuario?.id;
                                 return (
                                     <div key={msg.id_mensaje} className={`message-bubble ${esMio ? 'msg-mine' : 'msg-other'}`}>
                                         {!esMio && <span className="msg-sender">{msg.nombre} {msg.apellido}</span>}
