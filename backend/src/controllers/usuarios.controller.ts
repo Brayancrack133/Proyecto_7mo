@@ -32,10 +32,19 @@ export const crearUsuario = async (req: Request, res: Response) => {
 
 
 // Controlador para editar un usuario
+
 export const editarUsuario = async (req: Request, res: Response) => {
   try {
-    // Intentamos actualizar los datos del usuario
-    const actualizado = await usuarioService.editarUsuario(Number(req.params.id), req.body);
+    const id = Number(req.params.id);
+    const data = req.body;
+    
+    // Si se subió un archivo, agregamos la ruta a los datos
+    if (req.file) {
+        // Guardamos la ruta relativa para accederla desde el frontend
+        data.foto = `/uploads/${req.file.filename}`;
+    }
+
+    const actualizado = await usuarioService.editarUsuario(id, data);
     res.json(actualizado);
   } catch (error) {
     console.error("Error editando usuario:", error);
@@ -53,3 +62,4 @@ export const cambiarEstadoUsuario = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error cambiando estado" });
   }
 };
+

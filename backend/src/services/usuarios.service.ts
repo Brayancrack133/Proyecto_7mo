@@ -13,14 +13,17 @@ export const obtenerUsuarios = async () => {
 };
 
 export const buscarUsuarios = async (q: string) => {
-  const [rows] = await db.query(`
+  const [rows] = await db.query(
+    `
     SELECT u.id_usuario AS id, u.nombre, u.apellido, u.correo,
            '******' AS contraseña, u.estado, r.nombre_rol AS rol
     FROM usuarios u
     LEFT JOIN usuario_rol ur ON u.id_usuario = ur.id_usuario
     LEFT JOIN roles r ON ur.id_rol = r.id_rol
     WHERE u.nombre LIKE ? OR u.apellido LIKE ? OR u.correo LIKE ? OR r.nombre_rol LIKE ?
-  `, [`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`]);
+  `,
+    [`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`]
+  );
 
   return rows;
 };
@@ -32,45 +35,68 @@ export const crearUsuario = async (data: any) => {
   const hash = await bcrypt.hash(contraseña, 10);
 
   // Insertamos el usuario en la tabla `usuarios`
-  const [result]: any = await db.query(`
+  const [result]: any = await db.query(
+    `
     INSERT INTO usuarios (nombre, apellido, correo, contraseña, estado, fecha_creacion)
     VALUES (?, ?, ?, ?, 1, NOW()) 
-  `, [nombre, apellido, correo, hash]);
+  `,
+    [nombre, apellido, correo, hash]
+  );
 
   // Insertamos la relación con el rol en la tabla `usuario_rol`
-  await db.query(`
+  await db.query(
+    `
     INSERT INTO usuario_rol (id_usuario, id_rol)
     VALUES (?, ?)
-  `, [result.insertId, id_rol]);
+  `,
+    [result.insertId, id_rol]
+  );
 
   return { id: result.insertId, nombre, apellido, correo, id_rol };
 };
 
 // Función para editar un usuario
+// ... (dentro de usuarios.service.ts)
+
 export const editarUsuario = async (id: number, data: any) => {
-  const { nombre, apellido, correo, id_rol } = data;
+  const { nombre, apellido, correo, id_rol, foto } = data;
 
-  // Actualizamos los detalles del usuario en la tabla `usuarios`
-  await db.query(`
-    UPDATE usuarios SET nombre=?, apellido=?, correo=? WHERE id_usuario=?
-  `, [nombre, apellido, correo, id]);
+  // 1. Actualizar tabla usuarios (incluyendo foto si existe)
+  let query = "UPDATE usuarios SET nombre=?, apellido=?, correo=?";
+  const params = [nombre, apellido, correo];
 
-  // Actualizamos el rol del usuario en la tabla `usuario_rol`
-  await db.query(`
-    UPDATE usuario_rol SET id_rol=? WHERE id_usuario=?
-  `, [id_rol, id]);
+  if (foto) {
+    query += ", foto=?";
+    params.push(foto);
+  }
 
-  return { id, nombre, apellido, correo, id_rol };
+  query += " WHERE id_usuario=?";
+  params.push(id);
+
+  await db.query(query, params);
+
+  // 2. Actualizar rol (solo si viene id_rol, por seguridad)
+  if (id_rol) {
+    await db.query(`UPDATE usuario_rol SET id_rol=? WHERE id_usuario=?`, [
+      id_rol,
+      id,
+    ]);
+  }
+
+  // Devolvemos el objeto completo para actualizar el contexto en el frontend
+  return { id, nombre, apellido, correo, id_rol, foto };
 };
-
 
 // Función para cambiar el estado de un usuario
 export const cambiarEstadoUsuario = async (id: number) => {
-  await db.query(`
+  await db.query(
+    `
     UPDATE usuarios
-    SET estado = IF(estado='Habilitado','Deshabilitado','Habilitado')
-    WHERE id_usuario=?
-  `, [id]);
+    SET estado = NOT estado
+    WHERE id_usuario = ?
+  `,
+    [id]
+  );
 
-  return { id };
+  return { id, mensaje: "Estado actualizado" };
 };
