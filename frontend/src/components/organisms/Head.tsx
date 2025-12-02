@@ -38,7 +38,7 @@ const Header = () => {
 
   const avatarSrc = usuario?.foto
     ? `http://localhost:3000${usuario.foto}` 
-    : "/avatar.png";
+    : "/Images/User.png";
 
   return (
     <>

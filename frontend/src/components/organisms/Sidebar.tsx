@@ -17,7 +17,7 @@ const Sidebar: React.FC = () => {
 
   // 2. Agregamos "Mis Documentos" al array de opciones
   const opciones: OpcionMenu[] = [
-    { nombre: 'Inicio', ruta: '/', icon: Home },
+    { nombre: 'Inicio', ruta: '/inicio', icon: Home },
     { nombre: 'Proyectos', ruta: '/dashboard-proyecto', icon: LayoutDashboard},
     { nombre: 'Mis Documentos', ruta: '/mis-documentos', icon: FileText }, // <-- NUEVA OPCIÓN
     { nombre: 'Dashboard', ruta: '/dashboard', icon: LayoutDashboard }
