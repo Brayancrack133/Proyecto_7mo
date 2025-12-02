@@ -61,21 +61,31 @@ export const crearUsuario = async (data: any) => {
 export const editarUsuario = async (id: number, data: any) => {
   const { nombre, apellido, correo, id_rol, foto } = data;
 
-  // 1. Actualizar tabla usuarios (incluyendo foto si existe)
-  let query = "UPDATE usuarios SET nombre=?, apellido=?, correo=?";
-  const params = [nombre, apellido, correo];
-
-  if (foto) {
-    query += ", foto=?";
-    params.push(foto);
+  // VALIDACIÓN DE SEGURIDAD:
+  // Si los datos llegan vacíos, no ejecutamos la actualización para evitar corromper el usuario.
+  if (!nombre && !apellido && !correo && !foto) {
+     throw new Error("No se enviaron datos para actualizar");
   }
 
-  query += " WHERE id_usuario=?";
-  params.push(id);
+  // Construcción dinámica de la consulta para solo actualizar lo que se envía
+  let campos = [];
+  let params = [];
 
-  await db.query(query, params);
+  if (nombre) { campos.push("nombre=?"); params.push(nombre); }
+  if (apellido) { campos.push("apellido=?"); params.push(apellido); }
+  if (correo) { campos.push("correo=?"); params.push(correo); }
+  if (foto) { campos.push("foto=?"); params.push(foto); }
 
-  // 2. Actualizar rol (solo si viene id_rol, por seguridad)
+  // Si no hay nada que actualizar, salimos
+  if (campos.length === 0 && !id_rol) return;
+
+  if (campos.length > 0) {
+    const query = `UPDATE usuarios SET ${campos.join(", ")} WHERE id_usuario=?`;
+    params.push(id);
+    await db.query(query, params);
+  }
+
+  // 2. Actualizar rol (solo si viene id_rol)
   if (id_rol) {
     await db.query(`UPDATE usuario_rol SET id_rol=? WHERE id_usuario=?`, [
       id_rol,
@@ -83,10 +93,9 @@ export const editarUsuario = async (id: number, data: any) => {
     ]);
   }
 
-  // Devolvemos el objeto completo para actualizar el contexto en el frontend
+  // Devolvemos los datos combinados para el frontend
   return { id, nombre, apellido, correo, id_rol, foto };
 };
-
 // Función para cambiar el estado de un usuario
 export const cambiarEstadoUsuario = async (id: number) => {
   await db.query(
