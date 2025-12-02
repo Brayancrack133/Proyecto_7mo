@@ -17,9 +17,7 @@ export default function Header({ u }: HeaderProps) {
   const userPhoto =
     u?.foto && u.foto !== "" ? u.foto : "/Images/User.png";
 
-  const logout = () => {
-    window.location.href = "http://localhost:3000/api/auth/logout";
-  };
+
 
   return (
     <header className="header">
@@ -39,9 +37,10 @@ export default function Header({ u }: HeaderProps) {
           <img src={userPhoto} className="user-photo" alt="Usuario" />
 
           {open && (
-            <div className="dropdown">
-              <button onClick={logout}>Cerrar sesión</button>
-            </div>
+           <div className="dropdown">
+  <a href="/login" className="logout-btn">Cerrar sesión</a>
+</div>
+
           )}
         </div>
       </div>
