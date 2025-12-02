@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import "./Header.css";
 
 interface UserData {
@@ -12,22 +12,19 @@ interface HeaderProps {
 }
 
 export default function Header({ u }: HeaderProps) {
+  const [open, setOpen] = useState(false);
+
   const userPhoto =
-    u?.foto && u.foto !== ""
-      ? u.foto
-      : "/Images/User.png";
+    u?.foto && u.foto !== "" ? u.foto : "/Images/User.png";
+
+  const logout = () => {
+    window.location.href = "http://localhost:3000/api/auth/logout";
+  };
 
   return (
     <header className="header">
       <div className="header-left">
-        <div className="loguito"><img  className="logoF" src="/Images/LogoF.png" alt="" /></div>
-        
-
-        <nav className="nav-links">
-          
-          <Link to="/proyectos">Mis Proyectos</Link>
-          <Link to="/repositorio">Repositorio</Link>
-        </nav>
+        <img className="logoF" src="/Images/LogoF.png" alt="Logo" />
       </div>
 
       <div className="header-right">
@@ -35,11 +32,18 @@ export default function Header({ u }: HeaderProps) {
           {u ? `${u.nombre} ${u.apellido}` : "Mi cuenta"}
         </span>
 
-        <img
-          src={userPhoto}
-          alt="Foto usuario"
-          className="user-photo"
-        />
+        <div
+          className="user-menu"
+          onClick={() => setOpen(!open)}
+        >
+          <img src={userPhoto} className="user-photo" alt="Usuario" />
+
+          {open && (
+            <div className="dropdown">
+              <button onClick={logout}>Cerrar sesión</button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

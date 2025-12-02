@@ -68,9 +68,9 @@ export const editarUsuario = async (id: number, data: any) => {
 export const cambiarEstadoUsuario = async (id: number) => {
   await db.query(`
     UPDATE usuarios
-    SET estado = IF(estado='Habilitado','Deshabilitado','Habilitado')
-    WHERE id_usuario=?
+    SET estado = NOT estado
+    WHERE id_usuario = ?
   `, [id]);
 
-  return { id };
+  return { id, mensaje: "Estado actualizado" };
 };
