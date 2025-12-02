@@ -18,7 +18,7 @@ router.get(
   }),
   (req, res) => {
     // Aquí ya está logueado
-    res.redirect("http://localhost:5173/proyecto-principal"); 
+    res.redirect("http://localhost:5173/inicio"); 
   }
 );
 

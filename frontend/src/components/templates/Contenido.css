@@ -35,6 +35,23 @@
     padding: 30px;
     background: linear-gradient(180deg, #092046, #0b2c63);
     display: flex;
-    justify-content: flex-start;  /* puedes usar center si quieres centrar */
+    justify-content: flex-start;
+    /* puedes usar center si quieres centrar */
     align-items: flex-start;
+
+
+    
+    /* Ocupa toda la altura */
+    overflow-y: scroll;
+    /* Fuerza que este div tenga el scroll */
+
+    /* Ocultar barra Firefox */
+    scrollbar-width: none;
+
+    /* Ocultar barra IE/Edge */
+    -ms-overflow-style: none;
+}
+
+.contenido-principal::-webkit-scrollbar {
+    display: none;
 }

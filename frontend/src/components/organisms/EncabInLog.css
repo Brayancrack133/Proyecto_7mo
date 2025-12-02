@@ -1,0 +1,140 @@
+/* --- CONTENEDOR PRINCIPAL --- */
+.inlog1 {
+    display: flex;
+    /* Quitamos height fijo para que crezca si el texto es largo */
+    min-height: 450px; 
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    /* Mantenemos el borde redondeado inferior que te gustaba */
+    border-radius:  50px 50px 0px 0px; 
+    border-bottom: 1px solid #1e293b; /* Borde sutil oscuro */
+    /* Fondo oscuro acorde a tu Dashboard */
+    background: #0f172a; 
+    padding: 40px;
+    gap: 20px;
+    flex-wrap: wrap; /* Importante para móviles */
+}
+
+/* --- COLUMNA IZQUIERDA (TEXTO) --- */
+.inlog2 {
+    display: flex;
+    flex: 1; /* Ocupa el espacio disponible */
+    min-width: 300px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* --- ETIQUETA SUPERIOR (Badge) --- */
+.inlog3 {
+    display: flex;
+    /* Quitamos ancho fijo, se adapta al texto */
+    width: fit-content; 
+    padding: 10px 25px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    /* Fondo blanco semitransparente o sólido según prefieras */
+    background: rgba(255, 255, 255, 0.1); 
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.inlog4 {
+    color: #ffffff; /* Texto blanco */
+    text-align: center;
+    font-family: Raleway, sans-serif;
+    font-size: 18px; /* Ajustado para que no sea gigante */
+    font-weight: 800;
+    margin: 0;
+    line-height: normal;
+}
+
+/* --- TÍTULOS --- */
+.inlog5 {
+    width: 100%; /* Ancho completo del contenedor padre */
+    margin: 0;
+}
+
+.inlog6 {
+    color: #FD661F; /* Tu naranja original */
+    font-family: Raleway, sans-serif;
+    font-size: 36px; /* Tamaño original */
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.inlog7 {
+    color: #ffffff; /* Blanco para contrastar con el fondo oscuro */
+    font-family: Raleway, sans-serif;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* --- ETIQUETA INFERIOR (Subtítulo destacado) --- */
+.inlog8 {
+    display: flex;
+    width: fit-content; /* Se adapta al contenido */
+    padding: 10px 30px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    background: #FD661F; /* Fondo Naranja */
+}
+
+.inlog9 {
+    color: #FFF;
+    text-align: center;
+    font-family: Raleway, sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+}
+
+/* --- COLUMNA DERECHA (IMAGEN) --- */
+.inlog10 {
+    display: flex;
+    flex: 1; /* Ocupa el resto del espacio */
+    min-width: 300px; /* Tamaño mínimo para no desaparecer */
+    justify-content: center;
+    align-items: center;
+    /* Quitamos bordes y fondos extraños de la imagen */
+}
+
+.imgnpa {
+    width: 100%;
+    max-width: 450px; /* Limitamos el tamaño máximo */
+    height: auto; /* Altura automática para no deformar */
+    object-fit: contain;
+    /* Animación opcional de flotación para darle vida */
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .inlog1 {
+        flex-direction: column-reverse; /* Imagen arriba, texto abajo en móvil */
+        height: auto;
+        padding: 30px 15px;
+        text-align: center; /* Centrar textos en móvil */
+    }
+
+    .inlog2 {
+        align-items: center; /* Centrar elementos */
+        width: 100%;
+    }
+
+    .inlog6, .inlog7 {
+        font-size: 28px; /* Texto un poco más pequeño en móvil */
+    }
+}

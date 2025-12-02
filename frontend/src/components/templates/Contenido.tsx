@@ -13,6 +13,7 @@ const Contenido: React.FC<ContenidoProps> = ({ children }) => {
   return (
     <div className="inicio-page" style={{ position: 'relative', minHeight: '100vh' }}>
       <Header u={null} />
+
       <div className="contnt">
         <Sidebar />
 

@@ -19,7 +19,7 @@ const pool = mysql.createPool({
     
     // 🔥 SSL OBLIGATORIO PARA TIDB (Esto viene de tu rama)
     ssl: {
-      rejectUnauthorized: true,
+      rejectUnauthorized: false,
       minVersion: 'TLSv1.2'
     },
     

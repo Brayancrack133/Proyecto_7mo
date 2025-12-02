@@ -104,8 +104,17 @@ export default function GestUserPage() {
   };
 
   const toggleEstado = async (id: number) => {
-    await cambiarEstadoUsuario(id);
-    cargarUsuarios();
+    try {
+      if (!id && id !== 0) {
+        console.warn("toggleEstado: id inválido", id);
+        return;
+      }
+      await cambiarEstadoUsuario(id);
+      await cargarUsuarios();
+    } catch (err) {
+      console.error("Error cambiando estado:", err);
+      alert("Error al cambiar estado del usuario. Revisa consola.");
+    }
   };
 
   // ------------------ CRUD ROLES ------------------
@@ -145,7 +154,7 @@ export default function GestUserPage() {
        
       <div className="dashboard-header">
         <h1>Gestión de Usuarios</h1>
-<div>
+
         <button className="btn agregar" onClick={abrirAgregarUsuario}>
           <FaPlus /> Agregar Usuario
         </button>
@@ -153,7 +162,7 @@ export default function GestUserPage() {
         <button className="btn agregar" onClick={abrirAgregarRol}>
           <FaPlus /> Agregar Rol
         </button>
-      </div>
+      
 </div>
       <SearchBar value={busqueda} onChange={setBusqueda} />
 

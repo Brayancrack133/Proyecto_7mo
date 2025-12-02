@@ -1,12 +1,13 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// 1. INTERFAZ CORREGIDA (Coincide con tu LocalStorage real)
+// 1. Interfaz de Usuario
 export interface User {
-    id: number;        // <-- CAMBIO CRÍTICO: Antes era 'id_usuario'
+    id: number;
     nombre: string;
     apellido: string;
-    correo: string;    // <-- CAMBIO: Antes era 'email'
+    correo: string;
     rol?: string;
+    foto?: string;
 }
 
 interface UserContextType {
@@ -19,23 +20,21 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [usuario, setUsuario] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const usuarioGuardado = localStorage.getItem("usuario");
-        if (usuarioGuardado) {
-            try {
-                const parsedUser = JSON.parse(usuarioGuardado);
-                console.log("✅ Sesión recuperada:", parsedUser);
-                setUsuario(parsedUser);
-            } catch (error) {
-                console.error("Error leyendo usuario:", error);
-                localStorage.removeItem("usuario");
-            }
+    // 🚀 CAMBIO CLAVE: Leemos el localStorage DIRECTAMENTE al iniciar el estado.
+    // Esto evita el parpadeo de "Cargando..." porque los datos ya están ahí al primer render.
+    const [usuario, setUsuario] = useState<User | null>(() => {
+        try {
+            const usuarioGuardado = localStorage.getItem("usuario");
+            return usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
+        } catch (error) {
+            console.error("Error leyendo usuario del almacenamiento:", error);
+            return null;
         }
-        setIsLoading(false);
-    }, []);
+    });
+
+    // Ya no necesitamos un useEffect para cargar datos, ni el estado de loading inicial
+    // (a menos que quieras validar el token con el backend, pero para mostrar datos locales esto basta)
+    const [isLoading, setIsLoading] = useState(false); 
 
     const login = (userData: User) => {
         setUsuario(userData);
