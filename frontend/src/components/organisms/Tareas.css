@@ -67,3 +67,72 @@
     border-radius: 5px;
     cursor: pointer;
 }
+
+/* ========================================= */
+/* 👇 LOADER DE IA PROFESIONAL (NUEVO)       */
+/* ========================================= */
+.ai-loader-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(15, 23, 42, 0.85); /* Fondo oscuro elegante */
+    backdrop-filter: blur(8px); /* Desenfoque moderno */
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    animation: fadeInLoader 0.3s ease-out;
+}
+
+.ai-loader-content {
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.ai-loader-title {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.ai-loader-subtitle {
+    color: #94a3b8; /* Gris azulado suave */
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+/* BARRA DE PROGRESO */
+.ai-progress-track {
+    width: 100%;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.ai-progress-bar {
+    position: absolute;
+    height: 100%;
+    width: 30%;
+    /* TU GRADIENTE PERSONALIZADO (Azul -> Violeta) */
+    background: linear-gradient(90deg, #2563eb, #9e1eafff); 
+    border-radius: 4px;
+    animation: indeterminateProgress 1.5s infinite ease-in-out;
+    box-shadow: 0 0 10px rgba(158, 30, 175, 0.5); /* Resplandor */
+}
+
+@keyframes indeterminateProgress {
+    0% { left: -30%; width: 30%; }
+    50% { left: 25%; width: 50%; }
+    100% { left: 100%; width: 30%; }
+}
+
+@keyframes fadeInLoader {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

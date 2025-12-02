@@ -65,3 +65,55 @@ export const generarDetallesProyecto = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error al generar con IA", details: error.message });
   }
 };
+export const desglosarTareaIA = async (req: Request, res: Response) => {
+  try {
+    const { titulo_tarea, descripcion_tarea } = req.body;
+
+    if (!process.env.GOOGLE_API_KEY) {
+        throw new Error("Falta la GOOGLE_API_KEY en el archivo .env");
+    }
+
+    if (!titulo_tarea) {
+        res.status(400).json({ error: "Se requiere el título de la tarea." });
+        return;
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // Usamos Flash por velocidad
+
+    // 🎯 PROMPT ESPECIALIZADO: Task Breaker
+    const prompt = `
+      Actúa como un Tech Lead Senior. Tienes una tarea compleja: "${titulo_tarea}".
+      Contexto adicional: "${descripcion_tarea || 'Sin descripción'}".
+      
+      OBJETIVO:
+      Divide esta tarea en 3 a 5 subtareas técnicas concretas y accionables para un desarrollador.
+      
+      FORMATO DE RESPUESTA (JSON ESTRICTO):
+      Responde ÚNICAMENTE con un JSON válido con esta estructura exacta, sin markdown, sin explicaciones extra:
+      {
+        "subtareas": [
+          { "titulo": "Acción breve (Verb + Obj)", "descripcion": "Detalle técnico corto" },
+          { "titulo": "...", "descripcion": "..." }
+        ]
+      }
+    `;
+
+    console.log("🪄 [Task Breaker] Consultando a Gemini...");
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
+
+    // Limpieza de Markdown (por si Gemini se pone creativo)
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+
+    const jsonRespuesta = JSON.parse(text);
+    
+    console.log("✅ [Task Breaker] Desglose generado:", jsonRespuesta.subtareas.length, "items.");
+    res.json(jsonRespuesta);
+
+  } catch (error: any) {
+    console.error("❌ Error Task Breaker:", error.message);
+    res.status(500).json({ error: "Error al desglosar tarea", details: error.message });
+  }
+};

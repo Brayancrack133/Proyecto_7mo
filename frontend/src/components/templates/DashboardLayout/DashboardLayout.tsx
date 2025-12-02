@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '../../organisms/Header/Header';
 import { Sidebar } from './Sidebar/Sidebar';
 import { Outlet } from 'react-router-dom';
+import ChatFlotante from '../../organisms/ChatFlotante';
 
 export const DashboardLayout: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ export const DashboardLayout: React.FC = () => {
           <Outlet />   {/* 👈 AQUI se renderizan tus páginas */}
         </main>
       </div>
+      <ChatFlotante />
     </div>
   );
 };

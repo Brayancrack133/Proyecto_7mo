@@ -1,0 +1,222 @@
+/* FONDO Y CONTENEDOR */
+.modal-overlay-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(15, 23, 42, 0.7); /* Un poco más oscuro para enfoque */
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-smart-container {
+    background: #ffffff;
+    width: 95%;
+    max-width: 600px; /* Un poco más ancho para que respire */
+    border-radius: 16px; /* Bordes más suaves */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ========================================= */
+/* CABECERA CON ESTILO (TU PEDIDO)           */
+/* ========================================= */
+.modal-header {
+    padding: 24px 32px 16px 32px; /* Más espacio */
+    background-color: #fff;       /* Fondo blanco limpio */
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 22px; /* Título más grande */
+    font-weight: 700;
+    color: #0f172a;  /* Color oscuro casi negro */
+    letter-spacing: -0.5px;
+    
+    /* 👇 LA LÍNEA MÁGICA DEBAJO DEL TÍTULO */
+    position: relative;
+    padding-bottom: 12px; 
+    margin-bottom: 12px;
+}
+
+/* Pseudo-elemento para la línea de color */
+.modal-header h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px; /* No ocupa todo el ancho, solo un detalle elegante */
+    height: 4px;
+    border-radius: 2px;
+    /* Usamos tu gradiente para identidad de marca */
+    background: linear-gradient(90deg, #2563eb, #9e1eaf); 
+}
+
+.header-subtitle {
+    margin: 0;
+    font-size: 15px;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+/* ========================================= */
+/* LISTA DE TAREAS                           */
+/* ========================================= */
+.checklist-container {
+    padding: 10px 32px 24px 32px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    /* Scrollbar sutil */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+/* ITEM INDIVIDUAL */
+.checklist-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+.checklist-item:hover {
+    border-color: #9e1eaf; /* Hover violeta sutil */
+    background-color: #fafbfc;
+    transform: translateX(2px); /* Pequeño movimiento a la derecha */
+}
+
+.checklist-item.selected {
+    background-color: #fdf4ff; /* Fondo violeta muy suave */
+    border-color: #d8b4fe;     /* Borde violeta claro */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* CHECKBOX PERSONALIZADO */
+.custom-checkbox {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    margin-right: 16px;
+    margin-top: 2px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: white;
+}
+
+.checklist-item.selected .custom-checkbox {
+    background-color: #9e1eaf; /* Checkbox relleno de tu violeta */
+    border-color: #9e1eaf;
+}
+
+.checkmark {
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.checklist-item.selected .checkmark {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* TEXTOS DEL ITEM */
+.item-content {
+    flex: 1;
+}
+
+.item-title {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.item-desc {
+    display: block;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+/* FOOTER */
+.modal-footer {
+    padding: 20px 32px;
+    border-top: 1px solid #f1f5f9;
+    background-color: #fff; /* Footer blanco */
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* BOTONES */
+.btn-secondary {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #475569;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+.btn-primary {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: none;
+    /* TU GRADIENTE */
+    background: linear-gradient(135deg, #2563eb 0%, #9e1eaf 100%);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 10px 15px -3px rgba(158, 30, 175, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #94a3b8; /* Gris si está deshabilitado */
+    box-shadow: none;
+}
+
+/* ANIMACIONES */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

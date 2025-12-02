@@ -1,9 +1,12 @@
 import { Router } from "express";
 import { db } from "../config/db.js";
 import { RowDataPacket, ResultSetHeader } from "mysql2";
-
+import { crearProyecto, listarProyectosDelUsuario } from "../controllers/proyectos.controller.js"; // Ajusta tus imports existentes
 const router = Router();
 
+
+
+router.get("/proyectos", listarProyectosDelUsuario);
 // ==============================================================
 // RUTA 1: Obtener lista de proyectos (Para "Mis Proyectos")
 // ==============================================================

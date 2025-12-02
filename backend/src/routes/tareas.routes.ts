@@ -25,11 +25,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // RUTA GET TAREAS
+// GET: Obtener tareas de un proyecto
 router.get("/tareas/:idProyecto", (req, res) => {
     const { idProyecto } = req.params;
 
-    // --- CORRECCIÓN 2: AGREGUÉ t.id_responsable ---
-    // Si no lo pides aquí, en el frontend llegará undefined y nadie podrá editar nada.
     const query = `
         SELECT 
             t.id_tarea,
@@ -37,12 +36,14 @@ router.get("/tareas/:idProyecto", (req, res) => {
             t.descripcion,
             t.fecha_inicio,
             t.fecha_fin,
-            t.id_responsable, 
+            t.id_responsable,
+            t.id_tarea_padre, /* <--- ¡NUEVO CAMPO! Vital para el árbol */
             u.nombre AS nombre_responsable,
             u.apellido AS apellido_responsable
         FROM Tareas t
         LEFT JOIN Usuarios u ON t.id_responsable = u.id_usuario
         WHERE t.id_proyecto = ?
+        ORDER BY t.id_tarea ASC 
     `;
 
     db.query(query, [idProyecto], (err: any, results: any) => {
@@ -55,34 +56,39 @@ router.get("/tareas/:idProyecto", (req, res) => {
 });
 
 
+// POST: Crear nueva tarea (Manual o IA)
 router.post("/tareas", (req, res) => {
-    const { id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable } = req.body;
+    // 1. Recibimos 'id_tarea_padre' del cuerpo de la petición
+    const { id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable, id_tarea_padre } = req.body;
 
+    // 2. Actualizamos el query para incluir la columna nueva
     const query = `
-        INSERT INTO Tareas (id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO Tareas (id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable, id_tarea_padre)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(query, [id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable], (err:any, result: any) => {
+    // 3. Pasamos los valores (usando '|| null' por si viene undefined)
+    db.query(query, [id_proyecto, titulo, descripcion, fecha_inicio, fecha_fin, id_responsable, id_tarea_padre || null], (err: any, result: any) => {
         if (err) {
+            console.error("Error creando tarea:", err);
             return res.status(500).json({ error: "Error al crear la tarea" });
         }
 
         const idTarea = result.insertId;
 
-        // --- NUEVO: CREAR NOTIFICACIÓN PARA EL RESPONSABLE ---
-        // Tipo 1 = Tarea Asignada
-        const notiQuery = `
+        // Notificación (Tu lógica existente, se mantiene igual)
+        if (id_responsable) {
+            const notiQuery = `
                 INSERT INTO Notificaciones (id_usuario_destino, id_tipo_notificacion, contenido, id_tarea)
                 VALUES (?, 1, ?, ?)
             `;
-        const contenido = `Se te ha asignado una nueva tarea: "${titulo}"`;
-
-        db.query(notiQuery, [id_responsable, contenido, idTarea], (errNoti:any) => {
-            if (errNoti) console.error("Error creando notificación:", errNoti);
-            // Respondemos éxito aunque la notificación falle (no es crítico)
-            res.json({ message: "Tarea creada y notificada", id: idTarea });
-        });
+            const contenido = `Se te ha asignado una nueva tarea: "${titulo}"`;
+            db.query(notiQuery, [id_responsable, contenido, idTarea], (errNoti: any) => {
+                if (errNoti) console.error("Error notificación:", errNoti);
+            });
+        }
+        
+        res.json({ message: "Tarea creada", id: idTarea });
     });
 });
 
@@ -179,6 +185,21 @@ router.get("/tarea/:id", (req, res) => {
     db.query(query, [id], (err:any, result: any) => {
         if (err || result.length === 0) return res.status(404).json({ error: "No encontrada" });
         res.json(result[0]);
+    });
+});
+router.delete("/tareas/:id", (req, res) => {
+    const { id } = req.params;
+    
+    // Gracias al "ON DELETE CASCADE" que configuramos en la BD, 
+    // si borras un padre, se borran sus hijos automáticamente.
+    const query = "DELETE FROM Tareas WHERE id_tarea = ?";
+
+    db.query(query, [id], (err: any, result: any) => {
+        if (err) {
+            console.error("Error eliminando tarea:", err);
+            return res.status(500).json({ error: "Error al eliminar" });
+        }
+        res.json({ message: "Tarea eliminada" });
     });
 });
 

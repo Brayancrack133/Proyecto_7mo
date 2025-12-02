@@ -1,22 +1,19 @@
 import "dotenv/config";
 import express from "express";
-import cors from "cors";
-import session from "express-session"; // <--- Necesario para Passport
-import passport from "passport";       // <--- Necesario para Passport
+// import cors from "cors"; // YA NO NECESITAS LA LIBRERÍA DE CORS
+import session from "express-session"; 
+import passport from "passport";       
 import path from "path";
 import { fileURLToPath } from 'url';
+import riesgosRoutes from "./routes/riesgos.routes.js";
 
-// Cargar variables de entorno
-
-// Inicializar DB (Importar el pool configurado)
-// NOTA: Asegúrate de que en db.ts hayas aceptado TU versión (con SSL/TiDB)
 import { db } from "./config/db.js";
 
 // 1. Configuración de Estrategias de Passport (Del MAIN)
 import "./auth/google.js"; 
 import "./auth/github.js";
 
-// 2. Importar rutas (Combinación de ambas ramas)
+// 2. Importar rutas 
 import authRoutes from "./routes/auth.routes.js";
 import proyectosRoutes from "./routes/proyectos.routes.js";
 import tareasRoutes from "./routes/tareas.routes.js";
@@ -25,82 +22,79 @@ import notificacionesRoutes from "./routes/notificaciones.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import userRoutes from "./routes/usuarios.routes.js";
 import roleRoutes from "./routes/roles.routes.js";
-
-// Rutas de Autenticación Social (Del MAIN)
 import authGoogleRoutes from "./routes/googleauth.routes.js"; 
 import githubAuthRoutes from "./routes/githubaunth.js";       
-
-// Rutas de IA (TUYAS)
 import proyectosiaRoutes from "./routes/proyectosia.routes.js";
-
-// para proyecto con ia
 import proyecto_principal_routes from "./routes/proyectoPrincipal.routes.js";
-
-// ---> [NUEVO] Importar rutas del Dashboard <---
 import dashboardRoutes from "./routes/dashboard.routes.js"; 
+import asistenteRoutes from "./routes/asistente.routes.js"; // TU RUTA DE CHAT
 
 const app = express();
 
 // ==========================================
-// MIDDLEWARES
+// MIDDLEWARES (EL ORDEN ES CRÍTICO AQUÍ)
 // ==========================================
-// CORS: Es vital dejarlo al principio para que el Frontend no falle
-app.use(cors({
-    origin: 'http://localhost:5173', // Ajusta si es necesario
-    credentials: true
-}));
 
+// 👇 1. CORS MANUAL ROBUSTO (Debe ir primero para atrapar OPTIONS)
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    
+    // Manejar la petición OPTIONS (preflight)
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    
+    next();
+});
+
+// 👇 2. BODY PARSER (Debe ir después de CORS para leer JSON)
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
+// Eliminamos la línea duplicada app.use(express.json()); que tenías abajo.
 
-// Configuración de Sesión (Requerida por Passport - Del MAIN)
+// 3. CONFIGURACIÓN DE SESIÓN Y AUTENTICACIÓN (Passport)
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "mi_super_secreto_123", // Mejor usar .env
+    secret: process.env.SESSION_SECRET || "mi_super_secreto_123",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // Poner true si usas HTTPS en producción
+    cookie: { secure: false }, 
   })
 );
-
-// Inicializar Passport (Del MAIN)
 app.use(passport.initialize());
 app.use(passport.session());
 
+// 4. ARCHIVOS ESTÁTICOS (Para subir documentos)
+app.use('/uploads', express.static('uploads'));
+
 
 // ==========================================
-// DEFINICIÓN DE RUTAS
+// DEFINICIÓN DE RUTAS (Debe ir al final)
 // ==========================================
 
-// 1. Rutas de Autenticación
+// Rutas de IA y Riesgos
+app.use("/api/asistente", asistenteRoutes); // 👈 TU CHAT
+app.use("/api/riesgos", riesgosRoutes); // 👈 TU DETECTOR DE RIESGOS
+
+// Rutas de Autenticación
 app.use("/api/auth", authRoutes);
-app.use("/auth", authGoogleRoutes); // <--- Habilita /auth/google
-app.use("/auth", githubAuthRoutes); // <--- Habilita /auth/github
+app.use("/auth", authGoogleRoutes);
+app.use("/auth", githubAuthRoutes);
 
-// 2. Rutas del Sistema Base
+// Rutas del Sistema Base
 app.use("/api/usuarios", userRoutes);
 app.use("/api/roles", roleRoutes);
-
-// 3. Rutas funcionales (Montadas en /api)
-// NOTA: 'proyectosRoutes' ya incluye '/proyectos' o '/mis-proyectos' internamente, así que se monta en /api
 app.use("/api", proyectosRoutes); 
 app.use("/api", tareasRoutes);    
 app.use("/api", notificacionesRoutes);
 app.use("/api", chatRoutes);
 
-// CORRECCIÓN IMPORTANTE: Montar documentos en /api/documentos explícitamente
-// Antes lo tenías en /api, lo que causaba conflicto con /api/usuario/:id de proyectos o usuarios
+// Rutas explícitas
 app.use("/api/documentos", documentosRoutes);
-
-// ---> [NUEVO] Conectar la ruta del Dashboard <---
-// Esto habilita http://localhost:3000/api/dashboard/stats/:id
 app.use("/api/dashboard", dashboardRoutes);
-
-// para proyecto con ia
 app.use("/api/proyecto-principal", proyecto_principal_routes);
-
-
-// 4. Rutas de IA (TUYAS - Con el prefijo correcto que definimos hoy)
 app.use("/api/proyectos-ia", proyectosiaRoutes);
 
 

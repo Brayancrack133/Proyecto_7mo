@@ -1,107 +1,195 @@
 /* ============================================================ */
-/* TUS ESTILOS ORIGINALES (DISEÑO BASE) */
+/* DISEÑO BASE CORREGIDO PARA UNIFORMIDAD */
 /* ============================================================ */
 .tarjeta {
     display: flex;
-    width: 100%;
-    padding: 21px;
     flex-direction: column;
     align-items: flex-start;
+    justify-content: center; /* Centra el contenido verticalmente */
     gap: 10px;
+    
     border-radius: 8px;
     background: #FFF;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     
-    /* AGREGADO: Preparación para la animación */
+    /* 👇 LA SOLUCIÓN MATEMÁTICA */
+    width: 100%;            /* Ocupar todo el ancho disponible */
+    box-sizing: border-box; /* ¡VITAL! Evita que el padding engorde la tarjeta */
+    padding: 16px 20px;     /* Ajustado para balance */
+    min-height: 100px;      /* Altura mínima fija para uniformidad visual */
+    
+    /* Animaciones y Bordes */
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    border-left: 4px solid transparent; /* Borde invisible por defecto para que no brinque */
+    border-left: 4px solid transparent; 
+    border: 1px solid #e2e8f0; /* Borde sutil alrededor para definir mejor el bloque */
+    border-left-width: 4px;    /* El borde izquierdo es más grueso para el estado */
 }
 
+/* PARTE SUPERIOR (Título y Estado) */
 .prirapt {
     display: flex;
-    align-items: flex-start;
+    align-items: center; /* Alineación perfecta centro-centro */
     justify-content: space-between;
     width: 100%;
-    gap: 20px;
+    gap: 15px;
 }
 
 .tittarj {
     flex: 1;
     color: #1E293B;
-    font-family: "Segoe UI";
-    font-size: 18px;
-    font-style: normal;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 16px; 
     font-weight: 600;
     line-height: 1.4;
     margin: 0;
+    
+    /* Manejo de texto largo */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Máximo 2 líneas de título */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .esttarea {
     display: flex;
-    padding: 4px 12px;
+    padding: 4px 10px;
     justify-content: center;
     align-items: center;
-    gap: 10px;
-    border-radius: 9999px;
-    background: #DBEAFE;
+    border-radius: 20px;
+    background: #eff6ff; /* Un azul más suave */
     white-space: nowrap;
+    height: fit-content;
+    border: 1px solid #bfdbfe;
 }
 
 .txtesttar {
-    color: #1D4ED8;
-    font-family: "Segoe UI";
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 16px;
+    color: #1d4ed8;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* PARTE INFERIOR (Asignación y Fechas) */
 .segdapt {
     display: flex;
     align-items: center;
-    gap: 10px;
-    align-self: stretch;
-    margin-top: 5px;
+    gap: 8px;
+    width: 100%;
+    margin-top: auto; /* Empuja esto hacia abajo si sobra espacio */
 }
 
 .imatarj {
     width: 16px;
     height: 16px;
-    flex-shrink: 0;
+    opacity: 0.6;
 }
 
 .tarjtxt {
-    color: #475569;
-    font-family: "Segoe UI";
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 20px;
+    color: #64748b;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
 }
 
 .tercerapt {
     display: flex;
     align-items: center;
     gap: 15px;
-    align-self: stretch;
+    width: 100%;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+    margin-top: 10px;
 }
 
 /* ============================================================ */
-/* NUEVOS ESTILOS DE INTERACCIÓN (La magia del Hover) */
+/* INTERACCIÓN Y ESTADOS */
 /* ============================================================ */
 
-/* CASO A: INTERACTUABLE (Líder o Dueño) */
 .tarjeta-interactuable {
     cursor: pointer;
-    border-left-color: #2563eb; /* Azul corporativo */
+    border-left-color: #2563eb !important; /* Azul obligatorio */
 }
 
 .tarjeta-interactuable:hover {
-    transform: translateY(-4px); /* Se eleva */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1); /* Sombra más profunda */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1; /* Borde gris un poco más oscuro al hover */
 }
 
-/* CASO B: BLOQUEADA (Solo lectura) */
 .tarjeta-bloqueada {
     cursor: default;
-    border-left-color: #cbd5e1; /* Gris suave */
-    background-color: #f8fafc; /* Fondo ligeramente grisáceo para diferenciar */
+    border-left-color: #94a3b8 !important;
+    background-color: #f8fafc;
+    opacity: 0.9;
+}
+/* ... (Tus estilos anteriores de .tarjeta, .prirapt, etc. se quedan igual) ... */
+
+/* ========================================= */
+/* BOTONES DE ACCIÓN PROFESIONALES           */
+/* ========================================= */
+
+.actions-container {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Espacio entre botones */
+}
+
+/* Base para ambos botones */
+.btn-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px; /* Bordes suavemente redondeados (moderno) */
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
+}
+
+/* 1. BOTÓN IA (Magic) */
+.btn-action-ai {
+    /* Tu gradiente personalizado */
+    background: linear-gradient(135deg, #2563eb 0%, #9e1eafff 100%);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    color: white;
+}
+
+.btn-action-ai:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(158, 30, 175, 0.4); /* Resplandor violeta al hover */
+    filter: brightness(1.1);
+}
+
+.btn-action-ai:active {
+    transform: translateY(0);
+}
+
+/* 2. BOTÓN ELIMINAR (Delete) */
+.btn-action-delete {
+    background: transparent;
+    color: #94a3b8; /* Gris suave por defecto (no llama la atención) */
+    border: 1px solid transparent;
+}
+
+.btn-action-delete:hover {
+    background-color: #fef2f2; /* Fondo rojo muy pálido */
+    color: #ef4444; /* Icono rojo vivo */
+    border-color: #fecaca;
+}
+
+.btn-action-delete:active {
+    background-color: #fee2e2;
+}
+
+/* Iconos SVG internos */
+.btn-action svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5px; /* Un poco más grueso para que se vea nítido */
 }

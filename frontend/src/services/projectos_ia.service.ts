@@ -30,3 +30,18 @@ export const listarMetodologias = async () => {
     const res = await api.get("/metodologias"); // Asumiendo que esta ruta existe
     return res.data;
 };
+
+export const desglosarTareaConIA = async (titulo: string, descripcion: string) => {
+    try {
+        // NOTA: La URL correcta es /proyectos-ia/desglosar-tarea
+        // (Porque en index.ts definiste: app.use("/api/proyectos-ia", ...))
+        const response = await api.post("/proyectos-ia/desglosar-tarea", { 
+            titulo_tarea: titulo,
+            descripcion_tarea: descripcion 
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error al desglosar tarea:", error);
+        throw error;
+    }
+};

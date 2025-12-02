@@ -2,6 +2,8 @@ import React from 'react'
 import Sidebar from '../organisms/Sidebar'
 import './Contenido.css'
 import Header from '../organisms/Header/Header'
+// 👇 1. IMPORTAR EL CHAT
+import ChatFlotante from '../organisms/ChatFlotante'
 
 interface ContenidoProps {
   children?: React.ReactNode;
@@ -9,7 +11,7 @@ interface ContenidoProps {
 
 const Contenido: React.FC<ContenidoProps> = ({ children }) => {
   return (
-    <div className="inicio-page">
+    <div className="inicio-page" style={{ position: 'relative', minHeight: '100vh' }}>
       <Header u={null} />
       <div className="contnt">
         <Sidebar />
@@ -18,6 +20,9 @@ const Contenido: React.FC<ContenidoProps> = ({ children }) => {
           {children}
         </div>
       </div>
+
+      {/* 👇 2. AQUÍ VA EL CHAT FLOTANTE */}
+      <ChatFlotante />
     </div>
   );
 };
