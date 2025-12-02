@@ -16,7 +16,7 @@ router.get(
     failureRedirect: "http://localhost:5173/login?error=github",
   }),
   (req, res) => {
-    res.redirect("http://localhost:5173/proyecto-principal");
+    res.redirect("http://localhost:5173/inicio");
   }
 );
 

@@ -1,56 +1,167 @@
-
+/* ============================= */
+/*        ESTILOS GLOBALES       */
+/* ============================= */
 .principal {
   font-family: "Poppins", sans-serif;
   background: linear-gradient(180deg, #050a30, #0b3d91);
   color: white;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* 🔹 NAVBAR */
-.navbar {
+.landing-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ============================= */
+/*           NAVBAR               */
+/* ============================= */
+.navbar-fancy {
+  position: fixed; /* MODIFICADO: fixed en lugar de sticky */
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 20px 0;
+  overflow: hidden;
+  background: rgba(15, 15, 35, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+}
+
+.navbar-fancy .nav-links {
   display: flex;
   justify-content: center;
-  padding: 1.2rem;
-  background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(6px);
-}
-.navbar ul {
+  align-items: center; /* AGREGADO: alinea verticalmente */
+  gap: 40px;
   list-style: none;
-  display: flex;
-  gap: 2rem;
-  margin: 0;
-  padding: 0;
-}
-.navbar li a {
-  color: #ffcc80;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s;
-}
-.navbar li a:hover {
-  color: #ffffff;
+  position: relative;
+  z-index: 2;
+  margin: 0; /* AGREGADO: elimina márgenes */
+  padding: 0; /* AGREGADO: elimina padding */
 }
 
-/* 🔹 HERO SECTION */
+.navbar-fancy .nav-links li {
+  display: flex; /* AGREGADO: para alinear contenido */
+  align-items: center; /* AGREGADO: centra verticalmente el contenido */
+}
+
+.navbar-fancy .nav-links li a,
+.navbar-fancy .nav-links li button {
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 18px;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+  position: relative;
+  line-height: 1; /* AGREGADO: normaliza altura de línea */
+  display: inline-block; /* AGREGADO: para consistencia */
+}
+
+.navbar-fancy .nav-links li a:hover,
+.navbar-fancy .nav-links li button:hover {
+  color: #00e7ff;
+  text-shadow: 0 0 10px #00e7ff, 0 0 20px #00e7ff;
+}
+
+.navbar-fancy .nav-links li a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #00e7ff, #0066ff);
+  border-radius: 3px;
+  transition: 0.3s ease;
+}
+
+.navbar-fancy .nav-links li a:hover::after {
+  width: 100%;
+}
+
+/* ============================= */
+/*      SECCIONES GENERALES       */
+/* ============================= */
+.section-bubbles {
+  position: relative;
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #0a0f2d, #1b1f3b, #111629);
+  color: #fff;
+  overflow: hidden;
+  scroll-margin-top: 80px; /* AGREGADO: offset para scroll suave */
+}
+
+/* BURBUJAS GENERALES */
+.section-bubbles span {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  animation: float 12s infinite ease-in-out;
+  backdrop-filter: blur(8px);
+}
+
+.section-bubbles span:nth-child(1) { top: 10%; left: 15%; animation-duration: 14s; }
+.section-bubbles span:nth-child(2) { top: 60%; left: 5%; animation-duration: 10s; }
+.section-bubbles span:nth-child(3) { top: 50%; right: 10%; animation-duration: 18s; }
+.section-bubbles span:nth-child(4) { top: 20%; right: 20%; animation-duration: 11s; }
+.section-bubbles span:nth-child(5) { bottom: 15%; left: 35%; animation-duration: 13s; }
+
+@keyframes float {
+  0% { transform: translateY(0) scale(1); opacity: 0.4; }
+  50% { transform: translateY(-25px) scale(1.05); opacity: 0.8; }
+  100% { transform: translateY(0) scale(1); opacity: 0.4; }
+}
+
+/* ============================= */
+/*            HERO                */
+/* ============================= */
 .hero {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  padding: 4rem 8%;
+  padding: 2.5rem 8%;
+  padding-top: 100px; /* AGREGADO: espacio para el navbar fijo */
+  text-align: center;
+  gap: 2rem;
   position: relative;
 }
+
 .hero-text {
-  max-width: 550px;
+  max-width: 500px;
 }
+
 .logo {
-  font-size: 3rem;
+  font-size: 2.5rem;
   color: white;
+  font-weight: 700;
 }
+
 .slogan {
   font-style: italic;
   color: #f2c879;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
 }
+
+.descripcion {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #ddd;
+  line-height: 1.5;
+}
+
 .btn-main {
   background-color: #f4a261;
   padding: 12px 30px;
@@ -59,24 +170,81 @@
   text-decoration: none;
   font-weight: bold;
   transition: 0.3s;
+  display: inline-block; /* AGREGADO: para mejor control */
+  margin-bottom: 1.5rem; /* AGREGADO: espacio antes de la imagen */
 }
+
 .btn-main:hover {
   background-color: #e76f51;
   transform: translateY(-5px);
 }
-.descripcion {
-  margin-top: 2rem;
-  font-size: 1.1rem;
-  color: #ddd;
-}
-.circle {
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle at center, #b38728, #6f4e00);
-  border-radius: 50%;
+
+/* IMAGEN PRINCIPAL - CORREGIDA */
+.main-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 400px; /* MODIFICADO: limita el ancho máximo */
+  margin: 0 auto;
 }
 
-/* 🔹 FEATURES */
+.imgmain {
+  width: 100%;
+  max-width: 300px; /* AGREGADO: tamaño máximo de la imagen */
+  height: auto;
+  object-fit: contain; /* AGREGADO: mantiene proporciones */
+  border-radius: 15px;
+  transition: transform 0.3s ease-out;
+}
+
+.imgmain:hover {
+  transform: scale(1.05);
+}
+
+/* Si usas el contenedor .parent y .card (por si acaso) */
+.parent {
+  width: 100%;
+  max-width: 300px; /* MODIFICADO: reducido de 350px */
+  height: auto;
+  aspect-ratio: 1 / 1;
+  perspective: 1000px;
+  margin: 0 auto;
+}
+
+.card {
+  height: 100%;
+  background: linear-gradient(135deg, #040684, #cbaa18);
+  transition: transform 0.3s ease-in-out;
+  transform-style: preserve-3d;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 30px;
+  display: flex; /* AGREGADO */
+  justify-content: center; /* AGREGADO */
+  align-items: center; /* AGREGADO */
+}
+
+.card img {
+  width: 70%; /* MODIFICADO: reducido de 50% */
+  height: 70%; /* MODIFICADO: reducido de 50% */
+  object-fit: cover;
+  border-radius: 15px;
+  transition: transform 0.3s ease-out;
+}
+
+.parent:hover .card {
+  transform: rotateY(10deg) rotateX(10deg);
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 20px 40px;
+}
+
+.parent:hover .card img {
+  transform: scale(1.1) rotateY(10deg) rotateX(10deg);
+}
+
+/* ============================= */
+/*          FEATURES              */
+/* ============================= */
 .features {
   display: flex;
   flex-wrap: wrap;
@@ -84,91 +252,169 @@
   gap: 2rem;
   margin: 4rem 0;
 }
+
 .feature {
   width: 250px;
   text-align: center;
 }
+
 .feature img {
   width: 100%;
   border-radius: 10px;
   margin-bottom: 1rem;
   transition: transform 0.3s;
-  
 }
+
 .feature:hover img {
   transform: scale(1.05);
 }
+
 .feature h3 {
   color: #f2c879;
 }
 
-/* 🔹 HOW IT WORKS */
-.how-it-works {
-  
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 3rem 2rem;
-  border-radius: 10px;
-  max-width: 80%;
+/* ============================= */
+/*           NOSOTROS             */
+/* ============================= */
+.nosotros-section {
   text-align: center;
-  margin: 0 auto;
-}
-.how-it-works h2 {
-  color: #fff;
-  margin-bottom: 2rem;
-}
-.steps {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-}
-.step {
-  background: white;
-  color: #0a1a3d;
-  padding: 1.5rem;
-  border-radius: 10px;
-  width: 250px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-.circle-num {
-  width: 40px;
-  height: 40px;
-  background: #f2c879;
-  color: #0a1a3d;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin: 0 auto 1rem;
+  position: relative;
+  padding: 60px 20px;
 }
 
-/* 🔹 CTA */
-.cta {
-  text-align: center;
-  background: linear-gradient(135deg, #0b3d91, #050a30);
-  padding: 3rem 1rem;
-  border-top: 1px solid rgba(255,255,255,0.2);
-}
-.cta h3 {
+.nosotros-header h2 {
   font-size: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 10px;
+  font-weight: 700;
 }
-.cta p {
-  margin-bottom: 2rem;
+
+.nosotros-header p {
+  font-size: 1rem;
+  color: #dcdcdc;
+  margin-bottom: 40px;
 }
-.btn-gradient {
-  padding: 12px 35px;
+
+.nosotros-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.nosotros-card {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 25px;
+  border-radius: 20px;
+  width: 250px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nosotros-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 136, 255, 0.4);
+}
+
+.nosotros-card img {
+  width: 100%;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+
+.nosotros-card h3 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.nosotros-card p {
+  font-size: 0.95rem;
+  color: #e0e0e0;
+}
+
+/* ============================= */
+/*         CONTACTO               */
+/* ============================= */
+.contacto-section {
+  position: relative;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.contacto-title {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.contacto-sub {
+  color: #dcdcdc;
+  font-size: 1rem;
+  margin-bottom: 40px;
+}
+
+.contact-card-glass {
+  width: 90%;
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 25px;
-  background: linear-gradient(90deg, #a97100, #ffcc80);
-  color: #0a1a3d;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contact-input,
+.contact-textarea {
+  width: 100%;
+  padding: 13px 15px;
+  font-size: 1rem;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.16);
+  transition: 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.contact-input:focus,
+.contact-textarea:focus {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.02);
+}
+
+.contact-textarea { height: 120px; resize: none; }
+
+.contact-btn {
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00aaff, #0055ff);
+  color: #ffffff;
+  font-size: 1.1rem;
   font-weight: bold;
-  text-decoration: none;
+  border: none;
+  cursor: pointer;
   transition: 0.3s;
 }
-.btn-gradient:hover {
-  transform: translateY(-5px);
-  background: linear-gradient(90deg, #ffcc80, #a97100);
+
+.contact-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 136, 255, 0.4);
 }
-/* Animación fadeIn para las características */ @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } } /* Contenedor para aplicar la perspectiva */ .parent { width: 500px; height: 500px; perspective: 1000px; /* Esto define el "campo de visión" 3D */ } .main-image{ display: flex; justify-content: center; /* Centrado horizontal */ align-items: center; } .card { height: 100%; background: linear-gradient(135deg, #040684, #cbaa18); /* Fondo bonito */ transition: transform 0.3s ease-in-out; /* Suaviza el movimiento */ transform-style: preserve-3d; border-radius: 15px; overflow: hidden; /* Para que el efecto no se desborde */ box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 30px; } .card img { width: 100%; /* Para que la imagen ocupe todo el contenedor */ height: 100%; object-fit: cover; /* Asegura que la imagen se ajuste bien */ transition: transform 0.3s ease-out; transform-origin: center; border-radius: 15px; } /* Efecto cuando el cursor se mueve sobre el contenedor */ .parent:hover .card { transform: rotateY(10deg) rotateX(10deg); /* Gira la carta en el eje X y Y */ box-shadow: rgba(0, 0, 0, 0.4) 0px 20px 40px; } .parent:hover .card img { transform: scale(1.1) rotateY(10deg) rotateX(10deg); /* Aumenta el tamaño y da un pequeño giro */ } /* Efecto cuando el cursor se acerca */ .card:hover { transform: translate3d(0, 0, 100px); /* Eleva la carta en Z */ } .landing { display: flex; height: 100vh; background-color: #fafafa; }
+
+/* ============================= */
+/*         ANIMACIONES            */
+/* ============================= */
+@keyframes fadeIn { 
+  to { opacity: 1; transform: translateY(0); } 
+}
