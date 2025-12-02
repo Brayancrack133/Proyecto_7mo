@@ -27,7 +27,7 @@ export default function Header({ u }: HeaderProps) {
 
       <div className="header-right">
         <span className="user-name">
-          {u ? `${u.nombre} ${u.apellido}` : "Mi cuenta"}
+          {u ? `${u.nombre} ${u.apellido}` : "Administrador"}
         </span>
 
         <div

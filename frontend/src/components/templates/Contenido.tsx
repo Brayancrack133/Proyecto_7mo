@@ -1,7 +1,7 @@
 import React from 'react'
 import Sidebar from '../organisms/Sidebar'
 import './Contenido.css'
-import Header from '../organisms/Header/Header'
+import Header from '../organisms/Head'
 
 interface ContenidoProps {
   children?: React.ReactNode;
@@ -10,7 +10,7 @@ interface ContenidoProps {
 const Contenido: React.FC<ContenidoProps> = ({ children }) => {
   return (
     <div className="inicio-page">
-      <Header u={null} />
+      <Header />
       <div className="contnt">
         <Sidebar />
 
