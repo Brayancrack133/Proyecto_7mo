@@ -23,11 +23,7 @@ export default function Header({ u }: HeaderProps) {
         <div className="loguito"><img  className="logoF" src="/Images/LogoF.png" alt="" /></div>
         
 
-        <nav className="nav-links">
-          
-          <Link to="/proyectos">Mis Proyectos</Link>
-          <Link to="/repositorio">Repositorio</Link>
-        </nav>
+        
       </div>
 
       <div className="header-right">

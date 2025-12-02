@@ -1,0 +1,9 @@
+/* Esto ocultará la barra en el contenedor específico de inicio */
+.bshet {
+  gap: 10px;
+}
+
+/* Ocultar barra Chrome/Safari/Opera */
+.bshet::-webkit-scrollbar {
+    display: none; 
+}
