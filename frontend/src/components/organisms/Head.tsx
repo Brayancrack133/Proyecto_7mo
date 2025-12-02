@@ -31,7 +31,7 @@ const Header = () => {
         >
           <img
                     className="avatar"
-                    src="/avatar.png"
+                    src="/Images/User.png"
                     alt="Avatar Usuario"
                 />
 
