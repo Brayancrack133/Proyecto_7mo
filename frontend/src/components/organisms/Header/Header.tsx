@@ -38,7 +38,7 @@ export default function Header({ u }: HeaderProps) {
 
           {open && (
            <div className="dropdown">
-  <a href="/login" className="logout-btn">Cerrar sesión</a>
+  <a href="/login" >Cerrar sesión</a>
 </div>
 
           )}
